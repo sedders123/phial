@@ -137,8 +137,8 @@ class Phial():
         output_list = slack_rtm_output
         if output_list and len(output_list) > 0:
             for output in output_list:
-                if(output and 'text' in output
-                   and output['text'].startswith(self.config['prefix'])):
+                if(output and 'text' in output and
+                   output['text'].startswith(self.config['prefix'])):
                     return output['text'][1:], output['channel']
         return None, None
 
