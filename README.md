@@ -1,5 +1,7 @@
 # phial
 
+[![Documentation Status](https://readthedocs.org/projects/phial/badge/?version=latest)](http://phial.readthedocs.io/en/latest/)
+
 
 > A simple framework for building slack bots
 

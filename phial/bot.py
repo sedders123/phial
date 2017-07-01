@@ -7,57 +7,106 @@ from .wrappers import Command, Message
 
 class Phial():
     '''
-    The Phial object acts as the central object. It is gieven a token and an
-    optional config file. Once created it hold the core components of the bot,
-    including command functions, command patterns and more.
+    The Phial object acts as the central object. It is given a token and an
+    optional config dictionary. Once created it holds the core components of
+    the bot, including command functions, command patterns and more.
     '''
-    DEFAULT_CONFIG = {
+
+    #: Default configuration
+    default_config = {
         'prefix': '!',
         'read_websocket_delay': 1
     }
 
-    def __init__(self, token, config=DEFAULT_CONFIG):
+    def __init__(self, token, config=default_config):
         self.slack_client = SlackClient(token)
         self.commands = []
         self.command_functions = {}
         self.config = config
 
     @staticmethod
-    def build_command_pattern(command):
-        '''Creates the command pattern reg exs'''
+    def _build_command_pattern(command):
+        '''Creates the command pattern regexs'''
         command_regex = re.sub(r'(<\w+>)', r'(?P\1.+)', command)
         return re.compile("^{}$".format(command_regex))
 
     @staticmethod
-    def get_base_command(command):
+    def _get_base_command(command):
         '''Gets the root part of the command'''
         return command.split(" ")[0]
 
-    def add_command(self, command_str, command_func):
-        '''Creates a command pattern and adds a command function to the bot'''
-        command_pattern = self.build_command_pattern(command_str)
-        base_command = self.get_base_command(command_str)
+    def add_command(self, command_pattern_template, command_func):
+        '''
+        Creates a command pattern and adds a command function to the bot. This
+        is the same as :meth:`command`.
+
+        ::
+
+            @bot.command('hello')
+            def world():
+                pass
+
+        Is the same as ::
+
+            def world():
+                pass
+            bot.add_command('hello', world)
+
+        Args:
+            command_pattern_template(str): A string that will be used to create
+                                           a command_pattern regex
+            command_func(func): The fucntion to be run when the command pattern
+                                is matched
+        Raises:
+            ValueError
+                If command with the same name already registered
+        '''
+        command_pattern = self._build_command_pattern(command_pattern_template)
+        base_command = self._get_base_command(command_pattern_template)
         if base_command not in self.command_functions:
             self.command_functions[base_command] = command_func
             self.commands.append((command_pattern, base_command))
         else:
             raise ValueError('Command {0} already exists'.format(base_command))
 
-    def get_command_match(self, command):
+    def get_command_match(self, text):
         '''
         Returns a command function for the command pattern that is matched.
         Will returns None if no match
+
+        Args:
+            text(str): The string to be matched to a command
+
+        Returns:
+            A :class:`~phial.wrappers.Command` object if a match is found
+            otherwise :obj:`None`
         '''
-        for command_pattern, command_function in self.commands:
-            m = command_pattern.match(command)
+        for command_pattern, base_command in self.commands:
+            m = command_pattern.match(text)
             if m:
-                return m.groupdict(), command_function
+                return m.groupdict(), base_command
         return None
 
-    def command(self, command_text):
-        '''A decorator for add_command'''
+    def command(self, command_pattern_template):
+        '''
+        A decorator that is used to register a command function for a gievn
+        command. This does the same as :meth:`add_command` but is used as a
+        decorator.
+
+        Args:
+            command_pattern_template(str): A string that will be used to create
+                                           a command_pattern regex
+
+        Example:
+            ::
+
+                @bot.command('hello')
+                def world():
+                    pass
+
+        '''
         def decorator(f):
-            self.add_command(command_text, f)
+            self.add_command(command_pattern_template, f)
         return decorator
 
     def _create_command(self, text, channel):
@@ -94,13 +143,19 @@ class Phial():
         return None, None
 
     def send_message(self, message):
-        '''Posts a Message to Slack'''
+        '''
+        Takes a message object and then sends the message to Slack
+
+        Args:
+            message(Message): message object to be sent to Slack
+
+        '''
         self.slack_client.api_call("chat.postMessage",
                                    channel=message.channel,
                                    text=message.text,
                                    as_user=True)
 
-    def execute_response(self, response):
+    def _execute_response(self, response):
         '''Execute the response of a command function'''
         if isinstance(response, Message):
             self.send_message(response)
@@ -118,7 +173,7 @@ class Phial():
                         command = self._create_command(text, channel)
                         response = self._handle_command(command)
                         if response is not None:
-                            self.execute_response(response)
+                            self._execute_response(response)
                     except ValueError as err:
                         print('ValueError: {}'.format(err))
                 time.sleep(self.config['read_websocket_delay'])
