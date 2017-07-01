@@ -7,7 +7,7 @@ setup(
     license='MIT',
     author='James Seden Smith',
     author_email='sedders123@gmail.com',
-    description='A slack bot framwork',
+    description='A slack bot framework',
     packages=['phial'],
     include_package_data=True,
     zip_safe=False,

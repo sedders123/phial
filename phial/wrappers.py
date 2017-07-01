@@ -1,4 +1,5 @@
 class Command():
+    '''The command object used by Phial.'''
     def __init__(self, base_command, channel, args):
         self.base_command = base_command
         self.channel = channel
@@ -10,6 +11,7 @@ class Command():
 
 
 class Message():
+    '''The message class object used by Phial.'''
     def __init__(self, text, channel):
         self.text = text
         self.channel = channel

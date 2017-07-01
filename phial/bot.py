@@ -30,6 +30,7 @@ class Phial():
 
     @staticmethod
     def get_base_command(command):
+        '''Gets the root part of the command'''
         return command.split(" ")[0]
 
     def add_command(self, command_str, command_func):
@@ -60,6 +61,7 @@ class Phial():
         return decorator
 
     def _create_command(self, text, channel):
+        '''Creates an instance of a command'''
         command_match = self.get_command_match(text)
         if command_match:
             kwargs, base_command = command_match
@@ -69,6 +71,7 @@ class Phial():
                              .format(text))
 
     def _handle_command(self, command):
+        '''Executes a given command'''
         try:
             _command_ctx_stack.push(command)
             return self.command_functions[command.base_command](**command
@@ -91,6 +94,7 @@ class Phial():
         return None, None
 
     def send_message(self, message):
+        '''Posts a Message to Slack'''
         self.slack_client.api_call("chat.postMessage",
                                    channel=message.channel,
                                    text=message.text,
@@ -102,6 +106,7 @@ class Phial():
             self.send_message(response)
 
     def run(self):
+        '''Connects to slack client and handles incoming messages'''
         slack_client = self.slack_client
         if slack_client.rtm_connect():
             print("Phial connected and running!")
