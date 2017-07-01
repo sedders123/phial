@@ -1,6 +1,7 @@
 # phial
 
 [![Documentation Status](https://readthedocs.org/projects/phial/badge/?version=develop)](http://phial.readthedocs.io/en/develop/)
+[![CircleCI](https://circleci.com/gh/sedders123/phial.svg?style=svg)](https://circleci.com/gh/sedders123/phial)
 
 
 > A simple framework for building slack bots
@@ -54,7 +55,6 @@ More example bots can be found in the [examples](examples/) folder
 If a feature is missing, or you can improve the code please submit a PR or raise an Issue
 
 ## TODO:
- - Documentation
  - Tests
  - PyPi Package
  - Send files
