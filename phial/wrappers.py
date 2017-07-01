@@ -1,12 +1,12 @@
 class Command():
-    def __init__(self, command, channel, args):
-        self.command = command
+    def __init__(self, base_command, channel, args):
+        self.base_command = base_command
         self.channel = channel
         self.args = args
 
     def __repr__(self):
-        return "<Command: {0}, {1} in {2}>".format(self.command, self.args,
-                                                   self.channel)
+        return "<Command: {0}, {1} in {2}>".format(self.base_command,
+                                                   self.args, self.channel)
 
 
 class Message():

@@ -19,6 +19,7 @@ class Phial():
     def __init__(self, token, config=DEFAULT_CONFIG):
         self.slack_client = SlackClient(token)
         self.commands = []
+        self.command_functions = {}
         self.config = config
 
     @staticmethod
@@ -27,10 +28,19 @@ class Phial():
         command_regex = re.sub(r'(<\w+>)', r'(?P\1.+)', command)
         return re.compile("^{}$".format(command_regex))
 
+    @staticmethod
+    def get_base_command(command):
+        return command.split(" ")[0]
+
     def add_command(self, command_str, command_func):
         '''Creates a command pattern and adds a command function to the bot'''
         command_pattern = self.build_command_pattern(command_str)
-        self.commands.append((command_pattern, command_func))
+        base_command = self.get_base_command(command_str)
+        if base_command not in self.command_functions:
+            self.command_functions[base_command] = command_func
+            self.commands.append((command_pattern, base_command))
+        else:
+            raise ValueError('Command {0} already exists'.format(base_command))
 
     def get_command_match(self, command):
         '''
@@ -49,20 +59,20 @@ class Phial():
             self.add_command(command_text, f)
         return decorator
 
+    def _create_command(self, text, channel):
+        command_match = self.get_command_match(text)
+        if command_match:
+            kwargs, base_command = command_match
+            return Command(base_command, channel, kwargs)
+        else:
+            raise ValueError('Command "{}" has not been registered'
+                             .format(text))
 
-    def _handle_command(self, command, channel):
-        command_match = self.get_command_match(command)
+    def _handle_command(self, command):
         try:
-            if command_match:
-                base_command = command.split(" ")[0]
-                kwargs, command_function = command_match
-                _command_ctx_stack.push(Command(base_command, channel, kwargs))
-                return command_function(**kwargs)
-            else:
-                raise ValueError('Command "{}" has not been registered'
-                                 .format(command))
-        except ValueError as err:
-            print('ValueError: {}'.format(err))
+            _command_ctx_stack.push(command)
+            return self.command_functions[command.base_command](**command
+                                                                .args)
         finally:
             _command_ctx_stack.pop()
 
@@ -96,12 +106,16 @@ class Phial():
         if slack_client.rtm_connect():
             print("Phial connected and running!")
             while True:
-                command, channel = self._parse_slack_output(slack_client
-                                                            .rtm_read())
-                if command and channel:
-                    response = self._handle_command(command, channel)
-                    if response is not None:
-                        self.execute_response(response)
+                text, channel = self._parse_slack_output(slack_client
+                                                         .rtm_read())
+                if text and channel:
+                    try:
+                        command = self._create_command(text, channel)
+                        response = self._handle_command(command)
+                        if response is not None:
+                            self.execute_response(response)
+                    except ValueError as err:
+                        print('ValueError: {}'.format(err))
                 time.sleep(self.config['read_websocket_delay'])
         else:
             print("Connection failed. Invalid Slack token or bot ID?")
