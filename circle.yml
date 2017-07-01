@@ -1,0 +1,12 @@
+machine:
+  python:
+    version: 3.6.0
+
+dependencies:
+
+  post:
+    - pip install -r dev-requirements.txt
+
+test:
+  post:
+    - flake8 phial/
