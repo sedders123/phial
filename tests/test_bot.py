@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
-from phial import Phial, command, Message
+from phial import Phial, command, Response
 import phial.wrappers
 import re
 from .helpers import captured_output, MockTrueFunc
@@ -128,10 +128,10 @@ class TestCreateCommand(TestPhialBot):
 
     def test_basic_functionality(self):
         self.bot.commands = [(re.compile('^test$'), 'test')]
-        command_message = phial.wrappers.CommandMessage('test',
-                                                        'channel_id',
-                                                        'user',
-                                                        'timestamp')
+        command_message = phial.wrappers.Message('test',
+                                                 'channel_id',
+                                                 'user',
+                                                 'timestamp')
         command = self.bot._create_command(command_message)
         expected_command = phial.wrappers.Command('test',
                                                   'channel_id',
@@ -142,10 +142,10 @@ class TestCreateCommand(TestPhialBot):
 
     def test_basic_functionality_with_args(self):
         self.bot.commands = [(re.compile('^test (?P<one>.+)$'), 'test')]
-        command_message = phial.wrappers.CommandMessage('test first',
-                                                        'channel_id',
-                                                        'user',
-                                                        'timestamp')
+        command_message = phial.wrappers.Message('test first',
+                                                 'channel_id',
+                                                 'user',
+                                                 'timestamp')
         command = self.bot._create_command(command_message)
         expected_command = phial.wrappers.Command('test',
                                                   'channel_id',
@@ -156,10 +156,10 @@ class TestCreateCommand(TestPhialBot):
 
     def test_errors_when_no_command_match(self):
         with self.assertRaises(ValueError) as context:
-            command_message = phial.wrappers.CommandMessage('test',
-                                                            'channel_id',
-                                                            'user',
-                                                            'timestamp')
+            command_message = phial.wrappers.Message('test',
+                                                     'channel_id',
+                                                     'user',
+                                                     'timestamp')
             self.bot._create_command(command_message)
         self.assertTrue('Command "test" has not been registered'
                         in str(context.exception))
@@ -223,11 +223,10 @@ class TestParseSlackOutput(TestPhialBot):
                                 'ts': 'timestamp'
                                }]
         command_message = self.bot._parse_slack_output(sample_slack_output)
-        expected_command_message = phial.wrappers.CommandMessage('test',
-                                                                 'channel_id',
-                                                                 'user_id',
-                                                                 'timestamp'
-                                                                 )
+        expected_command_message = phial.wrappers.Message('test',
+                                                          'channel_id',
+                                                          'user_id',
+                                                          'timestamp')
         self.assertEquals(command_message, expected_command_message)
 
     def test_returns_none_correctly_for_normal_message(self):
@@ -248,7 +247,7 @@ class TestSendMessage(TestPhialBot):
     def test_basic_functionality(self):
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.api_call = MagicMock(return_value="test")
-        message = Message(text='Hi test', channel='channel_id')
+        message = Response(text='Hi test', channel='channel_id')
         self.bot.send_message(message)
 
         self.bot.slack_client.api_call.assert_called_with('chat.postMessage',
@@ -257,14 +256,70 @@ class TestSendMessage(TestPhialBot):
                                                           as_user=True)
 
 
+class TestSendReaction(TestPhialBot):
+    '''Test phial's send_message function'''
+
+    def test_basic_functionality(self):
+        self.bot.slack_client = MagicMock()
+        self.bot.slack_client.api_call = MagicMock()
+
+        response = Response(reaction='x',
+                            channel='channel_id',
+                            original_ts='timestamp')
+        self.bot.send_reaction(response)
+
+        self.bot.slack_client.api_call \
+            .assert_called_with("reactions.add",
+                                channel=response.channel,
+                                timestamp=response.original_ts,
+                                name=response.reaction,
+                                as_user=True)
+
+
 class TestExecuteResponse(TestPhialBot):
     '''Test phial's execute_response function'''
 
-    def test_basic_functionality(self):
+    def test_send_message(self):
         self.bot.send_message = MagicMock()
-        message = Message(text='Hi test', channel='channel_id')
-        self.bot._execute_response(message)
-        self.bot.send_message.assert_called_with(message)
+        response = Response(text='Hi test', channel='channel_id')
+        self.bot._execute_response(response)
+        self.bot.send_message.assert_called_with(response)
+
+    def test_send_reply(self):
+        self.bot.send_message = MagicMock()
+        response = Response(text='Hi test',
+                            channel='channel_id',
+                            original_ts='timestamp')
+        self.bot._execute_response(response)
+        self.bot.send_message.assert_called_with(response)
+
+    def test_send_reaction(self):
+        self.bot.send_reaction = MagicMock()
+        response = Response(reaction='x',
+                            channel='channel_id',
+                            original_ts='timestamp')
+        self.bot._execute_response(response)
+        self.bot.send_reaction.assert_called_with(response)
+
+    def test_errors_on_invalid_response(self):
+        with self.assertRaises(ValueError) as context:
+            self.bot._execute_response('test')
+        self.assertTrue('Only Response objects can be excecuted'
+                        in str(context.exception))
+
+    def test_errors_with_reaction_and_reply(self):
+        response = Response(reaction='x',
+                            text='test',
+                            channel='channel_id',
+                            original_ts='timestamp')
+
+        with self.assertRaises(ValueError) as context:
+            self.bot._execute_response(response)
+
+        error_msg = 'Response objects with an original timestamp can ' \
+                    + 'only have one of the attributes: Reaction, ' \
+                    + 'Text'
+        self.assertTrue(error_msg in str(context.exception))
 
 
 class TestRun(TestPhialBot):
@@ -277,17 +332,16 @@ class TestRun(TestPhialBot):
 
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.rtm_connect = MagicMock(return_value=True)
-        command_message = phial.wrappers.CommandMessage('test',
-                                                        'channel_id',
-                                                        'user',
-                                                        'timestamp')
+        command_message = phial.wrappers.Message('test',
+                                                 'channel_id',
+                                                 'user',
+                                                 'timestamp')
         self.bot._parse_slack_output = MagicMock(return_value=command_message)
         test_command = phial.wrappers.Command('test',
                                               'channel_id',
                                               {},
                                               'user_id',
-                                              'timestamp'
-                                              )
+                                              'timestamp')
         self.bot._create_command = MagicMock(return_value=test_command)
         self.bot._handle_command = MagicMock()
 
@@ -306,11 +360,10 @@ class TestRun(TestPhialBot):
     def test_errors_with_invalid_command(self):
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.rtm_connect = MagicMock(return_value=True)
-        test_command = phial.wrappers.CommandMessage('test',
-                                                     'channel_id',
-                                                     'user_id',
-                                                     'timestamp'
-                                                     )
+        test_command = phial.wrappers.Message('test',
+                                              'channel_id',
+                                              'user_id',
+                                              'timestamp')
         self.bot._parse_slack_output = MagicMock(return_value=test_command)
         with captured_output() as (out, err):
             self.bot.run()

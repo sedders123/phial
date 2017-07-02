@@ -2,7 +2,7 @@ from slackclient import SlackClient
 import time
 import re
 from .globals import _command_ctx_stack
-from .wrappers import Command, Message, CommandMessage
+from .wrappers import Command, Response, Message
 
 
 class Phial():
@@ -146,28 +146,59 @@ class Phial():
             for output in output_list:
                 if(output and 'text' in output and
                    output['text'].startswith(self.config['prefix'])):
-                    return CommandMessage(output['text'][1:],
-                                          output['channel'],
-                                          output['user'],
-                                          output['ts'])
+                    return Message(output['text'][1:],
+                                   output['channel'],
+                                   output['user'],
+                                   output['ts'])
         return None
 
     def send_message(self, message):
         '''
-        Takes a message object and then sends the message to Slack
+        Takes a response object and then sends the message to Slack
 
         Args:
-            message(Message): message object to be sent to Slack
+            message(Response): message object to be sent to Slack
 
         '''
-        self.slack_client.api_call("chat.postMessage",
-                                   channel=message.channel,
-                                   text=message.text,
+        if message.original_ts:
+            self.slack_client.api_call("chat.postMessage",
+                                       channel=message.channel,
+                                       text=message.text,
+                                       thread_ts=message.original_ts,
+                                       as_user=True)
+        else:
+            self.slack_client.api_call("chat.postMessage",
+                                       channel=message.channel,
+                                       text=message.text,
+                                       as_user=True)
+
+    def send_reaction(self, response):
+        '''
+        Takes a response object and then sends the reaction to Slack
+
+        Args:
+            response(Response): response object conataining the reaction to be
+                                sent to Slack
+
+        '''
+        self.slack_client.api_call("reactions.add",
+                                   channel=response.channel,
+                                   timestamp=response.original_ts,
+                                   name=response.reaction,
                                    as_user=True)
 
     def _execute_response(self, response):
         '''Execute the response of a command function'''
-        if isinstance(response, Message):
+        if not isinstance(response, Response):
+            raise ValueError('Only Response objects can be excecuted')
+        if response.original_ts and response.reaction and response.text:
+            raise ValueError('Response objects with an original timestamp can '
+                             + 'only have one of the attributes: Reaction, '
+                             + 'Text')
+
+        if response.original_ts and response.reaction:
+            self.send_reaction(response)
+        elif response.text:
             self.send_message(response)
 
     def is_running(self):

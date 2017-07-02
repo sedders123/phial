@@ -25,9 +25,9 @@ class Command():
         return self.__dict__ == other.__dict__
 
 
-class CommandMessage():
+class Message():
     '''
-    Internal class used by phial to sotre data about the message that initiated
+    Used by phial to store data about the message that initiated
     the command.
 
     Attributes:
@@ -43,28 +43,34 @@ class CommandMessage():
         self.timestamp = timestamp
 
     def __repr__(self):
-        return "<CommandMessage: {0} in {1} at {3}>".format(self.text,
-                                                            self.channel,
-                                                            self.timestamp)
+        return "<Message: {0} in {1} at {3}>".format(self.text,
+                                                     self.channel,
+                                                     self.timestamp)
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
 
-class Message():
+class Response():
     '''
-    The message class object used by Phial.
+    The response class object used by Phial.
 
     Attributes:
-        text(str): The message contents
-        channel(str): The Slack channel ID the message will be sent to
+        channel(str): The Slack channel ID the response will be sent to
+        text(str): The response contents
+        original_ts(str): The timestamp of the original message. If populated
+                          will put the text response in a thread
+        reation(str): The reaction to add to the original message. NOTE: only
+                      works when original_ts is populated
     '''
-    def __init__(self, text, channel):
-        self.text = text
+    def __init__(self, channel, text=None, original_ts=None, reaction=None):
         self.channel = channel
+        self.text = text
+        self.original_ts = original_ts
+        self.reaction = reaction
 
     def __repr__(self):
-        return "<Message: {0} in {1}>".format(self.text, self.channel)
+        return "<Response to {1}>".format(self.text, self.channel)
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
