@@ -244,7 +244,7 @@ class TestParseSlackOutput(TestPhialBot):
 class TestSendMessage(TestPhialBot):
     '''Test phial's send_message function'''
 
-    def test_basic_functionality(self):
+    def test_send_message(self):
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.api_call = MagicMock(return_value="test")
         message = Response(text='Hi test', channel='channel_id')
@@ -254,6 +254,21 @@ class TestSendMessage(TestPhialBot):
                                                           channel='channel_id',
                                                           text='Hi test',
                                                           as_user=True)
+
+    def test_send_reply(self):
+        self.bot.slack_client = MagicMock()
+        self.bot.slack_client.api_call = MagicMock(return_value="test")
+        message = Response(text='Hi test',
+                           channel='channel_id',
+                           original_ts='timestamp')
+        self.bot.send_message(message)
+
+        self.bot.slack_client.api_call \
+            .assert_called_with('chat.postMessage',
+                                channel='channel_id',
+                                text='Hi test',
+                                thread_ts='timestamp',
+                                as_user=True)
 
 
 class TestSendReaction(TestPhialBot):
