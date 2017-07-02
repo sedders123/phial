@@ -26,7 +26,7 @@ Phial is a slack bot framework, modelled loosely on [flask](https://github.com/p
 
 ### Python:
 
-```
+```python
 import Phial, command, Message
 
 bot = Phial('---slack token here---')
