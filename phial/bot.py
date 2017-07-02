@@ -2,7 +2,7 @@ from slackclient import SlackClient
 import time
 import re
 from .globals import _command_ctx_stack
-from .wrappers import Command, Message
+from .wrappers import Command, Message, CommandMessage
 
 
 class Phial():
@@ -112,15 +112,19 @@ class Phial():
             return f
         return decorator
 
-    def _create_command(self, text, channel):
+    def _create_command(self, command_message):
         '''Creates an instance of a command'''
-        command_match = self.get_command_match(text)
+        command_match = self.get_command_match(command_message.text)
         if command_match:
             kwargs, base_command = command_match
-            return Command(base_command, channel, kwargs)
+            return Command(base_command,
+                           command_message.channel,
+                           kwargs,
+                           command_message.user,
+                           command_message.timestamp)
         else:
             raise ValueError('Command "{}" has not been registered'
-                             .format(text))
+                             .format(command_message.text))
 
     def _handle_command(self, command):
         '''Executes a given command'''
@@ -142,8 +146,11 @@ class Phial():
             for output in output_list:
                 if(output and 'text' in output and
                    output['text'].startswith(self.config['prefix'])):
-                    return output['text'][1:], output['channel']
-        return None, None
+                    return CommandMessage(output['text'][1:],
+                                          output['channel'],
+                                          output['user'],
+                                          output['ts'])
+        return None
 
     def send_message(self, message):
         '''
@@ -173,11 +180,11 @@ class Phial():
         if slack_client.rtm_connect():
             print("Phial connected and running!")
             while self.is_running():
-                text, channel = self._parse_slack_output(slack_client
-                                                         .rtm_read())
-                if text and channel:
+                command_message = self._parse_slack_output(slack_client
+                                                           .rtm_read())
+                if command_message:
                     try:
-                        command = self._create_command(text, channel)
+                        command = self._create_command(command_message)
                         response = self._handle_command(command)
                         if response is not None:
                             self._execute_response(response)

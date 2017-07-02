@@ -128,20 +128,39 @@ class TestCreateCommand(TestPhialBot):
 
     def test_basic_functionality(self):
         self.bot.commands = [(re.compile('^test$'), 'test')]
-        command = self.bot._create_command('test', 'channel_id')
-        self.assertTrue(command.base_command == 'test')
-        self.assertTrue(command.channel == 'channel_id')
+        command_message = phial.wrappers.CommandMessage('test',
+                                                        'channel_id',
+                                                        'user',
+                                                        'timestamp')
+        command = self.bot._create_command(command_message)
+        expected_command = phial.wrappers.Command('test',
+                                                  'channel_id',
+                                                  {},
+                                                  'user',
+                                                  'timestamp')
+        self.assertEquals(command, expected_command)
 
     def test_basic_functionality_with_args(self):
         self.bot.commands = [(re.compile('^test (?P<one>.+)$'), 'test')]
-        command = self.bot._create_command('test first', 'channel_id')
-        self.assertTrue(command.base_command == 'test')
-        self.assertTrue(command.channel == 'channel_id')
-        self.assertTrue(command.args == {'one': 'first'})
+        command_message = phial.wrappers.CommandMessage('test first',
+                                                        'channel_id',
+                                                        'user',
+                                                        'timestamp')
+        command = self.bot._create_command(command_message)
+        expected_command = phial.wrappers.Command('test',
+                                                  'channel_id',
+                                                  {'one': 'first'},
+                                                  'user',
+                                                  'timestamp')
+        self.assertEquals(command, expected_command)
 
     def test_errors_when_no_command_match(self):
         with self.assertRaises(ValueError) as context:
-            self.bot._create_command('test', 'channel_id')
+            command_message = phial.wrappers.CommandMessage('test',
+                                                            'channel_id',
+                                                            'user',
+                                                            'timestamp')
+            self.bot._create_command(command_message)
         self.assertTrue('Command "test" has not been registered'
                         in str(context.exception))
 
@@ -153,7 +172,11 @@ class TestHandleCommand(TestPhialBot):
 
         test_func = MagicMock()
         self.bot.add_command('test', test_func)
-        command_instance = phial.wrappers.Command('test', 'channel_id', {})
+        command_instance = phial.wrappers.Command('test',
+                                                  'channel_id',
+                                                  {},
+                                                  'user',
+                                                  'timestamp')
         self.bot._handle_command(command_instance)
 
         self.assertTrue(test_func.called)
@@ -165,7 +188,11 @@ class TestHandleCommand(TestPhialBot):
             self.assertTrue(command.args == {})
 
         self.bot.add_command('test', test_func)
-        command_instance = phial.wrappers.Command('test', 'channel_id', {})
+        command_instance = phial.wrappers.Command('test',
+                                                  'channel_id',
+                                                  {},
+                                                  'user',
+                                                  'timestamp')
         self.bot._handle_command(command_instance)
 
     def test_command_context_pops_correctly(self):
@@ -173,7 +200,11 @@ class TestHandleCommand(TestPhialBot):
             pass
 
         self.bot.add_command('test', test_func)
-        command_instance = phial.wrappers.Command('test', 'channel_id', {})
+        command_instance = phial.wrappers.Command('test',
+                                                  'channel_id',
+                                                  {},
+                                                  'user',
+                                                  'timestamp')
         self.bot._handle_command(command_instance)
 
         with self.assertRaises(RuntimeError) as context:
@@ -185,22 +216,30 @@ class TestHandleCommand(TestPhialBot):
 class TestParseSlackOutput(TestPhialBot):
 
     def test_basic_functionality(self):
-        sample_slack_output = [{'text': '!test', 'channel': 'channel_id'}]
-        command, channel = self.bot._parse_slack_output(sample_slack_output)
-        self.assertTrue(command == 'test')
-        self.assertTrue(channel == 'channel_id')
+        sample_slack_output = [{
+                                'text': '!test',
+                                'channel': 'channel_id',
+                                'user': 'user_id',
+                                'ts': 'timestamp'
+                               }]
+        command_message = self.bot._parse_slack_output(sample_slack_output)
+        expected_command_message = phial.wrappers.CommandMessage('test',
+                                                                 'channel_id',
+                                                                 'user_id',
+                                                                 'timestamp'
+                                                                 )
+        self.assertEquals(command_message, expected_command_message)
 
     def test_returns_none_correctly_for_normal_message(self):
         sample_slack_output = [{'text': 'test', 'channel': 'channel_id'}]
-        command, channel = self.bot._parse_slack_output(sample_slack_output)
-        self.assertTrue(command is None)
-        self.assertTrue(channel is None)
+        command_message = self.bot._parse_slack_output(sample_slack_output)
+        print(command_message)
+        self.assertTrue(command_message is None)
 
     def test_returns_none_correctly_if_no_messages(self):
         sample_slack_output = []
-        command, channel = self.bot._parse_slack_output(sample_slack_output)
-        self.assertTrue(command is None)
-        self.assertTrue(channel is None)
+        command_message = self.bot._parse_slack_output(sample_slack_output)
+        self.assertTrue(command_message is None)
 
 
 class TestSendMessage(TestPhialBot):
@@ -238,18 +277,24 @@ class TestRun(TestPhialBot):
 
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.rtm_connect = MagicMock(return_value=True)
-        command = 'test'
-        channel = 'channel_id'
-        self.bot._parse_slack_output = MagicMock(return_value=(command,
-                                                               channel))
-        test_command = phial.wrappers.Command('test', 'channel_id', {})
+        command_message = phial.wrappers.CommandMessage('test',
+                                                        'channel_id',
+                                                        'user',
+                                                        'timestamp')
+        self.bot._parse_slack_output = MagicMock(return_value=command_message)
+        test_command = phial.wrappers.Command('test',
+                                              'channel_id',
+                                              {},
+                                              'user_id',
+                                              'timestamp'
+                                              )
         self.bot._create_command = MagicMock(return_value=test_command)
         self.bot._handle_command = MagicMock()
 
         self.bot.run()
         self.bot.slack_client.rtm_connect.assert_called_once()
         self.bot._parse_slack_output.assert_called_once()
-        self.bot._create_command.assert_called_with(command, channel)
+        self.bot._create_command.assert_called_with(command_message)
         self.bot._handle_command.assert_called_with(test_command)
 
     def test_errors_with_invalid_token(self):
@@ -258,16 +303,19 @@ class TestRun(TestPhialBot):
         self.assertTrue('Connection failed. Invalid Token or bot ID'
                         in str(context.exception))
 
-    def test_errors_with_invald_error(self):
+    def test_errors_with_invalid_command(self):
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.rtm_connect = MagicMock(return_value=True)
-        command = 'test'
-        channel = 'channel_id'
-        self.bot._parse_slack_output = MagicMock(return_value=(command,
-                                                               channel))
+        test_command = phial.wrappers.CommandMessage('test',
+                                                     'channel_id',
+                                                     'user_id',
+                                                     'timestamp'
+                                                     )
+        self.bot._parse_slack_output = MagicMock(return_value=test_command)
         with captured_output() as (out, err):
             self.bot.run()
 
         output = out.getvalue().strip()
         expected_message = 'ValueError: Command "test" has not been registered'
+        print(output)
         self.assertTrue(expected_message in output)
