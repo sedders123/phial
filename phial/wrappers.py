@@ -53,15 +53,40 @@ class Message():
 
 class Response():
     '''
-    The response class object used by Phial.
+    When returned in a command function will send a message, or reaction to
+    slack depending on contents.
 
     Attributes:
         channel(str): The Slack channel ID the response will be sent to
         text(str): The response contents
         original_ts(str): The timestamp of the original message. If populated
                           will put the text response in a thread
-        reation(str): The reaction to add to the original message. NOTE: only
-                      works when original_ts is populated
+        reation(str): A valid slack emoji name. NOTE: will only work when
+                      original_ts is populated
+
+    Examples:
+        The following would send a message to a slack channel when executed ::
+
+            @slackbot.command('ping')
+            def ping():
+                return Response(text="Pong", channel='channel_id')
+
+        The following would send a reply to a message in a thread ::
+
+            @slackbot.command('hello')
+            def hello():
+                return Response(text="hi",
+                                channel='channel_id',
+                                original_ts='original_ts')
+
+        The following would send a reaction to a message ::
+
+            @slackbot.command('react')
+            def react():
+                return Response(reaction="x",
+                                channel='channel_id',
+                                original_ts='original_ts')
+
     '''
     def __init__(self, channel, text=None, original_ts=None, reaction=None):
         self.channel = channel
