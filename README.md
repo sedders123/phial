@@ -2,6 +2,7 @@
 
 [![Documentation Status](https://readthedocs.org/projects/phial/badge/?version=develop)](http://phial.readthedocs.io/en/develop/)
 [![CircleCI](https://circleci.com/gh/sedders123/phial.svg?style=svg)](https://circleci.com/gh/sedders123/phial)
+[![Coverage Status](https://coveralls.io/repos/github/sedders123/phial/badge.svg?branch=develop)](https://coveralls.io/github/sedders123/phial?branch=develop)
 
 
 > A simple framework for building slack bots
@@ -57,9 +58,6 @@ If a feature is missing, or you can improve the code please submit a PR or raise
 ## TODO:
  - Tests
  - PyPi Package
- - Send files
- - Respond to messages with emoji
- - Respond to messages in threads
 
 
 ## License
