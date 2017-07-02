@@ -23,6 +23,7 @@ class Phial():
         self.commands = []
         self.command_functions = {}
         self.config = config
+        self.running = False
 
     @staticmethod
     def _build_command_pattern(command):
@@ -71,15 +72,16 @@ class Phial():
 
     def get_command_match(self, text):
         '''
-        Returns a command function for the command pattern that is matched.
+        Returns a dictionary of args and the base command for the command
+        pattern that is matched.
         Will returns None if no match
 
         Args:
             text(str): The string to be matched to a command
 
         Returns:
-            A :class:`~phial.wrappers.Command` object if a match is found
-            otherwise :obj:`None`
+            A :obj:`dict` object with kwargs and the base command if a match
+            is found otherwise :obj:`None`
         '''
         for command_pattern, base_command in self.commands:
             m = command_pattern.match(text)
@@ -107,6 +109,7 @@ class Phial():
         '''
         def decorator(f):
             self.add_command(command_pattern_template, f)
+            return f
         return decorator
 
     def _create_command(self, text, channel):
@@ -160,12 +163,16 @@ class Phial():
         if isinstance(response, Message):
             self.send_message(response)
 
+    def is_running(self):
+        return self.running
+
     def run(self):
         '''Connects to slack client and handles incoming messages'''
+        self.running = True
         slack_client = self.slack_client
         if slack_client.rtm_connect():
             print("Phial connected and running!")
-            while True:
+            while self.is_running():
                 text, channel = self._parse_slack_output(slack_client
                                                          .rtm_read())
                 if text and channel:
@@ -178,4 +185,4 @@ class Phial():
                         print('ValueError: {}'.format(err))
                 time.sleep(self.config['read_websocket_delay'])
         else:
-            print("Connection failed. Invalid Slack token or bot ID?")
+            raise ValueError("Connection failed. Invalid Token or bot ID")

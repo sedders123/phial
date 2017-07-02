@@ -3,10 +3,11 @@ machine:
     version: 3.6.0
 
 dependencies:
-
   post:
     - pip install -r dev-requirements.txt
 
 test:
   post:
-    - flake8 phial/
+    - flake8 phial/ tests/
+    - nosetests --with-coverage --cover-inclusive --cover-package=phial
+    - coveralls

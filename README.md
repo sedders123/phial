@@ -57,9 +57,6 @@ If a feature is missing, or you can improve the code please submit a PR or raise
 ## TODO:
  - Tests
  - PyPi Package
- - Send files
- - Respond to messages with emoji
- - Respond to messages in threads
 
 
 ## License
