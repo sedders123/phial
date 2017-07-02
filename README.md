@@ -33,6 +33,7 @@ bot = Phial('---slack token here---')
 
 @bot.command('greet <name>')
 def greet(name):
+    '''Simple command with argument which replies to a message'''
     return Message(text="hello {}".format(name),
                    channel=command.channel)
 
