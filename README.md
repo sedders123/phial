@@ -8,19 +8,16 @@
 > A simple framework for building slack bots
 
 Phial is a slack bot framework, modelled loosely on [flask](https://github.com/pallets/flask/).
+
+NOTE: This package is still in early development, things are likely to change
+
 ## Table of Contents
 
-- [Install](#install)
 - [Usage](#usage)
+- [Install](#install)
 - [Contribute](#contribute)
-- [Project TODO](#todo)
+- [To Do](#todo)
 - [License](#license)
-
-## Install
-
-```
-  $ pip install git+https://github.com/sedders123/phial
-```
 
 ## Usage
 
@@ -52,14 +49,20 @@ By default the bot requires a prefix of `!` before its commands. This can be cha
 
 More example bots can be found in the [examples](examples/) folder
 
+
+## Install
+
+```
+  $ pip install git+https://github.com/sedders123/phial
+```
+
 ## Contribute
 
 If a feature is missing, or you can improve the code please submit a PR or raise an Issue
 
 ## TODO:
- - Tests
  - PyPi Package
-
+ - Handle commands asynchronously 
 
 ## License
 
