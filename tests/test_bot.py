@@ -1,16 +1,24 @@
 import unittest
-from unittest.mock import MagicMock
-from phial import Phial, command, Response
+from unittest.mock import MagicMock, mock_open
+from phial import Phial, command, Response, Attachment
 import phial.wrappers
 import re
 from .helpers import captured_output, MockTrueFunc
+
+
+class TestPhialBotIsRunning(unittest.TestCase):
+    '''Tests for phial's _is_running function'''
+
+    def test_returns_expected_value(self):
+        bot = Phial('test-token')
+        self.assertFalse(bot._is_running())
 
 
 class TestPhialBot(unittest.TestCase):
 
     def setUp(self):
         self.bot = Phial('test-token')
-        self.bot.is_running = MockTrueFunc()
+        self.bot._is_running = MockTrueFunc()
 
     def tearDown(self):
         self.bot = None
@@ -291,6 +299,25 @@ class TestSendReaction(TestPhialBot):
                                 as_user=True)
 
 
+class TestUploadAttachment(TestPhialBot):
+    '''Test phial's upload_attachment function'''
+
+    def test_basic_functionality(self):
+        self.bot.slack_client = MagicMock()
+        self.bot.slack_client.api_call = MagicMock()
+
+        attachment = Attachment(channel='channel_id',
+                                filename='test.txt',
+                                content=mock_open())
+        self.bot.upload_attachment(attachment)
+
+        self.bot.slack_client.api_call \
+            .assert_called_with("files.upload",
+                                channels=attachment.channel,
+                                filename=attachment.filename,
+                                file=attachment.content)
+
+
 class TestExecuteResponse(TestPhialBot):
     '''Test phial's execute_response function'''
 
@@ -316,11 +343,28 @@ class TestExecuteResponse(TestPhialBot):
         self.bot._execute_response(response)
         self.bot.send_reaction.assert_called_with(response)
 
+    def test_upload_attachment(self):
+        self.bot.upload_attachment = MagicMock()
+        attachment = Attachment(channel='channel_id',
+                                filename='test.txt',
+                                content=mock_open())
+        self.bot._execute_response(attachment)
+        self.bot.upload_attachment.assert_called_with(attachment)
+
     def test_errors_on_invalid_response(self):
         with self.assertRaises(ValueError) as context:
             self.bot._execute_response('test')
-        self.assertTrue('Only Response objects can be excecuted'
-                        in str(context.exception))
+        error_msg = 'Only Response or Attachment objects can be returned ' \
+                    + 'from command functions'
+        self.assertTrue(error_msg in str(context.exception))
+
+    def test_errors_with_invalid_attachment(self):
+        attachment = Attachment(channel="channel_id",
+                                filename="test_file.txt")
+        with self.assertRaises(ValueError) as context:
+            self.bot._execute_response(attachment)
+        error_msg = 'The content field of Attachment objects must be set'
+        self.assertTrue(error_msg in str(context.exception))
 
     def test_errors_with_reaction_and_reply(self):
         response = Response(reaction='x',
@@ -331,6 +375,7 @@ class TestExecuteResponse(TestPhialBot):
         with self.assertRaises(ValueError) as context:
             self.bot._execute_response(response)
 
+        print(context.exception)
         error_msg = 'Response objects with an original timestamp can ' \
                     + 'only have one of the attributes: Reaction, ' \
                     + 'Text'
@@ -385,5 +430,4 @@ class TestRun(TestPhialBot):
 
         output = out.getvalue().strip()
         expected_message = 'ValueError: Command "test" has not been registered'
-        print(output)
         self.assertTrue(expected_message in output)

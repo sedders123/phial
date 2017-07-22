@@ -17,7 +17,7 @@ NOTE: This package is still in early development, things are likely to change
 - [Install](#install)
 - [Contribute](#contribute)
 - [To Do](#todo)
-- [License](#license)
+- [Licenses](#licenses)
 
 ## Usage
 
@@ -62,8 +62,10 @@ If a feature is missing, or you can improve the code please submit a PR or raise
 
 ## TODO:
  - PyPi Package
- - Handle commands asynchronously 
+ - Handle commands asynchronously
 
-## License
+## Licenses
 
-MIT © 2017 James Seden Smith
+phial - MIT © 2017 James Seden Smith
+
+Erlenmeyer Flask by Iconic from the Noun Project - [CC BY 3.0](https://creativecommons.org/licenses/by/3.0/) (used in [examples/phial.png](examples/phial.png))

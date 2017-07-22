@@ -2,7 +2,7 @@ from slackclient import SlackClient
 import time
 import re
 from .globals import _command_ctx_stack
-from .wrappers import Command, Response, Message
+from .wrappers import Command, Response, Message, Attachment
 
 
 class Phial():
@@ -174,10 +174,10 @@ class Phial():
 
     def send_reaction(self, response):
         '''
-        Takes a response object and then sends the reaction to Slack
+        Takes a `Response` object and then sends the reaction to Slack
 
         Args:
-            response(Response): response object conataining the reaction to be
+            response(Response): response object containing the reaction to be
                                 sent to Slack
 
         '''
@@ -187,22 +187,56 @@ class Phial():
                                    name=response.reaction,
                                    as_user=True)
 
+    def upload_attachment(self, attachment):
+        '''
+        Takes an `Attachment` object and then uploads the contents to Slack
+
+        Args:
+            attachment(Attachment): attachment object containing the file to be
+                                    uploaded to Slack
+
+        '''
+        self.slack_client.api_call('files.upload',
+                                   channels=attachment.channel,
+                                   filename=attachment.filename,
+                                   file=attachment.content)
+
     def _execute_response(self, response):
         '''Execute the response of a command function'''
-        if not isinstance(response, Response):
-            raise ValueError('Only Response objects can be excecuted')
-        if response.original_ts and response.reaction and response.text:
-            raise ValueError('Response objects with an original timestamp can '
-                             + 'only have one of the attributes: Reaction, '
-                             + 'Text')
+        if not isinstance(response, Response) and not isinstance(response,
+                                                                 Attachment):
+            raise ValueError('Only Response or Attachment objects can be ' +
+                             'returned from command functions')
+        if isinstance(response, Response):
+            if response.original_ts and response.reaction and response.text:
+                raise ValueError('Response objects with an original timestamp '
+                                 + 'can only have one of the attributes: '
+                                 + 'Reaction, Text')
+            if response.original_ts and response.reaction:
+                self.send_reaction(response)
+            elif response.text:
+                self.send_message(response)
+        if isinstance(response, Attachment):
+            if not response.content:
+                raise ValueError('The content field of Attachment objects ' +
+                                 'must be set')
+            self.upload_attachment(response)
 
-        if response.original_ts and response.reaction:
-            self.send_reaction(response)
-        elif response.text:
-            self.send_message(response)
-
-    def is_running(self):
+    def _is_running(self):
         return self.running
+
+    def _handle_message(self, message: Message):
+        '''
+         Takes a `Message` object and attempts to create a `Command` object
+         and then executes it.
+        '''
+        try:
+            command = self._create_command(message)
+            response = self._handle_command(command)
+            if response is not None:
+                self._execute_response(response)
+        except ValueError as err:
+            print('ValueError: {}'.format(err))
 
     def run(self):
         '''Connects to slack client and handles incoming messages'''
@@ -210,17 +244,11 @@ class Phial():
         slack_client = self.slack_client
         if slack_client.rtm_connect():
             print("Phial connected and running!")
-            while self.is_running():
-                command_message = self._parse_slack_output(slack_client
-                                                           .rtm_read())
-                if command_message:
-                    try:
-                        command = self._create_command(command_message)
-                        response = self._handle_command(command)
-                        if response is not None:
-                            self._execute_response(response)
-                    except ValueError as err:
-                        print('ValueError: {}'.format(err))
+            while self._is_running():
+                message = self._parse_slack_output(slack_client
+                                                   .rtm_read())
+                if message:
+                    self._handle_message(message)
                 time.sleep(self.config['read_websocket_delay'])
         else:
             raise ValueError("Connection failed. Invalid Token or bot ID")

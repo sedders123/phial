@@ -1,4 +1,5 @@
-from phial import Phial, command, Response
+from phial import Phial, command, Response, Attachment
+import os
 
 slackbot = Phial('token-goes-here')
 
@@ -17,10 +18,20 @@ def hello(name):
 
 @slackbot.command('react')
 def react():
-    '''Simple command that reacts to the orginal message'''
+    '''Simple command that reacts to the original message'''
     return Response(reaction="x",
                     channel=command.channel,
                     original_ts=command.message_ts)
+
+
+@slackbot.command('upload')
+def upload():
+    '''Simple command that uploads a set file'''
+    project_dir = os.path.dirname(__file__)
+    file_path = os.path.join(project_dir, 'phial.png')
+    return Attachment(channel=command.channel,
+                      filename='example.txt',
+                      content=open(file_path, 'rb'))
 
 
 @slackbot.command('reply')

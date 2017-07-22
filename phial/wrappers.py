@@ -99,3 +99,23 @@ class Response():
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
+
+
+class Attachment():
+    '''
+    When returned in a command function will send an attachment to Slack
+
+    Attributes:
+        channel(str): The Slack channel ID the file will be sent to
+        filename(str): The filename of the file
+        content(`io.BufferedReader`): The file to send to Slack. Open file
+                                      using open('<file>', 'rb')
+
+    '''
+    def __init__(self, channel, filename=None, content=None):
+        self.channel = channel
+        self.filename = filename
+        self.content = content
+
+    def __repr__(self):
+        return "<Attachment in {0} >".format(self.channel)
