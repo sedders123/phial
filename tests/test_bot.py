@@ -240,7 +240,6 @@ class TestParseSlackOutput(TestPhialBot):
     def test_returns_none_correctly_for_normal_message(self):
         sample_slack_output = [{'text': 'test', 'channel': 'channel_id'}]
         command_message = self.bot._parse_slack_output(sample_slack_output)
-        print(command_message)
         self.assertTrue(command_message is None)
 
     def test_returns_none_correctly_if_no_messages(self):
@@ -375,7 +374,6 @@ class TestExecuteResponse(TestPhialBot):
         with self.assertRaises(ValueError) as context:
             self.bot._execute_response(response)
 
-        print(context.exception)
         error_msg = 'Response objects with an original timestamp can ' \
                     + 'only have one of the attributes: Reaction, ' \
                     + 'Text'
