@@ -24,15 +24,14 @@ NOTE: This package is still in early development, things are likely to change
 ### Python:
 
 ```python
-import Phial, command, Response
+from phial import Phial, command, Response
 
 bot = Phial('---slack token here---')
 
 @bot.command('greet <name>')
 def greet(name):
     '''Simple command with argument which replies to a message'''
-    return Response(text="hello {}".format(name),
-                   channel=command.channel)
+    return "Hello {0}".format(name)
 
 bot.run()
 

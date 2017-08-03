@@ -7,15 +7,14 @@ class Command():
         channel(str): The Slack channel ID the command was called from
         args(dict): Any arguments passed to the command
         user(str): The Slack User ID of the user who intiated the command
-        message_ts(str): The timestamp of the message that initiated the
-                         command
+        message_text(`Message`): The message that initiated the command
     '''
-    def __init__(self, base_command, channel, args, user, message_ts):
+    def __init__(self, base_command, channel, args, user, message):
         self.base_command = base_command
         self.channel = channel
         self.args = args
         self.user = user
-        self.message_ts = message_ts
+        self.message = message
 
     def __repr__(self):
         return "<Command: {0}, {1} in {2}>".format(self.base_command,

@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import MagicMock, mock_open
 from phial import Phial, command, Response, Attachment
 import phial.wrappers
+import phial.globals
 import re
 from .helpers import captured_output, MockTrueFunc
 
@@ -145,7 +146,7 @@ class TestCreateCommand(TestPhialBot):
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  'timestamp')
+                                                  command_message)
         self.assertEquals(command, expected_command)
 
     def test_basic_functionality_with_args(self):
@@ -159,7 +160,7 @@ class TestCreateCommand(TestPhialBot):
                                                   'channel_id',
                                                   {'one': 'first'},
                                                   'user',
-                                                  'timestamp')
+                                                  command_message)
         self.assertEquals(command, expected_command)
 
     def test_errors_when_no_command_match(self):
@@ -189,6 +190,9 @@ class TestHandleCommand(TestPhialBot):
 
         self.assertTrue(test_func.called)
 
+
+class TestCommandContextWorksCorrectly(TestPhialBot):
+
     def test_command_context_works_correctly(self):
         def test_func():
             self.assertTrue(command.base_command == 'test')
@@ -208,12 +212,11 @@ class TestHandleCommand(TestPhialBot):
             pass
 
         self.bot.add_command('test', test_func)
-        command_instance = phial.wrappers.Command('test',
+        command_instance = phial.wrappers.Message('!test',
                                                   'channel_id',
-                                                  {},
                                                   'user',
                                                   'timestamp')
-        self.bot._handle_command(command_instance)
+        self.bot._handle_message(command_instance)
 
         with self.assertRaises(RuntimeError) as context:
             print(command)
@@ -320,6 +323,19 @@ class TestUploadAttachment(TestPhialBot):
 class TestExecuteResponse(TestPhialBot):
     '''Test phial's execute_response function'''
 
+    def test_send_string(self):
+        self.bot.send_message = MagicMock()
+        command_instance = phial.wrappers.Command(base_command="base",
+                                                  channel="channel_id",
+                                                  args={},
+                                                  user="user",
+                                                  message={})
+        phial.globals._command_ctx_stack.push(command_instance)
+        self.bot._execute_response("string")
+        expected_response = Response(text='string', channel='channel_id')
+        self.bot.send_message.assert_called_with(expected_response)
+        phial.globals._command_ctx_stack.pop()
+
     def test_send_message(self):
         self.bot.send_message = MagicMock()
         response = Response(text='Hi test', channel='channel_id')
@@ -352,7 +368,7 @@ class TestExecuteResponse(TestPhialBot):
 
     def test_errors_on_invalid_response(self):
         with self.assertRaises(ValueError) as context:
-            self.bot._execute_response('test')
+            self.bot._execute_response([])
         error_msg = 'Only Response or Attachment objects can be returned ' \
                     + 'from command functions'
         self.assertTrue(error_msg in str(context.exception))

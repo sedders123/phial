@@ -1,7 +1,7 @@
 from slackclient import SlackClient
 import time
 import re
-from .globals import _command_ctx_stack
+from .globals import _command_ctx_stack, command
 from .wrappers import Command, Response, Message, Attachment
 
 
@@ -121,25 +121,22 @@ class Phial():
                            command_message.channel,
                            kwargs,
                            command_message.user,
-                           command_message.timestamp)
+                           command_message)
         else:
             raise ValueError('Command "{}" has not been registered'
                              .format(command_message.text))
 
     def _handle_command(self, command):
         '''Executes a given command'''
-        try:
-            _command_ctx_stack.push(command)
-            return self.command_functions[command.base_command](**command
-                                                                .args)
-        finally:
-            _command_ctx_stack.pop()
+        _command_ctx_stack.push(command)
+        return self.command_functions[command.base_command](**command
+                                                            .args)
 
     def _parse_slack_output(self, slack_rtm_output):
         """
             The Slack Real Time Messaging API is an events firehose.
-            this parsing function returns None unless a message is
-            directed at the Bot, based on its ID.
+            This parsing function returns None unless a message is
+            directed at the Bot, based on the messages prefix.
         """
         output_list = slack_rtm_output
         if output_list and len(output_list) > 0:
@@ -203,8 +200,11 @@ class Phial():
 
     def _execute_response(self, response):
         '''Execute the response of a command function'''
-        if not isinstance(response, Response) and not isinstance(response,
-                                                                 Attachment):
+        if isinstance(response, str):
+            self.send_message(Response(text=response, channel=command.channel))
+
+        elif not isinstance(response, Response) and not isinstance(response,
+                                                                   Attachment):
             raise ValueError('Only Response or Attachment objects can be ' +
                              'returned from command functions')
         if isinstance(response, Response):
@@ -237,6 +237,8 @@ class Phial():
                 self._execute_response(response)
         except ValueError as err:
             print('ValueError: {}'.format(err))
+        finally:
+            _command_ctx_stack.pop()
 
     def run(self):
         '''Connects to slack client and handles incoming messages'''
