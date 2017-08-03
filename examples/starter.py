@@ -7,7 +7,7 @@ slackbot = Phial('token-goes-here')
 @slackbot.command('ping')
 def ping():
     '''Simple command which replies with a message'''
-    return Response(text="Pong", channel=command.channel)
+    return "Pong"
 
 
 @slackbot.command('hello <name>')
@@ -42,4 +42,5 @@ def reply():
                     original_ts=command.message_ts)
 
 
-slackbot.run()
+if __name__ == '__main__':
+    slackbot.run()
