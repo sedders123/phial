@@ -1,6 +1,6 @@
 import unittest
 from unittest.mock import MagicMock, mock_open
-from phial import Phial, command, Response, Attachment
+from phial import Phial, command, Response, Attachment, g
 import phial.wrappers
 import phial.globals
 import re
@@ -23,6 +23,8 @@ class TestPhialBot(unittest.TestCase):
 
     def tearDown(self):
         self.bot = None
+        phial.globals._global_ctx_stack.pop()
+        phial.globals._command_ctx_stack.pop()
 
 
 class TestCommandDecarator(TestPhialBot):
@@ -445,3 +447,36 @@ class TestRun(TestPhialBot):
         output = out.getvalue().strip()
         expected_message = 'ValueError: Command "test" has not been registered'
         self.assertTrue(expected_message in output)
+
+
+class TestGlobalContext(unittest.TestCase):
+
+    def test_global_context_in_command(self):
+        bot = Phial('test-token')
+
+        def command_function():
+            g['test'] = "test value"
+
+        def second_command_function():
+            self.assertEquals(g['test'], "test value")
+
+        bot.add_command('test', command_function)
+        command_instance = phial.wrappers.Command('test',
+                                                  'channel_id',
+                                                  {},
+                                                  'user',
+                                                  'timestamp')
+        bot.add_command('test2', second_command_function)
+        second_command_instance = phial.wrappers.Command('test2',
+                                                         'channel_id',
+                                                         {},
+                                                         'user',
+                                                         'timestamp')
+        bot._handle_command(command_instance)
+        bot._handle_command(second_command_instance)
+
+    def test_global_context_fails_outside_app_context(self):
+        with self.assertRaises(RuntimeError) as context:
+            print(g)
+        self.assertTrue('Working outside the app context'
+                        in str(context.exception))

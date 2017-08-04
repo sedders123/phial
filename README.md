@@ -41,12 +41,21 @@ bot.run()
 
 By default the bot requires a prefix of `!` before its commands. This can be changed in the config.
 ```
-> youruser: !greet jim
-> bot: Hello Jim
+youruser:
+> !greet jim
+bot:
+> Hello Jim
 ```
 
+Features:
 
-More example bots can be found in the [examples](examples/) folder
+ - Simple command definition
+ - Send messages to slack
+ - Reply to messages in a thread
+ - Reply to messages with a reaction
+ - Upload Files
+
+Examples of commands utilising these features can be found in the [examples](examples/) folder
 
 
 ## Install
@@ -61,7 +70,6 @@ If a feature is missing, or you can improve the code please submit a PR or raise
 
 ## TODO:
  - PyPi Package
- - Handle commands asynchronously
 
 ## Licenses
 
