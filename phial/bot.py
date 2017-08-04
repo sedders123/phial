@@ -1,7 +1,7 @@
 from slackclient import SlackClient
 import time
 import re
-from .globals import _command_ctx_stack, command
+from .globals import _command_ctx_stack, command, _global_ctx_stack
 from .wrappers import Command, Response, Message, Attachment
 
 
@@ -24,6 +24,7 @@ class Phial():
         self.command_functions = {}
         self.config = config
         self.running = False
+        _global_ctx_stack.push({})
 
     @staticmethod
     def _build_command_pattern(command):

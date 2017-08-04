@@ -1,4 +1,4 @@
-from phial import Phial, command, Response, Attachment
+from phial import Phial, command, Response, Attachment, g
 import os
 
 slackbot = Phial('token-goes-here')
@@ -40,6 +40,29 @@ def reply():
     return Response(text="this is a thread",
                     channel=command.channel,
                     original_ts=command.message_ts)
+
+
+@slackbot.command('start')
+def start():
+    '''A command which uses an application global variable'''
+    g['variable'] = True
+    return "Started"
+
+
+@slackbot.command('stop')
+def stop():
+    '''A command which uses an application global variable'''
+    g['variable'] = False
+    return "Stopped"
+
+
+@slackbot.command('check')
+def check():
+    '''A command that reads an application global variable'''
+    if g['variable']:
+        return "Process Started"
+    else:
+        return "Process Stopped"
 
 
 if __name__ == '__main__':
