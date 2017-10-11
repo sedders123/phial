@@ -1,5 +1,4 @@
 from slackclient import SlackClient
-import time
 import re
 from .globals import _command_ctx_stack, command, _global_ctx_stack
 from .wrappers import Command, Response, Message, Attachment
@@ -14,8 +13,7 @@ class Phial():
 
     #: Default configuration
     default_config = {
-        'prefix': '!',
-        'read_websocket_delay': 1
+        'prefix': '!'
     }
 
     def __init__(self, token, config=default_config):
@@ -252,6 +250,5 @@ class Phial():
                                                    .rtm_read())
                 if message:
                     self._handle_message(message)
-                time.sleep(self.config['read_websocket_delay'])
         else:
             raise ValueError("Connection failed. Invalid Token or bot ID")
