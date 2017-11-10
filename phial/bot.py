@@ -19,6 +19,7 @@ class Phial():
     def __init__(self, token, config=default_config):
         self.slack_client = SlackClient(token)
         self.commands = []
+        self.middleware_functions = []
         self.command_functions = {}
         self.config = config
         self.running = False
@@ -55,7 +56,7 @@ class Phial():
         Args:
             command_pattern_template(str): A string that will be used to create
                                            a command_pattern regex
-            command_func(func): The fucntion to be run when the command pattern
+            command_func(func): The function to be run when the command pattern
                                 is matched
         Raises:
             ValueError
@@ -82,6 +83,8 @@ class Phial():
             A :obj:`dict` object with kwargs and the base command if a match
             is found otherwise :obj:`None`
         '''
+        if self.config['prefix'] and text.startswith(self.config['prefix']):
+            text = text[1:]
         for command_pattern, base_command in self.commands:
             m = command_pattern.match(text)
             if m:
@@ -110,6 +113,61 @@ class Phial():
             self.add_command(command_pattern_template, f)
             return f
         return decorator
+
+    def middleware(self):
+        '''
+        A decorator that is used to register a middleware function.
+        This does the same as :meth:`add_middleware` but is used as a
+        decorator. Each middleware function will be passed a `Message`
+        , and must return a `Message` for the next middleware function
+        to be able to work. To stop processing of a message simply return
+        `None`.
+
+        Example:
+            ::
+
+                @bot.middleware()
+                def intercept_message(message):
+                    # Process message from slack before passing it on phial's 
+                    # default processing
+                    ... code here
+                    return message
+
+                @bot.middleware()
+                def intercept_and_halt_message(message):
+                    # Process message from slack without phial's default
+                    # processing
+                    ... code here
+                    return None
+
+        '''
+        def decorator(f):
+            self.middleware_functions.append(f)
+            return f
+        return decorator
+
+    def add_middleware(self, middleware_func):
+        '''
+        Adds a middleware function to the bot. This is the same as 
+        :meth:`middleware`.
+
+        ::
+
+            @bot.middleware()
+            def intercept(messaage):
+                return message
+
+        Is the same as ::
+
+            def intercept(messaage):
+                return message
+            bot.add_middleware(intercept)
+
+        Args:
+            middleware_func(func): The function to be added to the middleware
+                                   pipeline
+        '''
+        self.middleware_functions.append(middleware_func)
 
     def _create_command(self, command_message):
         '''Creates an instance of a command'''
@@ -140,9 +198,8 @@ class Phial():
         output_list = slack_rtm_output
         if output_list and len(output_list) > 0:
             for output in output_list:
-                if(output and 'text' in output and
-                   output['text'].startswith(self.config['prefix'])):
-                    return Message(output['text'][1:],
+                if(output and 'text' in output):
+                    return Message(output['text'],
                                    output['channel'],
                                    output['user'],
                                    output['ts'])
@@ -226,9 +283,22 @@ class Phial():
 
     def _handle_message(self, message: Message):
         '''
-         Takes a `Message` object and attempts to create a `Command` object
-         and then executes it.
+         Takes a `Message` object and  run the middleware on the message before
+         attempting to create and executes a `Command` if the message has not
+         been intercepted.
         '''
+
+        # Run middleware functions
+        for func in self.middleware_functions:
+            if message:
+                message = func(message)
+
+        # If message has been intercepted return early
+        if not message:
+            return
+
+        # If message has not been intercepted continue with standard message
+        # handling
         try:
             command = self._create_command(message)
             response = self._handle_command(command)

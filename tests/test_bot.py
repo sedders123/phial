@@ -236,16 +236,17 @@ class TestParseSlackOutput(TestPhialBot):
                                 'ts': 'timestamp'
                                }]
         command_message = self.bot._parse_slack_output(sample_slack_output)
-        expected_command_message = phial.wrappers.Message('test',
+        expected_command_message = phial.wrappers.Message('!test',
                                                           'channel_id',
                                                           'user_id',
                                                           'timestamp')
         self.assertEquals(command_message, expected_command_message)
 
-    def test_returns_none_correctly_for_normal_message(self):
-        sample_slack_output = [{'text': 'test', 'channel': 'channel_id'}]
+    def test_returns_message_correctly_for_normal_message(self):
+        sample_slack_output = [{'text': 'test', 'channel': 'channel_id',
+                                'user': 'user', 'ts': 'timestamp'}]
         command_message = self.bot._parse_slack_output(sample_slack_output)
-        self.assertTrue(command_message is None)
+        self.assertTrue(type(command_message) is phial.wrappers.Message)
 
     def test_returns_none_correctly_if_no_messages(self):
         sample_slack_output = []
@@ -396,6 +397,49 @@ class TestExecuteResponse(TestPhialBot):
                     + 'only have one of the attributes: Reaction, ' \
                     + 'Text'
         self.assertTrue(error_msg in str(context.exception))
+
+
+class TestMiddleware(TestPhialBot):
+    '''Test phial's middleware'''
+
+    def test_decarator(self):
+        @self.bot.middleware()
+        def middleware_test(message):
+            return message
+
+        self.assertTrue(middleware_test in self.bot.middleware_functions)
+
+    def test_add_function(self):
+        def middleware_test(message):
+            return message
+        self.bot.add_middleware(middleware_test)
+        self.assertTrue(middleware_test in self.bot.middleware_functions)
+
+    def test_halts_message_when_none_returned(self):
+        middleware_test = MagicMock(return_value=None)
+        self.bot.add_middleware(middleware_test)
+        test = MagicMock()
+        self.bot.add_command('test', test)
+        message = phial.wrappers.Message('!test',
+                                         'channel_id',
+                                         'user',
+                                         'timestamp')
+        self.bot._handle_message(message)
+        middleware_test.assert_called_once_with(message)
+        test.assert_not_called()
+
+    def test_passes_on_message_correctly(self):
+        message = phial.wrappers.Message('!test',
+                                         'channel_id',
+                                         'user',
+                                         'timestamp')
+        middleware_test = MagicMock(return_value=message)
+        self.bot.add_middleware(middleware_test)
+        test = MagicMock()
+        self.bot.add_command('test', test)
+        self.bot._handle_message(message)
+        middleware_test.assert_called_once_with(message)
+        test.assert_called_once()
 
 
 class TestRun(TestPhialBot):
