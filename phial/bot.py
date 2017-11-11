@@ -32,7 +32,7 @@ class Phial():
         return re.compile("^{}$".format(command_regex))
 
     def _is_command_text(self, text):
-        if not self.config['prefix']:
+        if 'prefix' not in self.config or not self.config['prefix']:
             return True
         return text.startswith(self.config['prefix'])
 
@@ -205,10 +205,14 @@ class Phial():
         if output_list and len(output_list) > 0:
             for output in output_list:
                 if(output and 'text' in output):
+                    bot_id = None
+                    if 'bot_id' in output:
+                        bot_id = output['bot_id']
                     return Message(output['text'],
                                    output['channel'],
                                    output['user'],
-                                   output['ts'])
+                                   output['ts'],
+                                   bot_id)
         return None
 
     def send_message(self, message):
@@ -299,8 +303,8 @@ class Phial():
             if message:
                 message = func(message)
 
-        # If message has been intercepted return early
-        if not message:
+        # If message has been intercepted or is a bot message return early
+        if not message or message.bot_id:
             return
 
         # If message has not been intercepted continue with standard message
