@@ -34,15 +34,19 @@ class Message():
         channel(str): The Slack channel ID the message was sent from
         user(str): The user who sent the message
         timestamp(str): The messages timestamp
+        bot_id(str, optional): If the message was sent by a bot
+                               the ID of that bot.
+                               Defaults to None.
     '''
-    def __init__(self, text, channel, user, timestamp):
+    def __init__(self, text, channel, user, timestamp, bot_id=None):
         self.text = text
         self.channel = channel
         self.user = user
         self.timestamp = timestamp
+        self.bot_id = bot_id
 
     def __repr__(self):
-        return "<Message: {0} in {1} at {3}>".format(self.text,
+        return "<Message: {0} in {1} at {2}>".format(self.text,
                                                      self.channel,
                                                      self.timestamp)
 

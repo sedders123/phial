@@ -1,6 +1,7 @@
 from phial import Phial, command, Response
 from multiprocessing import Process
 from time import sleep
+import logging
 
 slackbot = Phial('token-goes-here')
 
@@ -9,6 +10,8 @@ slackbot = Phial('token-goes-here')
 def regex_in_command():
     '''Command that uses regex to define structure'''
     base_command = command.message.text.split(" ")[0]
+    if slackbot.config['prefix']:
+        base_command = base_command[1:]
     if base_command == "center":
         return Response(text="Yeehaw! You're a Yank", channel=command.channel)
     elif base_command == "centre":
@@ -46,5 +49,13 @@ def background_processing():
     return "Foreground message"
 
 
+@slackbot.middleware()
+def log_message(message):
+    logging.info(message)
+    return message
+
+
 if __name__ == '__main__':
+    FORMAT = '%(asctime)-15s %(message)s'
+    logging.basicConfig(format=FORMAT, level=logging.INFO)
     slackbot.run()
