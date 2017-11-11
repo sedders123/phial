@@ -139,7 +139,7 @@ class TestCreateCommand(TestPhialBot):
 
     def test_basic_functionality(self):
         self.bot.commands = [(re.compile('^test$'), 'test')]
-        command_message = phial.wrappers.Message('test',
+        command_message = phial.wrappers.Message('!test',
                                                  'channel_id',
                                                  'user',
                                                  'timestamp')
@@ -153,7 +153,7 @@ class TestCreateCommand(TestPhialBot):
 
     def test_basic_functionality_with_args(self):
         self.bot.commands = [(re.compile('^test (?P<one>.+)$'), 'test')]
-        command_message = phial.wrappers.Message('test first',
+        command_message = phial.wrappers.Message('!test first',
                                                  'channel_id',
                                                  'user',
                                                  'timestamp')
@@ -167,12 +167,12 @@ class TestCreateCommand(TestPhialBot):
 
     def test_errors_when_no_command_match(self):
         with self.assertRaises(ValueError) as context:
-            command_message = phial.wrappers.Message('test',
+            command_message = phial.wrappers.Message('!test',
                                                      'channel_id',
                                                      'user',
                                                      'timestamp')
             self.bot._create_command(command_message)
-        self.assertTrue('Command "test" has not been registered'
+        self.assertTrue('Command "!test" has not been registered'
                         in str(context.exception))
 
 
@@ -452,7 +452,7 @@ class TestRun(TestPhialBot):
 
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.rtm_connect = MagicMock(return_value=True)
-        command_message = phial.wrappers.Message('test',
+        command_message = phial.wrappers.Message('!test',
                                                  'channel_id',
                                                  'user',
                                                  'timestamp')
@@ -480,7 +480,7 @@ class TestRun(TestPhialBot):
     def test_errors_with_invalid_command(self):
         self.bot.slack_client = MagicMock()
         self.bot.slack_client.rtm_connect = MagicMock(return_value=True)
-        test_command = phial.wrappers.Message('test',
+        test_command = phial.wrappers.Message('!test',
                                               'channel_id',
                                               'user_id',
                                               'timestamp')
@@ -489,8 +489,8 @@ class TestRun(TestPhialBot):
             self.bot.run()
 
         output = out.getvalue().strip()
-        expected_message = 'ValueError: Command "test" has not been registered'
-        self.assertTrue(expected_message in output)
+        expected_msg = 'ValueError: Command "!test" has not been registered'
+        self.assertTrue(expected_msg in output)
 
 
 class TestGlobalContext(unittest.TestCase):

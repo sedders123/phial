@@ -42,7 +42,7 @@ class Message():
         self.timestamp = timestamp
 
     def __repr__(self):
-        return "<Message: {0} in {1} at {3}>".format(self.text,
+        return "<Message: {0} in {1} at {2}>".format(self.text,
                                                      self.channel,
                                                      self.timestamp)
 

@@ -31,9 +31,15 @@ class Phial():
         command_regex = re.sub(r'(<\w+>)', r'(?P\1.+)', command)
         return re.compile("^{}$".format(command_regex))
 
-    @staticmethod
-    def _get_base_command(command):
+    def _is_command_text(self, text):
+        if not self.config['prefix']:
+            return True
+        return text.startswith(self.config['prefix'])
+
+    def _get_base_command(self, command):
         '''Gets the root part of the command'''
+        if self.config['prefix'] and command.startswith(self.config['prefix']):
+            command = command[1:]
         return command.split(" ")[0]
 
     def add_command(self, command_pattern_template, command_func):
@@ -128,7 +134,7 @@ class Phial():
 
                 @bot.middleware()
                 def intercept_message(message):
-                    # Process message from slack before passing it on phial's 
+                    # Process message from slack before passing it on phial's
                     # default processing
                     ... code here
                     return message
@@ -148,7 +154,7 @@ class Phial():
 
     def add_middleware(self, middleware_func):
         '''
-        Adds a middleware function to the bot. This is the same as 
+        Adds a middleware function to the bot. This is the same as
         :meth:`middleware`.
 
         ::
@@ -299,15 +305,16 @@ class Phial():
 
         # If message has not been intercepted continue with standard message
         # handling
-        try:
-            command = self._create_command(message)
-            response = self._handle_command(command)
-            if response is not None:
-                self._execute_response(response)
-        except ValueError as err:
-            print('ValueError: {}'.format(err))
-        finally:
-            _command_ctx_stack.pop()
+        if self._is_command_text(message.text):
+            try:
+                command = self._create_command(message)
+                response = self._handle_command(command)
+                if response is not None:
+                    self._execute_response(response)
+            except ValueError as err:
+                print('ValueError: {}'.format(err))
+            finally:
+                _command_ctx_stack.pop()
 
     def run(self):
         '''Connects to slack client and handles incoming messages'''
