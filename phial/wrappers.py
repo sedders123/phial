@@ -15,6 +15,7 @@ class Command():
         self.args = args
         self.user = user
         self.message = message
+        self.message_ts = message.timestamp
 
     def __repr__(self):
         return "<Command: {0}, {1} in {2}>".format(self.base_command,

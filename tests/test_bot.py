@@ -187,11 +187,15 @@ class TestHandleCommand(TestPhialBot):
 
         test_func = MagicMock()
         self.bot.add_command('test', test_func)
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
         command_instance = phial.wrappers.Command('test',
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  'timestamp')
+                                                  message)
         self.bot._handle_command(command_instance)
 
         self.assertTrue(test_func.called)
@@ -206,11 +210,15 @@ class TestCommandContextWorksCorrectly(TestPhialBot):
             self.assertTrue(command.args == {})
 
         self.bot.add_command('test', test_func)
+        message = phial.wrappers.Message('!test',
+                                         'channel_id',
+                                         'user',
+                                         'timestamp')
         command_instance = phial.wrappers.Command('test',
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  'timestamp')
+                                                  message)
         self.bot._handle_command(command_instance)
 
     def test_command_context_pops_correctly(self):
@@ -343,11 +351,15 @@ class TestExecuteResponse(TestPhialBot):
 
     def test_send_string(self):
         self.bot.send_message = MagicMock()
+        message = phial.wrappers.Message(text="!base",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
         command_instance = phial.wrappers.Command(base_command="base",
                                                   channel="channel_id",
                                                   args={},
                                                   user="user",
-                                                  message={})
+                                                  message=message)
         phial.globals._command_ctx_stack.push(command_instance)
         self.bot._execute_response("string")
         expected_response = Response(text='string', channel='channel_id')
@@ -491,7 +503,7 @@ class TestRun(TestPhialBot):
                                               'channel_id',
                                               {},
                                               'user_id',
-                                              'timestamp')
+                                              command_message)
         self.bot._create_command = MagicMock(return_value=test_command)
         self.bot._handle_command = MagicMock()
 
@@ -535,17 +547,21 @@ class TestGlobalContext(unittest.TestCase):
             self.assertEquals(g['test'], "test value")
 
         bot.add_command('test', command_function)
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
         command_instance = phial.wrappers.Command('test',
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  'timestamp')
+                                                  message)
         bot.add_command('test2', second_command_function)
         second_command_instance = phial.wrappers.Command('test2',
                                                          'channel_id',
                                                          {},
                                                          'user',
-                                                         'timestamp')
+                                                         message)
         bot._handle_command(command_instance)
         bot._handle_command(second_command_instance)
 
