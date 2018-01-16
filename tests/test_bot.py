@@ -27,7 +27,8 @@ class TestPhialBot(unittest.TestCase):
         phial.globals._command_ctx_stack.pop()
 
     def assertCommandInCommands(self, command):
-        self.assertTrue(self.bot._build_command_pattern(command) in self.bot.commands)
+        self.assertTrue(self.bot._build_command_pattern(command)
+                        in self.bot.commands)
 
 
 class TestCommandDecarator(TestPhialBot):
@@ -60,7 +61,7 @@ class TestAddCommand(TestPhialBot):
             return 'test'
         self.bot.add_command('test', command_function)
 
-        self.assertTrue(self.bot._build_command_pattern('test') in self.bot.commands)
+        self.assertCommandInCommands('test')
         self.assertTrue(command_function in self.bot.commands
                         .values())
 
@@ -116,9 +117,10 @@ class TestGetCommandMatch(TestPhialBot):
     def test_multi_substition_matching(self):
         self.bot.commands = {re.compile('^test (?P<one>.+) (?P<two>.+)$'):
                              'test'}
-        kwargs, command_pattern = self.bot.get_command_match('test first second')
-        self.assertTrue(kwargs == {'one': 'first', 'two': 'second'})
-        self.assertTrue(command_pattern == re.compile('^test (?P<one>.+) (?P<two>.+)$'))
+        kwargs, command_pattern = self.bot.get_command_match('test one two')
+        self.assertTrue(kwargs == {'one': 'one', 'two': 'two'})
+        self.assertTrue(command_pattern ==
+                        re.compile('^test (?P<one>.+) (?P<two>.+)$'))
 
     def test_returns_none_correctly(self):
         command_match = self.bot.get_command_match('test')
@@ -192,6 +194,7 @@ class TestCommandContextWorksCorrectly(TestPhialBot):
 
     def test_command_context_works_correctly(self):
         command_pattern = self.bot._build_command_pattern('test')
+
         def test_func():
             self.assertTrue(command.command_pattern == command_pattern)
             self.assertTrue(command.channel == 'channel_id')

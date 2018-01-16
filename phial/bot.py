@@ -168,7 +168,7 @@ class Phial():
         Args:
             command_pattern_template(str): A string that will be used to create
                                 a command_pattern regex
-        
+
         Example:
             ::
 
@@ -176,7 +176,7 @@ class Phial():
                 @bot.alias('goodbye')
                 def world():
                     pass
-            
+
             Is the same as ::
                 @bot.command('hello')
                 @bot.command('goodbye')
