@@ -3,14 +3,14 @@ class Command():
     The command object used by Phial.
 
     Attributes:
-        base_command(str): The base part of the command
+        command_pattern(str): The regex used for matching the command
         channel(str): The Slack channel ID the command was called from
         args(dict): Any arguments passed to the command
         user(str): The Slack User ID of the user who intiated the command
         message_text(`Message`): The message that initiated the command
     '''
-    def __init__(self, base_command, channel, args, user, message):
-        self.base_command = base_command
+    def __init__(self, command_pattern, channel, args, user, message):
+        self.command_pattern = command_pattern
         self.channel = channel
         self.args = args
         self.user = user
@@ -18,7 +18,7 @@ class Command():
         self.message_ts = message.timestamp
 
     def __repr__(self):
-        return "<Command: {0}, {1} in {2}>".format(self.base_command,
+        return "<Command: {0}, {1} in {2}>".format(self.message,
                                                    self.args, self.channel)
 
     def __eq__(self, other):

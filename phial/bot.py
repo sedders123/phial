@@ -18,9 +18,8 @@ class Phial():
 
     def __init__(self, token, config=default_config):
         self.slack_client = SlackClient(token)
-        self.commands = []
+        self.commands = {}
         self.middleware_functions = []
-        self.command_functions = {}
         self.config = config
         self.running = False
         _global_ctx_stack.push({})
@@ -30,17 +29,6 @@ class Phial():
         '''Creates the command pattern regexs'''
         command_regex = re.sub(r'(<\w+>)', r'(?P\1.+)', command)
         return re.compile("^{}$".format(command_regex))
-
-    def _is_command_text(self, text):
-        if 'prefix' not in self.config or not self.config['prefix']:
-            return True
-        return text.startswith(self.config['prefix'])
-
-    def _get_base_command(self, command):
-        '''Gets the root part of the command'''
-        if self.config['prefix'] and command.startswith(self.config['prefix']):
-            command = command[1:]
-        return command.split(" ")[0]
 
     def add_command(self, command_pattern_template, command_func):
         '''
@@ -69,16 +57,15 @@ class Phial():
                 If command with the same name already registered
         '''
         command_pattern = self._build_command_pattern(command_pattern_template)
-        base_command = self._get_base_command(command_pattern_template)
-        if base_command not in self.command_functions:
-            self.command_functions[base_command] = command_func
-            self.commands.append((command_pattern, base_command))
+        if command_pattern not in self.commands:
+            self.commands[command_pattern] = command_func
         else:
-            raise ValueError('Command {0} already exists'.format(base_command))
+            raise ValueError('Command {0} already exists'
+                             .format(command_pattern.split("<")[0]))
 
     def get_command_match(self, text):
         '''
-        Returns a dictionary of args and the base command for the command
+        Returns a dictionary of args and the command pattern for the command
         pattern that is matched.
         Will returns None if no match
 
@@ -86,15 +73,13 @@ class Phial():
             text(str): The string to be matched to a command
 
         Returns:
-            A :obj:`dict` object with kwargs and the base command if a match
+            A :obj:`dict` object with kwargs and the command pattern if a match
             is found otherwise :obj:`None`
         '''
-        if self.config['prefix'] and text.startswith(self.config['prefix']):
-            text = text[1:]
-        for command_pattern, base_command in self.commands:
+        for command_pattern in self.commands:
             m = command_pattern.match(text)
             if m:
-                return m.groupdict(), base_command
+                return m.groupdict(), command_pattern
         return None
 
     def command(self, command_pattern_template):
@@ -179,8 +164,8 @@ class Phial():
         '''Creates an instance of a command'''
         command_match = self.get_command_match(command_message.text)
         if command_match:
-            kwargs, base_command = command_match
-            return Command(base_command,
+            kwargs, command_pattern = command_match
+            return Command(command_pattern,
                            command_message.channel,
                            kwargs,
                            command_message.user,
@@ -192,8 +177,8 @@ class Phial():
     def _handle_command(self, command):
         '''Executes a given command'''
         _command_ctx_stack.push(command)
-        return self.command_functions[command.base_command](**command
-                                                            .args)
+        return self.commands[command.command_pattern](**command
+                                                      .args)
 
     def _parse_slack_output(self, slack_rtm_output):
         """
