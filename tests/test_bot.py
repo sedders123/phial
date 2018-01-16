@@ -483,13 +483,13 @@ class TestRun(TestPhialBot):
                                               'channel_id',
                                               {},
                                               'user_id',
-                                              command_message)
+                                              '!test')
         self.bot._create_command = MagicMock(return_value=test_command)
-        self.bot._handle_command = MagicMock()
+        self.bot._handle_command = MagicMock(return_value=None)
 
         self.bot.run()
-        self.bot.slack_client.rtm_connect.assert_called_once()
-        self.bot._parse_slack_output.assert_called_once()
+        assert self.bot.slack_client.rtm_connect.call_count == 1
+        assert self.bot._parse_slack_output.call_count == 1
         self.bot._create_command.assert_called_with(command_message)
         self.bot._handle_command.assert_called_with(test_command)
 
