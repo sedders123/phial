@@ -99,7 +99,7 @@ class Response():
         self.reaction = reaction
 
     def __repr__(self):
-        return "<Response to {1}>".format(self.text, self.channel)
+        return "<Response: {0}>".format(self.text)
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__

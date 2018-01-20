@@ -53,6 +53,28 @@ class TestCommandDecarator(TestPhialBot):
                                                 test_command_function)
 
 
+class TestAliasDecarator(TestPhialBot):
+    '''Tests for phial's alias decorator'''
+
+    def test_command_decorator_functionality(self):
+        @self.bot.alias('test')
+        def command_function():
+            return 'test'
+
+        self.assertCommandInCommands('test')
+        self.assertTrue(command_function in self.bot.commands
+                        .values())
+
+    def test_command_decorator_calls_add_command(self):
+        self.bot.add_command = MagicMock()
+
+        @self.bot.alias('test_add_called')
+        def test_command_function():
+            return 'test'
+        self.bot.add_command.assert_called_with('test_add_called',
+                                                test_command_function)
+
+
 class TestAddCommand(TestPhialBot):
     '''Tests for phial's add_command function'''
 

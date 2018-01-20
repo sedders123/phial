@@ -319,16 +319,14 @@ class Phial():
 
         # If message has not been intercepted continue with standard message
         # handling
-        if self._is_command_text(message.text):
-            try:
-                command = self._create_command(message)
-                response = self._handle_command(command)
-                if response is not None:
-                    self._execute_response(response)
-            except ValueError as err:
-                print('ValueError: {}'.format(err))
-            finally:
-                _command_ctx_stack.pop()
+        try:
+            command = self._create_command(message)
+            response = self._handle_command(command)
+            self._execute_response(response)
+        except ValueError as err:
+            print('ValueError: {}'.format(err))
+        finally:
+            _command_ctx_stack.pop()
 
     def run(self):
         '''Connects to slack client and handles incoming messages'''
