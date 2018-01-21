@@ -180,7 +180,6 @@ class TestCreateCommand(TestPhialBot):
                                                   {'one': 'first'},
                                                   'user',
                                                   command_message)
-        print(command.command_pattern)
         self.assertEquals(command, expected_command)
 
     def test_errors_when_no_command_match(self):
