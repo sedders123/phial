@@ -76,6 +76,8 @@ class Phial():
             A :obj:`dict` object with kwargs and the command pattern if a match
             is found otherwise :obj:`None`
         '''
+        if self.config['prefix'] and text.startswith(self.config['prefix']):
+            text = text[1:]
         for command_pattern in self.commands:
             m = command_pattern.match(text)
             if m:

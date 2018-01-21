@@ -201,6 +201,10 @@ class TestHandleCommand(TestPhialBot):
 
         test_func = MagicMock()
         self.bot.add_command('test', test_func)
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
         command_patern = self.bot._build_command_pattern('test')
         command_instance = phial.wrappers.Command(command_patern,
                                                   'channel_id',
@@ -223,6 +227,10 @@ class TestCommandContextWorksCorrectly(TestPhialBot):
             self.assertTrue(command.args == {})
 
         self.bot.add_command('test', test_func)
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
         command_instance = phial.wrappers.Command(command_pattern,
                                                   'channel_id',
                                                   {},
@@ -360,6 +368,10 @@ class TestExecuteResponse(TestPhialBot):
 
     def test_send_string(self):
         self.bot.send_message = MagicMock()
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
         command_instance = phial.wrappers.Command(command_pattern="base",
                                                   channel="channel_id",
                                                   args={},
@@ -471,7 +483,6 @@ class TestMiddleware(TestPhialBot):
         self.bot.add_command('test', test)
         self.bot._handle_message(message)
         middleware_test.assert_called_once_with(message)
-        test.assert_called_once()
 
 
 class TestHandleMessage(TestPhialBot):
@@ -508,7 +519,7 @@ class TestRun(TestPhialBot):
                                               'channel_id',
                                               {},
                                               'user_id',
-                                              '!test')
+                                              command_message)
         self.bot._create_command = MagicMock(return_value=test_command)
         self.bot._handle_command = MagicMock(return_value=None)
 
@@ -544,6 +555,8 @@ class TestGlobalContext(unittest.TestCase):
 
     def test_global_context_in_command(self):
         bot = Phial('test-token')
+        command_pattern1 = bot._build_command_pattern('test')
+        command_pattern2 = bot._build_command_pattern('test2')
 
         def command_function():
             g['test'] = "test value"
@@ -556,13 +569,13 @@ class TestGlobalContext(unittest.TestCase):
                                          channel="channel_id",
                                          user="user",
                                          timestamp="timestamp")
-        command_instance = phial.wrappers.Command('test',
+        command_instance = phial.wrappers.Command(command_pattern1,
                                                   'channel_id',
                                                   {},
                                                   'user',
                                                   message)
         bot.add_command('test2', second_command_function)
-        second_command_instance = phial.wrappers.Command('test2',
+        second_command_instance = phial.wrappers.Command(command_pattern2,
                                                          'channel_id',
                                                          {},
                                                          'user',
@@ -575,12 +588,3 @@ class TestGlobalContext(unittest.TestCase):
             print(g)
         self.assertTrue('Working outside the app context'
                         in str(context.exception))
-
-
-class TestIsCommandText(unittest.TestCase):
-    '''Test the is_command_text function'''
-
-    def test_without_prefix(self):
-        bot = Phial('test-token', {})
-        is_command = bot._is_command_text('test')
-        self.assertTrue(is_command)
