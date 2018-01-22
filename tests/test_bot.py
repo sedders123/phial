@@ -26,6 +26,10 @@ class TestPhialBot(unittest.TestCase):
         phial.globals._global_ctx_stack.pop()
         phial.globals._command_ctx_stack.pop()
 
+    def assertCommandInCommands(self, command):
+        self.assertTrue(self.bot._build_command_pattern(command)
+                        in self.bot.commands)
+
 
 class TestCommandDecarator(TestPhialBot):
     '''Tests for phial's command decorator'''
@@ -35,14 +39,36 @@ class TestCommandDecarator(TestPhialBot):
         def command_function():
             return 'test'
 
-        self.assertTrue('test' in self.bot.command_functions)
-        self.assertTrue(command_function in self.bot.command_functions
+        self.assertCommandInCommands('test')
+        self.assertTrue(command_function in self.bot.commands
                         .values())
 
     def test_command_decorator_calls_add_command(self):
         self.bot.add_command = MagicMock()
 
         @self.bot.command('test_add_called')
+        def test_command_function():
+            return 'test'
+        self.bot.add_command.assert_called_with('test_add_called',
+                                                test_command_function)
+
+
+class TestAliasDecarator(TestPhialBot):
+    '''Tests for phial's alias decorator'''
+
+    def test_command_decorator_functionality(self):
+        @self.bot.alias('test')
+        def command_function():
+            return 'test'
+
+        self.assertCommandInCommands('test')
+        self.assertTrue(command_function in self.bot.commands
+                        .values())
+
+    def test_command_decorator_calls_add_command(self):
+        self.bot.add_command = MagicMock()
+
+        @self.bot.alias('test_add_called')
         def test_command_function():
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
@@ -57,8 +83,8 @@ class TestAddCommand(TestPhialBot):
             return 'test'
         self.bot.add_command('test', command_function)
 
-        self.assertTrue('test' in self.bot.command_functions)
-        self.assertTrue(command_function in self.bot.command_functions
+        self.assertCommandInCommands('test')
+        self.assertTrue(command_function in self.bot.commands
                         .values())
 
     def test_add_command_errors_on_duplicate_name(self):
@@ -70,7 +96,7 @@ class TestAddCommand(TestPhialBot):
         with self.assertRaises(ValueError) as context:
             self.bot.add_command('duplicate', command_function)
 
-        self.assertTrue('duplicate' in str(context.exception))
+        self.assertTrue('already exists' in str(context.exception))
 
 
 class TestBuildCommandPattern(TestPhialBot):
@@ -95,43 +121,28 @@ class TestBuildCommandPattern(TestPhialBot):
         self.assertTrue(command_pattern == expected_result)
 
 
-class TestGetBaseCommand(TestPhialBot):
-    '''Test phial's get_base_command function'''
-
-    def test_get_base_command_functionality(self):
-        base_command = self.bot._get_base_command('test')
-        self.assertTrue(base_command == 'test')
-
-    def test_get_base_command_with_args(self):
-        base_command = self.bot._get_base_command('test <one>')
-        self.assertTrue(base_command == 'test')
-
-    def test_with_prefix(self):
-        base_command = self.bot._get_base_command('!test')
-        self.assertTrue(base_command == 'test')
-
-
 class TestGetCommandMatch(TestPhialBot):
     '''Test phial's get_command_match function'''
 
     def test_basic_functionality(self):
-        self.bot.commands = [(re.compile('^test$'), 'test')]
-        command_pattern, base_command = self.bot.get_command_match('test')
-        self.assertTrue(command_pattern == {})
-        self.assertTrue(base_command == 'test')
+        self.bot.commands = {re.compile('^test$'): 'test'}
+        kwargs, command_pattern = self.bot.get_command_match('test')
+        self.assertTrue(kwargs == {})
+        self.assertTrue(command_pattern == re.compile('^test$'))
 
     def test_single_substition_matching(self):
-        self.bot.commands = [(re.compile('^test (?P<one>.+)$'), 'test')]
-        args, base_command = self.bot.get_command_match('test first')
-        self.assertTrue(args == {'one': 'first'})
-        self.assertTrue(base_command == 'test')
+        self.bot.commands = {re.compile('^test (?P<one>.+)$'): 'test'}
+        kwargs, command_pattern = self.bot.get_command_match('test first')
+        self.assertTrue(kwargs == {'one': 'first'})
+        self.assertTrue(command_pattern == re.compile('^test (?P<one>.+)$'))
 
     def test_multi_substition_matching(self):
-        self.bot.commands = [(re.compile('^test (?P<one>.+) (?P<two>.+)$'),
-                             'test')]
-        args, base_command = self.bot.get_command_match('test first second')
-        self.assertTrue(args == {'one': 'first', 'two': 'second'})
-        self.assertTrue(base_command == 'test')
+        self.bot.commands = {re.compile('^test (?P<one>.+) (?P<two>.+)$'):
+                             'test'}
+        kwargs, command_pattern = self.bot.get_command_match('test one two')
+        self.assertTrue(kwargs == {'one': 'one', 'two': 'two'})
+        self.assertTrue(command_pattern ==
+                        re.compile('^test (?P<one>.+) (?P<two>.+)$'))
 
     def test_returns_none_correctly(self):
         command_match = self.bot.get_command_match('test')
@@ -142,13 +153,14 @@ class TestCreateCommand(TestPhialBot):
     '''Test phial's create_command function'''
 
     def test_basic_functionality(self):
-        self.bot.commands = [(re.compile('^test$'), 'test')]
-        command_message = phial.wrappers.Message('!test',
+        command_patern = re.compile('^test$')
+        self.bot.commands = {command_patern: 'test'}
+        command_message = phial.wrappers.Message('test',
                                                  'channel_id',
                                                  'user',
                                                  'timestamp')
         command = self.bot._create_command(command_message)
-        expected_command = phial.wrappers.Command('test',
+        expected_command = phial.wrappers.Command(command_patern,
                                                   'channel_id',
                                                   {},
                                                   'user',
@@ -156,13 +168,14 @@ class TestCreateCommand(TestPhialBot):
         self.assertEquals(command, expected_command)
 
     def test_basic_functionality_with_args(self):
-        self.bot.commands = [(re.compile('^test (?P<one>.+)$'), 'test')]
-        command_message = phial.wrappers.Message('!test first',
+        command_patern = re.compile('^test (?P<one>.+)$')
+        self.bot.commands = {command_patern: 'test'}
+        command_message = phial.wrappers.Message('test first',
                                                  'channel_id',
                                                  'user',
                                                  'timestamp')
         command = self.bot._create_command(command_message)
-        expected_command = phial.wrappers.Command('test',
+        expected_command = phial.wrappers.Command(command_patern,
                                                   'channel_id',
                                                   {'one': 'first'},
                                                   'user',
@@ -191,7 +204,8 @@ class TestHandleCommand(TestPhialBot):
                                          channel="channel_id",
                                          user="user",
                                          timestamp="timestamp")
-        command_instance = phial.wrappers.Command('test',
+        command_patern = self.bot._build_command_pattern('test')
+        command_instance = phial.wrappers.Command(command_patern,
                                                   'channel_id',
                                                   {},
                                                   'user',
@@ -204,17 +218,19 @@ class TestHandleCommand(TestPhialBot):
 class TestCommandContextWorksCorrectly(TestPhialBot):
 
     def test_command_context_works_correctly(self):
+        command_pattern = self.bot._build_command_pattern('test')
+
         def test_func():
-            self.assertTrue(command.base_command == 'test')
+            self.assertTrue(command.command_pattern == command_pattern)
             self.assertTrue(command.channel == 'channel_id')
             self.assertTrue(command.args == {})
 
         self.bot.add_command('test', test_func)
-        message = phial.wrappers.Message('!test',
-                                         'channel_id',
-                                         'user',
-                                         'timestamp')
-        command_instance = phial.wrappers.Command('test',
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
+        command_instance = phial.wrappers.Command(command_pattern,
                                                   'channel_id',
                                                   {},
                                                   'user',
@@ -351,11 +367,11 @@ class TestExecuteResponse(TestPhialBot):
 
     def test_send_string(self):
         self.bot.send_message = MagicMock()
-        message = phial.wrappers.Message(text="!base",
+        message = phial.wrappers.Message(text="!test",
                                          channel="channel_id",
                                          user="user",
                                          timestamp="timestamp")
-        command_instance = phial.wrappers.Command(base_command="base",
+        command_instance = phial.wrappers.Command(command_pattern="base",
                                                   channel="channel_id",
                                                   args={},
                                                   user="user",
@@ -466,7 +482,6 @@ class TestMiddleware(TestPhialBot):
         self.bot.add_command('test', test)
         self.bot._handle_message(message)
         middleware_test.assert_called_once_with(message)
-        test.assert_called_once()
 
 
 class TestHandleMessage(TestPhialBot):
@@ -499,17 +514,17 @@ class TestRun(TestPhialBot):
                                                  'user',
                                                  'timestamp')
         self.bot._parse_slack_output = MagicMock(return_value=command_message)
-        test_command = phial.wrappers.Command('test',
+        test_command = phial.wrappers.Command(re.compile('^test$'),
                                               'channel_id',
                                               {},
                                               'user_id',
                                               command_message)
         self.bot._create_command = MagicMock(return_value=test_command)
-        self.bot._handle_command = MagicMock()
+        self.bot._handle_command = MagicMock(return_value=None)
 
         self.bot.run()
-        self.bot.slack_client.rtm_connect.assert_called_once()
-        self.bot._parse_slack_output.assert_called_once()
+        assert self.bot.slack_client.rtm_connect.call_count == 1
+        assert self.bot._parse_slack_output.call_count == 1
         self.bot._create_command.assert_called_with(command_message)
         self.bot._handle_command.assert_called_with(test_command)
 
@@ -539,6 +554,8 @@ class TestGlobalContext(unittest.TestCase):
 
     def test_global_context_in_command(self):
         bot = Phial('test-token')
+        command_pattern1 = bot._build_command_pattern('test')
+        command_pattern2 = bot._build_command_pattern('test2')
 
         def command_function():
             g['test'] = "test value"
@@ -551,13 +568,13 @@ class TestGlobalContext(unittest.TestCase):
                                          channel="channel_id",
                                          user="user",
                                          timestamp="timestamp")
-        command_instance = phial.wrappers.Command('test',
+        command_instance = phial.wrappers.Command(command_pattern1,
                                                   'channel_id',
                                                   {},
                                                   'user',
                                                   message)
         bot.add_command('test2', second_command_function)
-        second_command_instance = phial.wrappers.Command('test2',
+        second_command_instance = phial.wrappers.Command(command_pattern2,
                                                          'channel_id',
                                                          {},
                                                          'user',
@@ -570,12 +587,3 @@ class TestGlobalContext(unittest.TestCase):
             print(g)
         self.assertTrue('Working outside the app context'
                         in str(context.exception))
-
-
-class TestIsCommandText(unittest.TestCase):
-    '''Test the is_command_text function'''
-
-    def test_without_prefix(self):
-        bot = Phial('test-token', {})
-        is_command = bot._is_command_text('test')
-        self.assertTrue(is_command)
