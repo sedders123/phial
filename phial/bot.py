@@ -76,13 +76,16 @@ class Phial():
             A :obj:`dict` object with kwargs and the command pattern if a match
             is found otherwise :obj:`None`
         '''
-        if self.config['prefix'] and text.startswith(self.config['prefix']):
+        if self.config['prefix']:
+            if not text.startswith(self.config['prefix']):
+                return None
             text = text[1:]
         for command_pattern in self.commands:
             m = command_pattern.match(text)
             if m:
                 return m.groupdict(), command_pattern
-        return None
+        raise ValueError('Command "{}" has not been registered'
+                         .format(text))
 
     def command(self, command_pattern_template):
         '''
@@ -197,12 +200,11 @@ class Phial():
                            kwargs,
                            command_message.user,
                            command_message)
-        else:
-            raise ValueError('Command "{}" has not been registered'
-                             .format(command_message.text))
 
     def _handle_command(self, command):
         '''Executes a given command'''
+        if command is None:
+            return  # Do nothing if no command
         _command_ctx_stack.push(command)
         return self.commands[command.command_pattern](**command
                                                       .args)
@@ -210,8 +212,7 @@ class Phial():
     def _parse_slack_output(self, slack_rtm_output):
         """
             The Slack Real Time Messaging API is an events firehose.
-            This parsing function returns None unless a message is
-            directed at the Bot, based on the messages prefix.
+            This function parses the JSON form Slack into phial Messages
         """
         output_list = slack_rtm_output
         if output_list and len(output_list) > 0:
@@ -278,6 +279,8 @@ class Phial():
 
     def _execute_response(self, response):
         '''Execute the response of a command function'''
+        if response is None:
+            return  # Do nothing if command function returns nothing
         if isinstance(response, str):
             self.send_message(Response(text=response, channel=command.channel))
 
