@@ -126,20 +126,20 @@ class TestGetCommandMatch(TestPhialBot):
 
     def test_basic_functionality(self):
         self.bot.commands = {re.compile('^test$'): 'test'}
-        kwargs, command_pattern = self.bot.get_command_match('test')
+        kwargs, command_pattern = self.bot.get_command_match('!test')
         self.assertTrue(kwargs == {})
         self.assertTrue(command_pattern == re.compile('^test$'))
 
     def test_single_substition_matching(self):
         self.bot.commands = {re.compile('^test (?P<one>.+)$'): 'test'}
-        kwargs, command_pattern = self.bot.get_command_match('test first')
+        kwargs, command_pattern = self.bot.get_command_match('!test first')
         self.assertTrue(kwargs == {'one': 'first'})
         self.assertTrue(command_pattern == re.compile('^test (?P<one>.+)$'))
 
     def test_multi_substition_matching(self):
         self.bot.commands = {re.compile('^test (?P<one>.+) (?P<two>.+)$'):
                              'test'}
-        kwargs, command_pattern = self.bot.get_command_match('test one two')
+        kwargs, command_pattern = self.bot.get_command_match('!test one two')
         self.assertTrue(kwargs == {'one': 'one', 'two': 'two'})
         self.assertTrue(command_pattern ==
                         re.compile('^test (?P<one>.+) (?P<two>.+)$'))
@@ -155,7 +155,7 @@ class TestCreateCommand(TestPhialBot):
     def test_basic_functionality(self):
         command_patern = re.compile('^test$')
         self.bot.commands = {command_patern: 'test'}
-        command_message = phial.wrappers.Message('test',
+        command_message = phial.wrappers.Message('!test',
                                                  'channel_id',
                                                  'user',
                                                  'timestamp')
@@ -170,7 +170,7 @@ class TestCreateCommand(TestPhialBot):
     def test_basic_functionality_with_args(self):
         command_patern = re.compile('^test (?P<one>.+)$')
         self.bot.commands = {command_patern: 'test'}
-        command_message = phial.wrappers.Message('test first',
+        command_message = phial.wrappers.Message('!test first',
                                                  'channel_id',
                                                  'user',
                                                  'timestamp')
@@ -189,7 +189,7 @@ class TestCreateCommand(TestPhialBot):
                                                      'user',
                                                      'timestamp')
             self.bot._create_command(command_message)
-        self.assertTrue('Command "!test" has not been registered'
+        self.assertTrue('Command "test" has not been registered'
                         in str(context.exception))
 
 
@@ -546,7 +546,7 @@ class TestRun(TestPhialBot):
             self.bot.run()
 
         output = out.getvalue().strip()
-        expected_msg = 'ValueError: Command "!test" has not been registered'
+        expected_msg = 'ValueError: Command "test" has not been registered'
         self.assertTrue(expected_msg in output)
 
 
