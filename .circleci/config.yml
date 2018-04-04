@@ -10,7 +10,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: deps-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
       - run:
           name: Create Virtual Env
           command: |
@@ -21,12 +21,12 @@ jobs:
             . venv/bin/activate
             pip install -r dev-requirements.txt
       - run:
-          name: Lint Code
+          name: Install Phial
           command: |
             . venv/bin/activate
             pip install -e .
       - save_cache:
-          key: deps-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
           paths:
             - "venv"
       - run:
