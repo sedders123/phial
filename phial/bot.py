@@ -25,12 +25,14 @@ class Phial():
         _global_ctx_stack.push({})
 
     @staticmethod
-    def _build_command_pattern(command):
+    def _build_command_pattern(command, case_sensitive):
         '''Creates the command pattern regexs'''
         command_regex = re.sub(r'(<\w+>)', r'(?P\1.+)', command)
-        return re.compile("^{}$".format(command_regex))
+        return re.compile("^{}$".format(command_regex),
+                          0 if case_sensitive else re.IGNORECASE)
 
-    def add_command(self, command_pattern_template, command_func):
+    def add_command(self, command_pattern_template, command_func,
+                    case_sensitive=False):
         '''
         Creates a command pattern and adds a command function to the bot. This
         is the same as :meth:`command`.
@@ -52,11 +54,16 @@ class Phial():
                                            a command_pattern regex
             command_func(func): The function to be run when the command pattern
                                 is matched
+            case_sensitive(bool, optional): Whether or not the command is case
+                                            sensitive.
+                                            Defaults to False
         Raises:
             ValueError
                 If command with the same name already registered
         '''
-        command_pattern = self._build_command_pattern(command_pattern_template)
+        print(case_sensitive)
+        command_pattern = self._build_command_pattern(command_pattern_template,
+                                                      case_sensitive)
         if command_pattern not in self.commands:
             self.commands[command_pattern] = command_func
         else:
@@ -87,7 +94,7 @@ class Phial():
         raise ValueError('Command "{}" has not been registered'
                          .format(text))
 
-    def command(self, command_pattern_template):
+    def command(self, command_pattern_template, case_sensitive=False):
         '''
         A decorator that is used to register a command function for a given
         command. This does the same as :meth:`add_command` but is used as a
@@ -96,6 +103,9 @@ class Phial():
         Args:
             command_pattern_template(str): A string that will be used to create
                                            a command_pattern regex
+            case_sensitive(bool, optional): Whether or not the command is case
+                                sensitive.
+                                Defaults to False
 
         Example:
             ::
@@ -106,7 +116,7 @@ class Phial():
 
         '''
         def decorator(f):
-            self.add_command(command_pattern_template, f)
+            self.add_command(command_pattern_template, f, case_sensitive)
             return f
         return decorator
 

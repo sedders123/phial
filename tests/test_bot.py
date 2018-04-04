@@ -26,8 +26,9 @@ class TestPhialBot(unittest.TestCase):
         phial.globals._global_ctx_stack.pop()
         phial.globals._command_ctx_stack.pop()
 
-    def assertCommandInCommands(self, command):
-        self.assertTrue(self.bot._build_command_pattern(command)
+    def assertCommandInCommands(self, command, case_sensitive=False):
+        self.assertTrue(self.bot._build_command_pattern(command,
+                                                        case_sensitive)
                         in self.bot.commands)
 
 
@@ -50,7 +51,8 @@ class TestCommandDecarator(TestPhialBot):
         def test_command_function():
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
-                                                test_command_function)
+                                                test_command_function,
+                                                False)
 
 
 class TestAliasDecarator(TestPhialBot):
@@ -72,7 +74,8 @@ class TestAliasDecarator(TestPhialBot):
         def test_command_function():
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
-                                                test_command_function)
+                                                test_command_function,
+                                                False)
 
 
 class TestAddCommand(TestPhialBot):
@@ -102,22 +105,47 @@ class TestAddCommand(TestPhialBot):
 class TestBuildCommandPattern(TestPhialBot):
     '''Test phial's build_command_pattern function'''
 
-    def test_build_command_pattern_no_substition(self):
+    def test_build_command_pattern_no_substition_ignore_case(self):
         command_template = 'test'
-        command_pattern = self.bot._build_command_pattern(command_template)
-        expected_result = re.compile('^test$')
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          False)
+        expected_result = re.compile('^test$', re.IGNORECASE)
         self.assertTrue(command_pattern == expected_result)
 
-    def test_build_command_pattern_single_substition(self):
+    def test_build_command_pattern_single_substition_ignore_case(self):
         command_template = 'test <one>'
-        command_pattern = self.bot._build_command_pattern(command_template)
-        expected_result = re.compile('^test (?P<one>.+)$')
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          False)
+        expected_result = re.compile('^test (?P<one>.+)$', re.IGNORECASE)
         self.assertTrue(command_pattern == expected_result)
 
-    def test_build_command_pattern_multiple_substition(self):
+    def test_build_command_pattern_multiple_substition_ignore_case(self):
         command_template = 'test <one> <two>'
-        command_pattern = self.bot._build_command_pattern(command_template)
-        expected_result = re.compile('^test (?P<one>.+) (?P<two>.+)$')
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          False)
+        expected_result = re.compile('^test (?P<one>.+) (?P<two>.+)$',
+                                     re.IGNORECASE)
+        self.assertTrue(command_pattern == expected_result)
+
+    def test_build_command_pattern_no_substition_case_sensitive(self):
+        command_template = 'tEst'
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          True)
+        expected_result = re.compile('^tEst$')
+        self.assertTrue(command_pattern == expected_result)
+
+    def test_build_command_pattern_single_substition_case_sensitive(self):
+        command_template = 'tEst <one>'
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          True)
+        expected_result = re.compile('^tEst (?P<one>.+)$')
+        self.assertTrue(command_pattern == expected_result)
+
+    def test_build_command_pattern_multiple_substition_case_sensitive(self):
+        command_template = 'tEst <one> <two>'
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          True)
+        expected_result = re.compile('^tEst (?P<one>.+) (?P<two>.+)$')
         self.assertTrue(command_pattern == expected_result)
 
 
@@ -204,7 +232,7 @@ class TestHandleCommand(TestPhialBot):
                                          channel="channel_id",
                                          user="user",
                                          timestamp="timestamp")
-        command_patern = self.bot._build_command_pattern('test')
+        command_patern = self.bot._build_command_pattern('test', False)
         command_instance = phial.wrappers.Command(command_patern,
                                                   'channel_id',
                                                   {},
@@ -218,7 +246,7 @@ class TestHandleCommand(TestPhialBot):
 class TestCommandContextWorksCorrectly(TestPhialBot):
 
     def test_command_context_works_correctly(self):
-        command_pattern = self.bot._build_command_pattern('test')
+        command_pattern = self.bot._build_command_pattern('test', False)
 
         def test_func():
             self.assertTrue(command.command_pattern == command_pattern)
@@ -554,8 +582,8 @@ class TestGlobalContext(unittest.TestCase):
 
     def test_global_context_in_command(self):
         bot = Phial('test-token')
-        command_pattern1 = bot._build_command_pattern('test')
-        command_pattern2 = bot._build_command_pattern('test2')
+        command_pattern1 = bot._build_command_pattern('test', False)
+        command_pattern2 = bot._build_command_pattern('test2', False)
 
         def command_function():
             g['test'] = "test value"
