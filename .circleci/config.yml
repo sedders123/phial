@@ -75,24 +75,24 @@ jobs:
             python setup.py verify
 
       - run:
-          name: init .pypirc
+          name: Create .pypirc
           command: |
             echo -e "[pypi]" >> ~/.pypirc
             echo -e "username = sedders123" >> ~/.pypirc
             echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
 
       - run:
-          name: create source distribution
+          name: Create source distribution
           command: |
             python setup.py sdist
 
       - run:
-          name: create wheel
+          name: Create wheel
           command: |
             python setup.py bdist_wheel
 
       - run:
-          name: upload to pypi
+          name: Upload to pypi
           command: |
             . venv/bin/activate
             twine upload dist/*
@@ -105,6 +105,7 @@ workflows:
           filters:
             tags:
               only: /.*/
+
       - deploy:
           requires:
             - build
