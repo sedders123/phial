@@ -1,8 +1,26 @@
 from setuptools import setup
+from setuptools.command.install import install
+import os
+import sys
+
+VERSION = '0.1.0'
+
+
+class VerifyVersionCommand(install):
+    """Custom command to verify that the git tag matches our version"""
+    description = 'Verify that the git tag matches our version'
+
+    def run(self):
+        tag = os.getenv('CIRCLE_TAG')
+
+        if tag != VERSION:
+            info = f"Git tag: {tag} does not match phial version: {VERSION}"
+            sys.exit(info)
+
 
 setup(
     name='phial-slack',
-    version='0.1.0',
+    version=VERSION,
     url='https://github.com/sedders123/phial/',
     license='MIT',
     author='James Seden Smith',
@@ -27,5 +45,8 @@ setup(
         'Programming Language :: Python',
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Python Modules'
-    ]
+    ],
+    cmdclass={
+        'verify': VerifyVersionCommand,
+    }
 )
