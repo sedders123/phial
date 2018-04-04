@@ -17,7 +17,6 @@ Table of Contents
 -  `Usage <#usage>`__
 -  `Install <#install>`__
 -  `Contribute <#contribute>`__
--  `To Do <#todo>`__
 -  `Licenses <#licenses>`__
 
 Usage
@@ -75,11 +74,6 @@ Contribute
 
 If a feature is missing, or you can improve the code please submit a PR
 or raise an Issue
-
-TODO:
------
-
--  PyPi Package
 
 Licenses
 --------
