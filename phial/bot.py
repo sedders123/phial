@@ -337,12 +337,15 @@ class Phial():
         '''Connects to slack client and handles incoming messages'''
         self.running = True
         slack_client = self.slack_client
-        if slack_client.rtm_connect():
-            print("Phial connected and running!")
-            while self._is_running():
+        if not slack_client.rtm_connect():
+            raise ValueError("Connection failed. Invalid Token or bot ID")
+
+        print("Phial connected and running!")
+        while self._is_running():
+            try:
                 message = self._parse_slack_output(slack_client
                                                    .rtm_read())
                 if message:
                     self._handle_message(message)
-        else:
-            raise ValueError("Connection failed. Invalid Token or bot ID")
+            except Exception as e:
+                print(f"Error: {e}")
