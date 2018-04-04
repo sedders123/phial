@@ -10,14 +10,23 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: deps-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}
       - run:
+          name: Create Virtual Env
           command: |
             python3 -m venv venv
+      - run:
+          name: Install dev requirements
+          command: |
             . venv/bin/activate
             pip install -r dev-requirements.txt
+      - run:
+          name: Lint Code
+          command: |
+            . venv/bin/activate
+            pip install -e .
       - save_cache:
-          key: deps-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          key: deps-{{ .Branch }}-{{ checksum "dev-requirements.txt" }}
           paths:
             - "venv"
       - run:
