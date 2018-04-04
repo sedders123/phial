@@ -1,0 +1,37 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/python:3.6.1
+
+    working_directory: ~/repo
+
+    steps:
+      - checkout
+
+      - restore_cache:
+          key: deps-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - run:
+          command: |
+            python3 -m venv venv
+            . venv/bin/activate
+            pip install -r dev-requirements.txt
+      - save_cache:
+          key: deps-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "venv"
+      - run:
+          name: Lint Code
+          command: |
+            . venv/bin/activate
+            flake8 phial/ tests/
+      - run:
+          name: Run Tests
+          command: |
+            . venv/bin/activate
+            nosetests --with-coverage --cover-inclusive --cover-package=phial
+      - run:
+          name: Upload coverage
+          command: |
+            . venv/bin/activate
+            coveralls
