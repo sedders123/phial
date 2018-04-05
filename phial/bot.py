@@ -175,7 +175,7 @@ class Phial():
         '''
         self.middleware_functions.append(middleware_func)
 
-    def alias(self, command_pattern_template):
+    def alias(self, command_pattern_template, case_sensitive=False):
         '''
         A decorator that is used to register an alias for a command.
         Internally this is the same as :meth:`command`.
@@ -183,6 +183,9 @@ class Phial():
         Args:
             command_pattern_template(str): A string that will be used to create
                                 a command_pattern regex
+            case_sensitive(bool, optional): Whether or not the command is case
+                                sensitive.
+                                Defaults to False
 
         Example:
             ::
@@ -198,7 +201,7 @@ class Phial():
                 def world():
                     pass
         '''
-        return self.command(command_pattern_template)
+        return self.command(command_pattern_template, case_sensitive)
 
     def _create_command(self, command_message):
         '''Creates an instance of a command'''
