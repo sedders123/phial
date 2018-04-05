@@ -348,4 +348,4 @@ class Phial():
                 if message:
                     self._handle_message(message)
             except Exception as e:
-                print(f"Error: {e}")
+                print("Error: {0}".format(e))
