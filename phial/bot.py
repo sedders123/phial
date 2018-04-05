@@ -40,13 +40,13 @@ class Phial():
         ::
 
             @bot.command('hello')
-            def world():
-                pass
+            def hello():
+                return "world"
 
         Is the same as ::
 
-            def world():
-                pass
+            def hello():
+                return "world"
             bot.add_command('hello', world)
 
         Args:
@@ -61,7 +61,6 @@ class Phial():
             ValueError
                 If command with the same name already registered
         '''
-        print(case_sensitive)
         command_pattern = self._build_command_pattern(command_pattern_template,
                                                       case_sensitive)
         if command_pattern not in self.commands:
@@ -111,8 +110,12 @@ class Phial():
             ::
 
                 @bot.command('hello')
-                def world():
-                    pass
+                def hello():
+                    return "world"
+
+                @bot.command('caseSensitive', case_sensitive=True)
+                def case_sensitive():
+                    return "You typed caseSensitive"
 
         '''
         def decorator(f):
@@ -192,14 +195,14 @@ class Phial():
 
                 @bot.command('hello')
                 @bot.alias('goodbye')
-                def world():
-                    pass
+                def hello():
+                    return "world"
 
             Is the same as ::
                 @bot.command('hello')
                 @bot.command('goodbye')
-                def world():
-                    pass
+                def hello():
+                    return "world"
         '''
         return self.command(command_pattern_template, case_sensitive)
 

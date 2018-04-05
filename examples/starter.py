@@ -65,5 +65,11 @@ def check():
         return "Process Stopped"
 
 
+@slackbot.command('caseSensitive', case_sensitive=True)
+def case_sensitive():
+    '''Simple command which replies with a message'''
+    return "You typed caseSensitive"
+
+
 if __name__ == '__main__':
     slackbot.run()
