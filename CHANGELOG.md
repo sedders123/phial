@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.2.0](https://github.com/sedders123/phial/releases/tag/0.2.0) - 2018-04-05
 ### Added
-- Optional Case Sensitivity for commands. Commands are now no longer case sensitve by default, they have an optional parameter to turn on case sensitivity if desired.
+- Optional Case Sensitivity for commands. Commands are now no longer case sensitive by default, they have an optional parameter to turn on case sensitivity if desired.
 ### Changed
 - Minimum Python version now 3.4
 
