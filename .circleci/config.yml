@@ -91,8 +91,8 @@ jobs:
           name: Create .pypirc
           command: |
             echo -e "[pypi]" >> ~/.pypirc
-            echo -e "username = sedders123" >> ~/.pypirc
-            echo -e "password = $PYPI_PASSWORD" >> ~/.pypirc
+            echo -e "username=sedders123" >> ~/.pypirc
+            echo -e "password=$PYPI_PASSWORD" >> ~/.pypirc
 
       - run:
           name: Create source distribution
