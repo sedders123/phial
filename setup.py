@@ -32,10 +32,10 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    python_requires='>=3.6',
+    python_requires='>=3.4',
     keywords=['Slack', 'bot', 'Slackbot'],
     install_requires=[
-        'slackclient==1.0.6',
+        'slackclient==1.2.1',
         'Werkzeug==0.12.2',
     ],
     classifiers=[
