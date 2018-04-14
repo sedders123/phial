@@ -1,22 +1,24 @@
 from werkzeug.local import LocalStack, LocalProxy
+from typing import cast, Dict
+from .wrappers import Command
 
 
-def _find_command():
+def _find_command() -> Command:
     '''Gets the command from the context stack'''
     top = _command_ctx_stack.top
     if top is None:
         raise RuntimeError('Not in a context with a command')
-    return top
+    return cast(Command, top)
 
 
-def _get_global():
+def _get_global() -> Dict:
     top = _global_ctx_stack.top
     if top is None:
         raise RuntimeError('Working outside the app context')
-    return top
+    return cast(Dict, top)
 
 
-_command_ctx_stack = LocalStack()
-_global_ctx_stack = LocalStack()
-command = LocalProxy(_find_command)
-g = LocalProxy(_get_global)
+_command_ctx_stack = LocalStack()  # type: ignore
+_global_ctx_stack = LocalStack()  # type: ignore
+command = cast(Command, LocalProxy(_find_command))  # type: Command
+g = cast(Dict, LocalProxy(_get_global))  # type: Dict

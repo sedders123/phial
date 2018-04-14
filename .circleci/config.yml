@@ -39,6 +39,12 @@ jobs:
             flake8 phial/ tests/
 
       - run:
+          name: Static type check
+          command: |
+            . venv/bin/activate
+            mypy phial --strict-optional --disallow-untyped-defs --disallow-incomplete-defs --disallow-untyped-decorators --no-implicit-optional --disallow-subclassing-any
+
+      - run:
           name: Run Tests
           command: |
             . venv/bin/activate

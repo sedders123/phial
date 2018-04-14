@@ -1,5 +1,6 @@
-from slackclient import SlackClient
+from slackclient import SlackClient  # type: ignore
 import re
+from typing import Dict, List, Pattern, Callable, Union, Tuple, Any  # noqa
 from .globals import _command_ctx_stack, command, _global_ctx_stack
 from .wrappers import Command, Response, Message, Attachment
 
@@ -16,23 +17,26 @@ class Phial():
         'prefix': '!'
     }
 
-    def __init__(self, token, config=default_config):
+    def __init__(self, token: str, config: dict = default_config) -> None:
         self.slack_client = SlackClient(token)
-        self.commands = {}
-        self.middleware_functions = []
+        self.commands = {}  # type: Dict
+        self.middleware_functions = []  # type: List
         self.config = config
         self.running = False
         _global_ctx_stack.push({})
 
     @staticmethod
-    def _build_command_pattern(command, case_sensitive):
+    def _build_command_pattern(command: str,
+                               case_sensitive: bool) -> Pattern[str]:
         '''Creates the command pattern regexs'''
         command_regex = re.sub(r'(<\w+>)', r'(?P\1.+)', command)
         return re.compile("^{}$".format(command_regex),
                           0 if case_sensitive else re.IGNORECASE)
 
-    def add_command(self, command_pattern_template, command_func,
-                    case_sensitive=False):
+    def add_command(self,
+                    command_pattern_template: str,
+                    command_func: Callable,
+                    case_sensitive: bool = False) -> None:
         '''
         Creates a command pattern and adds a command function to the bot. This
         is the same as :meth:`command`.
@@ -69,7 +73,8 @@ class Phial():
             raise ValueError('Command {0} already exists'
                              .format(command_pattern.split("<")[0]))
 
-    def get_command_match(self, text):
+    def get_command_match(self, text: str) -> Union[None,
+                                                    Tuple[Dict, Pattern[str]]]:
         '''
         Returns a dictionary of args and the command pattern for the command
         pattern that is matched.
@@ -93,7 +98,9 @@ class Phial():
         raise ValueError('Command "{}" has not been registered'
                          .format(text))
 
-    def command(self, command_pattern_template, case_sensitive=False):
+    def command(self,
+                command_pattern_template: str,
+                case_sensitive: bool = False) -> Callable:
         '''
         A decorator that is used to register a command function for a given
         command. This does the same as :meth:`add_command` but is used as a
@@ -118,12 +125,12 @@ class Phial():
                     return "You typed caseSensitive"
 
         '''
-        def decorator(f):
+        def decorator(f: Callable) -> Callable:
             self.add_command(command_pattern_template, f, case_sensitive)
             return f
         return decorator
 
-    def middleware(self):
+    def middleware(self) -> Callable:
         '''
         A decorator that is used to register a middleware function.
         This does the same as :meth:`add_middleware` but is used as a
@@ -150,12 +157,12 @@ class Phial():
                     return None
 
         '''
-        def decorator(f):
+        def decorator(f: Callable) -> Callable:
             self.middleware_functions.append(f)
             return f
         return decorator
 
-    def add_middleware(self, middleware_func):
+    def add_middleware(self, middleware_func: Callable) -> None:
         '''
         Adds a middleware function to the bot. This is the same as
         :meth:`middleware`.
@@ -178,7 +185,9 @@ class Phial():
         '''
         self.middleware_functions.append(middleware_func)
 
-    def alias(self, command_pattern_template, case_sensitive=False):
+    def alias(self,
+              command_pattern_template: str,
+              case_sensitive: bool =False) -> Callable:
         '''
         A decorator that is used to register an alias for a command.
         Internally this is the same as :meth:`command`.
@@ -206,7 +215,8 @@ class Phial():
         '''
         return self.command(command_pattern_template, case_sensitive)
 
-    def _create_command(self, command_message):
+    def _create_command(self,
+                        command_message: Message) -> Union[None, Command]:
         '''Creates an instance of a command'''
         command_match = self.get_command_match(command_message.text)
         if command_match:
@@ -216,8 +226,9 @@ class Phial():
                            kwargs,
                            command_message.user,
                            command_message)
+        return None
 
-    def _handle_command(self, command):
+    def _handle_command(self, command: Union[Command, None]) -> Any:
         '''Executes a given command'''
         if command is None:
             return  # Do nothing if no command
@@ -225,7 +236,9 @@ class Phial():
         return self.commands[command.command_pattern](**command
                                                       .args)
 
-    def _parse_slack_output(self, slack_rtm_output):
+    def _parse_slack_output(self,
+                            slack_rtm_output: List[Dict])-> Union[None,
+                                                                  Message]:
         """
             The Slack Real Time Messaging API is an events firehose.
             This function parses the JSON form Slack into phial Messages
@@ -244,7 +257,7 @@ class Phial():
                                    bot_id)
         return None
 
-    def send_message(self, message):
+    def send_message(self, message: Response) -> None:
         '''
         Takes a response object and then sends the message to Slack
 
@@ -264,7 +277,7 @@ class Phial():
                                        text=message.text,
                                        as_user=True)
 
-    def send_reaction(self, response):
+    def send_reaction(self, response: Response) -> None:
         '''
         Takes a `Response` object and then sends the reaction to Slack
 
@@ -279,7 +292,7 @@ class Phial():
                                    name=response.reaction,
                                    as_user=True)
 
-    def upload_attachment(self, attachment):
+    def upload_attachment(self, attachment: Attachment) -> None:
         '''
         Takes an `Attachment` object and then uploads the contents to Slack
 
@@ -293,7 +306,8 @@ class Phial():
                                    filename=attachment.filename,
                                    file=attachment.content)
 
-    def _execute_response(self, response):
+    def _execute_response(self,
+                          response: Union[str, Response, Attachment]) -> None:
         '''Execute the response of a command function'''
         if response is None:
             return  # Do nothing if command function returns nothing
@@ -319,10 +333,10 @@ class Phial():
                                  'must be set')
             self.upload_attachment(response)
 
-    def _is_running(self):
+    def _is_running(self) -> bool:
         return self.running
 
-    def _handle_message(self, message: Message):
+    def _handle_message(self, message: Message) -> None:
         '''
          Takes a `Message` object and  run the middleware on the message before
          attempting to create and executes a `Command` if the message has not
@@ -349,7 +363,7 @@ class Phial():
         finally:
             _command_ctx_stack.pop()
 
-    def run(self):
+    def run(self) -> None:
         '''Connects to slack client and handles incoming messages'''
         self.running = True
         slack_client = self.slack_client
