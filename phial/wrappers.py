@@ -1,28 +1,4 @@
-class Command():
-    '''
-    The command object used by Phial.
-
-    Attributes:
-        command_pattern(str): The regex used for matching the command
-        channel(str): The Slack channel ID the command was called from
-        args(dict): Any arguments passed to the command
-        user(str): The Slack User ID of the user who intiated the command
-        message_text(`Message`): The message that initiated the command
-    '''
-    def __init__(self, command_pattern, channel, args, user, message):
-        self.command_pattern = command_pattern
-        self.channel = channel
-        self.args = args
-        self.user = user
-        self.message = message
-        self.message_ts = message.timestamp
-
-    def __repr__(self):
-        return "<Command: {0}, {1} in {2}>".format(self.message,
-                                                   self.args, self.channel)
-
-    def __eq__(self, other):
-        return self.__dict__ == other.__dict__
+from typing import Dict, Pattern, IO, Union
 
 
 class Message():
@@ -39,19 +15,56 @@ class Message():
                                the ID of that bot.
                                Defaults to None.
     '''
-    def __init__(self, text, channel, user, timestamp, bot_id=None):
+    def __init__(self,
+                 text: str,
+                 channel: str,
+                 user: str,
+                 timestamp: str,
+                 bot_id: Union[str, None] = None) -> None:
         self.text = text
         self.channel = channel
         self.user = user
         self.timestamp = timestamp
         self.bot_id = bot_id
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Message: {0} in {1} at {2}>".format(self.text,
                                                      self.channel,
                                                      self.timestamp)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
+        return self.__dict__ == other.__dict__
+
+
+class Command():
+    '''
+    The command object used by Phial.
+
+    Attributes:
+        command_pattern(str): The regex used for matching the command
+        channel(str): The Slack channel ID the command was called from
+        args(dict): Any arguments passed to the command
+        user(str): The Slack User ID of the user who intiated the command
+        message_text(`Message`): The message that initiated the command
+    '''
+    def __init__(self,
+                 command_pattern: Pattern[str],
+                 channel: str,
+                 args: Dict,
+                 user: str,
+                 message: Message) -> None:
+        self.command_pattern = command_pattern
+        self.channel = channel
+        self.args = args
+        self.user = user
+        self.message = message
+        self.message_ts = message.timestamp
+
+    def __repr__(self) -> str:
+        return "<Command: {0}, {1} in {2}>".format(self.message,
+                                                   self.args, self.channel)
+
+    def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
 
 
@@ -92,16 +105,20 @@ class Response():
                                 original_ts='original_ts')
 
     '''
-    def __init__(self, channel, text=None, original_ts=None, reaction=None):
+    def __init__(self,
+                 channel: str,
+                 text: Union[str, None] = None,
+                 original_ts: Union[str, None] = None,
+                 reaction: Union[str, None] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
         self.reaction = reaction
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Response: {0}>".format(self.text)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
 
 
@@ -116,10 +133,13 @@ class Attachment():
                                       using open('<file>', 'rb')
 
     '''
-    def __init__(self, channel, filename=None, content=None):
+    def __init__(self,
+                 channel: str,
+                 filename: Union[str, None] = None,
+                 content: Union[IO[bytes], None] = None) -> None:
         self.channel = channel
         self.filename = filename
         self.content = content
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<Attachment in {0} >".format(self.channel)
