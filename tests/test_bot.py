@@ -4,7 +4,7 @@ from phial import Phial, command, Response, Attachment, g
 import phial.wrappers
 import phial.globals
 import re
-from .helpers import captured_output, MockTrueFunc
+from .helpers import MockTrueFunc
 
 
 class TestPhialBotIsRunning(unittest.TestCase):
@@ -580,12 +580,13 @@ class TestRun(TestPhialBot):
                                               'user_id',
                                               'timestamp')
         self.bot._parse_slack_output = MagicMock(return_value=test_command)
-        with captured_output() as (out, err):
+
+        expected_msg = 'ValueError: Command "test" has not been registered'
+        with self.assertLogs(logger='phial.bot', level='ERROR') as cm:
             self.bot.run()
 
-        output = out.getvalue().strip()
-        expected_msg = 'ValueError: Command "test" has not been registered'
-        self.assertTrue(expected_msg in output)
+            error = cm.output[0]
+            self.assertIn(expected_msg, error)
 
 
 class TestGlobalContext(unittest.TestCase):
