@@ -8,8 +8,6 @@ phial
 Phial is a slack bot framework, modelled loosely on
 `flask <https://github.com/pallets/flask/>`__.
 
-NOTE: This package is still in early development, things are likely to
-change
 
 Table of Contents
 -----------------
