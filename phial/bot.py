@@ -1,6 +1,7 @@
 from slackclient import SlackClient  # type: ignore
 import re
 from typing import Dict, List, Pattern, Callable, Union, Tuple, Any  # noqa
+import logging
 from .globals import _command_ctx_stack, command, _global_ctx_stack
 from .wrappers import Command, Response, Message, Attachment
 
@@ -17,12 +18,17 @@ class Phial():
         'prefix': '!'
     }
 
-    def __init__(self, token: str, config: dict = default_config) -> None:
+    def __init__(self,
+                 token: str,
+                 config: dict = default_config,
+                 logger: logging.Logger = logging.getLogger(__name__)) -> None:
         self.slack_client = SlackClient(token)
         self.commands = {}  # type: Dict
         self.middleware_functions = []  # type: List
         self.config = config
         self.running = False
+        self.logger = logger
+
         _global_ctx_stack.push({})
 
     @staticmethod
@@ -69,6 +75,8 @@ class Phial():
                                                       case_sensitive)
         if command_pattern not in self.commands:
             self.commands[command_pattern] = command_func
+            self.logger.debug("Command {0} added"
+                              .format(command_pattern_template))
         else:
             raise ValueError('Command {0} already exists'
                              .format(command_pattern.split("<")[0]))
@@ -158,7 +166,7 @@ class Phial():
 
         '''
         def decorator(f: Callable) -> Callable:
-            self.middleware_functions.append(f)
+            self.add_middleware(f)
             return f
         return decorator
 
@@ -183,6 +191,10 @@ class Phial():
             middleware_func(func): The function to be added to the middleware
                                    pipeline
         '''
+        self.logger.debug("Middleware {0} added"
+                          .format(getattr(middleware_func,
+                                          '__name__',
+                                          repr(middleware_func))))
         self.middleware_functions.append(middleware_func)
 
     def alias(self,
@@ -247,6 +259,8 @@ class Phial():
         if output_list and len(output_list) > 0:
             for output in output_list:
                 if(output and 'text' in output):
+                    self.logger.debug("Message recieved from Slack: {0}"
+                                      .format(output))
                     bot_id = None
                     if 'bot_id' in output:
                         bot_id = output['bot_id']
@@ -359,7 +373,7 @@ class Phial():
             response = self._handle_command(command)
             self._execute_response(response)
         except ValueError as err:
-            print('ValueError: {}'.format(err))
+            self.logger.exception('ValueError: {}'.format(err))
         finally:
             _command_ctx_stack.pop()
 
@@ -370,7 +384,7 @@ class Phial():
         if not slack_client.rtm_connect():
             raise ValueError("Connection failed. Invalid Token or bot ID")
 
-        print("Phial connected and running!")
+        self.logger.info("Phial connected and running!")
         while self._is_running():
             try:
                 message = self._parse_slack_output(slack_client
@@ -378,4 +392,4 @@ class Phial():
                 if message:
                     self._handle_message(message)
             except Exception as e:
-                print("Error: {0}".format(e))
+                self.logger.exception("Error: {0}".format(e))
