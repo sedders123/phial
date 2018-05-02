@@ -75,6 +75,8 @@ class Phial():
                                                       case_sensitive)
         if command_pattern not in self.commands:
             self.commands[command_pattern] = command_func
+            self.logger.debug("Command {0} added"
+                              .format(command_pattern_template))
         else:
             raise ValueError('Command {0} already exists'
                              .format(command_pattern.split("<")[0]))
@@ -164,7 +166,7 @@ class Phial():
 
         '''
         def decorator(f: Callable) -> Callable:
-            self.middleware_functions.append(f)
+            self.add_middleware(f)
             return f
         return decorator
 
@@ -189,6 +191,10 @@ class Phial():
             middleware_func(func): The function to be added to the middleware
                                    pipeline
         '''
+        self.logger.debug("Middleware {0} added"
+                          .format(getattr(middleware_func,
+                                          '__name__',
+                                          repr(middleware_func))))
         self.middleware_functions.append(middleware_func)
 
     def alias(self,
@@ -253,6 +259,8 @@ class Phial():
         if output_list and len(output_list) > 0:
             for output in output_list:
                 if(output and 'text' in output):
+                    self.logger.debug("Message recieved from Slack: {0}"
+                                      .format(output))
                     bot_id = None
                     if 'bot_id' in output:
                         bot_id = output['bot_id']
