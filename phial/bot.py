@@ -330,10 +330,10 @@ class Phial():
         if isinstance(response, str):
             self.send_message(Response(text=response, channel=command.channel))
 
-        elif isinstance(response, list) and all(isinstance(x,
-                            MessageAttachment) for x in response):
+        elif (isinstance(response, list) and
+              all(isinstance(x, MessageAttachment) for x in response)):
             self.send_message(Response(attachments=response,
-                                        channel=command.channel))
+                              channel=command.channel))
 
         elif not isinstance(response, Response) and not isinstance(response,
                                                                    Attachment):
