@@ -109,7 +109,7 @@ class Response():
                  channel: str,
                  text: Optional[str] = None,
                  original_ts: Optional[str] = None,
-                 attachments: Optional[object] = None,
+                 attachments: Optional[list] = None,
                  reaction: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text
@@ -117,12 +117,14 @@ class Response():
         self.reaction = reaction
         self.attachments = attachments
 
-    def serialiseAttachments(self) -> list:
+    def serialiseAttachments(self) -> None:
         result = []
-        for attachment in self.attachments:
-            result.append(attachment.serialise())
+        if (isinstance(self.attachments, list) and
+           all(isinstance(x, MessageAttachment) for x in self.attachments)):
+            for attachment in self.attachments:
+                result.append(attachment.serialise())
 
-        self.attachments = result
+            self.attachments = result
 
     def __repr__(self) -> str:
         return "<Response: {0}>".format(self.text)
@@ -183,22 +185,26 @@ class MessageAttachment():
 
     def serialise(self) -> object:
         fieldResult = []
-        for field in self.fields:
-            fieldResult.append(field.serialise())
-        return {
-            "fallback": self.fallback,
-            "color": self.color,
-            "author_link": self.author_link,
-            "author_icon": self.author_icon,
-            "title": self.title,
-            "title_link": self.title_link,
-            "text": self.text,
-            "image_url": self.image_url,
-            "thumb_url": self.thumb_url,
-            "fields": fieldResult,
-            "footer": self.footer,
-            "footer_icon": self.footer_icon,
-        }
+
+        if (isinstance(self.fields, list) and
+           all(isinstance(x, MessageAttachmentField) for x in self.fields)):
+            for field in self.fields:
+                fieldResult.append(field.serialise())
+            return {
+                "fallback": self.fallback,
+                "color": self.color,
+                "author_link": self.author_link,
+                "author_icon": self.author_icon,
+                "title": self.title,
+                "title_link": self.title_link,
+                "text": self.text,
+                "image_url": self.image_url,
+                "thumb_url": self.thumb_url,
+                "fields": fieldResult,
+                "footer": self.footer,
+                "footer_icon": self.footer_icon,
+            }
+        return None
 
 
 class MessageAttachmentField():
