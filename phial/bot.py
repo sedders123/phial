@@ -3,7 +3,7 @@ import re
 from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
 import logging
 from .globals import _command_ctx_stack, command, _global_ctx_stack
-from .wrappers import Command, Response, Message, Attachment
+from .wrappers import Command, Response, Message, Attachment, MessageAttachment
 
 
 class Phial():
@@ -278,16 +278,19 @@ class Phial():
             message(Response): message object to be sent to Slack
 
         '''
+        message.serialiseAttachments()
         if message.original_ts:
             self.slack_client.api_call("chat.postMessage",
                                        channel=message.channel,
                                        text=message.text,
                                        thread_ts=message.original_ts,
+                                       attachments=message.attachments,
                                        as_user=True)
         else:
             self.slack_client.api_call("chat.postMessage",
                                        channel=message.channel,
                                        text=message.text,
+                                       attachments=message.attachments,
                                        as_user=True)
 
     def send_reaction(self, response: Response) -> None:
@@ -326,6 +329,9 @@ class Phial():
             return  # Do nothing if command function returns nothing
         if isinstance(response, str):
             self.send_message(Response(text=response, channel=command.channel))
+
+        elif isinstance(response, list) and all(isinstance(x, MessageAttachment) for x in response):
+            self.send_message(Response(attachments=response, channel=command.channel))
 
         elif not isinstance(response, Response) and not isinstance(response,
                                                                    Attachment):

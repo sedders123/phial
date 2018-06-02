@@ -109,11 +109,20 @@ class Response():
                  channel: str,
                  text: Optional[str] = None,
                  original_ts: Optional[str] = None,
+                 attachments: Optional[object] = None,
                  reaction: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
         self.reaction = reaction
+        self.attachments = attachments
+
+    def serialiseAttachments(self) -> list:
+        result = []
+        for attachment in self.attachments:
+            result.append(attachment.serialise())
+
+        self.attachments = result
 
     def __repr__(self) -> str:
         return "<Response: {0}>".format(self.text)
@@ -143,3 +152,65 @@ class Attachment():
 
     def __repr__(self) -> str:
         return "<Attachment in {0} >".format(self.channel)
+
+class MessageAttachment():
+    def __init__(self,
+                 fallback: Union[str, None] = None,
+                 color: Union[str, None] = None,
+                 author_link: Union[str, None] = None,
+                 author_icon: Union[str, None] = None,
+                 title: Union[str, None] = None,
+                 title_link: Union[str, None] = None,
+                 text: Union[str, None] = None,
+                 image_url: Union[str, None] = None,
+                 thumb_url: Union[str, None] = None,
+                 fields: Union[object, None] = None,
+                 footer: Union[str, None] = None,
+                 footer_icon: Union[str, None] = None) -> None:
+        self.fallback = fallback
+        self.color = color
+        self.author_link = author_link
+        self.author_icon = author_icon
+        self.title = title
+        self.title_link = title_link
+        self.text = text
+        self.image_url = image_url
+        self.thumb_url = thumb_url
+        self.fields = fields
+        self.footer = footer
+        self.footer_icon = footer_icon
+
+    def serialise(self) -> object:
+        fieldResult = []
+        for field in self.fields:
+            fieldResult.append(field.serialise())
+        return {
+            "fallback": self.fallback,
+            "color": self.color,
+            "author_link": self.author_link,
+            "author_icon": self.author_icon,
+            "title": self.title,
+            "title_link": self.title_link,
+            "text": self.text,
+            "image_url": self.image_url,
+            "thumb_url": self.thumb_url,
+            "fields": fieldResult,
+            "footer": self.footer,
+            "footer_icon": self.footer_icon,
+        }
+
+class MessageAttachmentField():
+    def __init__(self,
+                 title: Union[str, None] = None,
+                 value: Union[str, None] = None,
+                 short: Union[str, bool] = None) -> None:
+        self.title = title
+        self.value = value
+        self.short = short
+
+    def serialise(self) -> object:
+        return {
+            "title": self.title,
+            "value": self.value,
+            "short": self.short,
+        }
