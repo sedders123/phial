@@ -81,8 +81,8 @@ class Phial():
             raise ValueError('Command {0} already exists'
                              .format(command_pattern.split("<")[0]))
 
-    def get_command_match(self, text: str) -> Optional[
-                                                    Tuple[Dict, Pattern[str]]]:
+    def get_command_match(self, text: str) -> Optional[Tuple[Dict,
+                                                             Pattern[str]]]:
         '''
         Returns a dictionary of args and the command pattern for the command
         pattern that is matched.
