@@ -54,7 +54,7 @@ jobs:
           name: Upload coverage
           command: |
             . venv/bin/activate
-            coveralls
+            [[ -v "${COVERALLS_REPO_TOKEN}" ]] && coveralls
 
   deploy:
     docker:
