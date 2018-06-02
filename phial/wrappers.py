@@ -153,20 +153,21 @@ class Attachment():
     def __repr__(self) -> str:
         return "<Attachment in {0} >".format(self.channel)
 
+
 class MessageAttachment():
     def __init__(self,
-                 fallback: Union[str, None] = None,
-                 color: Union[str, None] = None,
-                 author_link: Union[str, None] = None,
-                 author_icon: Union[str, None] = None,
-                 title: Union[str, None] = None,
-                 title_link: Union[str, None] = None,
-                 text: Union[str, None] = None,
-                 image_url: Union[str, None] = None,
-                 thumb_url: Union[str, None] = None,
-                 fields: Union[object, None] = None,
-                 footer: Union[str, None] = None,
-                 footer_icon: Union[str, None] = None) -> None:
+                 fallback: Optional[str] = None,
+                 color: Optional[str] = None,
+                 author_link: Optional[str] = None,
+                 author_icon: Optional[str] = None,
+                 title: Optional[str] = None,
+                 title_link: Optional[str] = None,
+                 text: Optional[str] = None,
+                 image_url: Optional[str] = None,
+                 thumb_url: Optional[str] = None,
+                 fields: Optional[object] = None,
+                 footer: Optional[str] = None,
+                 footer_icon: Optional[str] = None) -> None:
         self.fallback = fallback
         self.color = color
         self.author_link = author_link
@@ -199,11 +200,12 @@ class MessageAttachment():
             "footer_icon": self.footer_icon,
         }
 
+
 class MessageAttachmentField():
     def __init__(self,
-                 title: Union[str, None] = None,
-                 value: Union[str, None] = None,
-                 short: Union[str, bool] = None) -> None:
+                 title: Optional[str] = None,
+                 value: Optional[str] = None,
+                 short: Optional[bool] = None) -> None:
         self.title = title
         self.value = value
         self.short = short
