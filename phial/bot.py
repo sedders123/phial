@@ -1,6 +1,6 @@
 from slackclient import SlackClient  # type: ignore
 import re
-from typing import Dict, List, Pattern, Callable, Union, Tuple, Any  # noqa
+from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
 import logging
 from .globals import _command_ctx_stack, command, _global_ctx_stack
 from .wrappers import Command, Response, Message, Attachment
@@ -81,7 +81,7 @@ class Phial():
             raise ValueError('Command {0} already exists'
                              .format(command_pattern.split("<")[0]))
 
-    def get_command_match(self, text: str) -> Union[None,
+    def get_command_match(self, text: str) -> Optional[
                                                     Tuple[Dict, Pattern[str]]]:
         '''
         Returns a dictionary of args and the command pattern for the command
@@ -228,7 +228,7 @@ class Phial():
         return self.command(command_pattern_template, case_sensitive)
 
     def _create_command(self,
-                        command_message: Message) -> Union[None, Command]:
+                        command_message: Message) -> Optional[Command]:
         '''Creates an instance of a command'''
         command_match = self.get_command_match(command_message.text)
         if command_match:
@@ -240,7 +240,7 @@ class Phial():
                            command_message)
         return None
 
-    def _handle_command(self, command: Union[Command, None]) -> Any:
+    def _handle_command(self, command: Optional[Command]) -> Any:
         '''Executes a given command'''
         if command is None:
             return  # Do nothing if no command
@@ -249,8 +249,7 @@ class Phial():
                                                       .args)
 
     def _parse_slack_output(self,
-                            slack_rtm_output: List[Dict])-> Union[None,
-                                                                  Message]:
+                            slack_rtm_output: List[Dict])-> Optional[Message]:
         """
             The Slack Real Time Messaging API is an events firehose.
             This function parses the JSON form Slack into phial Messages

@@ -1,4 +1,4 @@
-from typing import Dict, Pattern, IO, Union
+from typing import Dict, Pattern, IO, Optional
 
 
 class Message():
@@ -20,7 +20,7 @@ class Message():
                  channel: str,
                  user: str,
                  timestamp: str,
-                 bot_id: Union[str, None] = None) -> None:
+                 bot_id: Optional[str] = None) -> None:
         self.text = text
         self.channel = channel
         self.user = user
@@ -107,9 +107,9 @@ class Response():
     '''
     def __init__(self,
                  channel: str,
-                 text: Union[str, None] = None,
-                 original_ts: Union[str, None] = None,
-                 reaction: Union[str, None] = None) -> None:
+                 text: Optional[str] = None,
+                 original_ts: Optional[str] = None,
+                 reaction: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
@@ -135,8 +135,8 @@ class Attachment():
     '''
     def __init__(self,
                  channel: str,
-                 filename: Union[str, None] = None,
-                 content: Union[IO[bytes], None] = None) -> None:
+                 filename: Optional[str] = None,
+                 content: Optional[IO[bytes]] = None) -> None:
         self.channel = channel
         self.filename = filename
         self.content = content
