@@ -117,15 +117,6 @@ class Response():
         self.reaction = reaction
         self.attachments = attachments
 
-    def serialiseAttachments(self) -> None:
-        result = []
-        if (isinstance(self.attachments, list) and
-           all(isinstance(x, MessageAttachment) for x in self.attachments)):
-            for attachment in self.attachments:
-                result.append(attachment.serialise())
-
-            self.attachments = result
-
     def __repr__(self) -> str:
         return "<Response: {0}>".format(self.text)
 
@@ -156,10 +147,56 @@ class Attachment():
         return "<Attachment in {0} >".format(self.channel)
 
 
+class MessageAttachmentField():
+    '''
+    Displays field in message attachment
+
+    Attributes:
+        title(str): The title of the field
+        value(str): The value of the field
+        short(bool): If false, 2 fields will be displayed on the same line
+
+    '''
+    def __init__(self,
+                 title: Optional[str] = None,
+                 value: Optional[str] = None,
+                 short: Optional[bool] = None) -> None:
+        self.title = title
+        self.value = value
+        self.short = short
+
+    def __repr__(self) -> str:
+        return "<Message Attachment Field with title {0} >".format(self.title)
+
+
 class MessageAttachment():
+    '''
+    Displays a message attachment
+
+    Attributes:
+        fallback(str): Plain text summary of the attachment
+        color(str): Hex code beginning with a '#' for the side bar colour
+        author_name(str): Small text to display the authors name
+        author_link(str): URL for link on authors name
+        author_icon(str): URL for 16x16 icon beside the authors name
+        title(str): The title of the attachment
+        title_link(str): A URL for the attachment title
+        text(str): The main text body of an attachment
+        image_url(str): URL to an image file that will be displayed with
+                        an attachment
+        thumb_url(str): URL to an image file that will be displayed as a
+                        thumbnail on the right side of a message attachment
+        fields(list): A list of MessageAttachmentFields to display on the
+                      attachment
+        footer(str): Small text to help contextualize and identify an
+                     attachment
+        footer_icon(str): URL for 16x16 icon beside the footer
+
+    '''
     def __init__(self,
                  fallback: Optional[str] = None,
                  color: Optional[str] = None,
+                 author_name: Optional[str] = None,
                  author_link: Optional[str] = None,
                  author_icon: Optional[str] = None,
                  title: Optional[str] = None,
@@ -167,11 +204,12 @@ class MessageAttachment():
                  text: Optional[str] = None,
                  image_url: Optional[str] = None,
                  thumb_url: Optional[str] = None,
-                 fields: Optional[object] = None,
+                 fields: Optional[list] = None,
                  footer: Optional[str] = None,
                  footer_icon: Optional[str] = None) -> None:
         self.fallback = fallback
         self.color = color
+        self.author_name = author_name
         self.author_link = author_link
         self.author_icon = author_icon
         self.title = title
@@ -183,42 +221,5 @@ class MessageAttachment():
         self.footer = footer
         self.footer_icon = footer_icon
 
-    def serialise(self) -> object:
-        fieldResult = []
-
-        if (isinstance(self.fields, list) and
-           all(isinstance(x, MessageAttachmentField) for x in self.fields)):
-            for field in self.fields:
-                fieldResult.append(field.serialise())
-            return {
-                "fallback": self.fallback,
-                "color": self.color,
-                "author_link": self.author_link,
-                "author_icon": self.author_icon,
-                "title": self.title,
-                "title_link": self.title_link,
-                "text": self.text,
-                "image_url": self.image_url,
-                "thumb_url": self.thumb_url,
-                "fields": fieldResult,
-                "footer": self.footer,
-                "footer_icon": self.footer_icon,
-            }
-        return None
-
-
-class MessageAttachmentField():
-    def __init__(self,
-                 title: Optional[str] = None,
-                 value: Optional[str] = None,
-                 short: Optional[bool] = None) -> None:
-        self.title = title
-        self.value = value
-        self.short = short
-
-    def serialise(self) -> object:
-        return {
-            "title": self.title,
-            "value": self.value,
-            "short": self.short,
-        }
+    def __repr__(self) -> str:
+        return "<Message Attachment with text {0} >".format(self.text)

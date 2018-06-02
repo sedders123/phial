@@ -2,6 +2,7 @@ from slackclient import SlackClient  # type: ignore
 import re
 from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
 import logging
+import json
 from .globals import _command_ctx_stack, command, _global_ctx_stack
 from .wrappers import Command, Response, Message, Attachment, MessageAttachment
 
@@ -278,19 +279,23 @@ class Phial():
             message(Response): message object to be sent to Slack
 
         '''
-        message.serialiseAttachments()
+
         if message.original_ts:
             self.slack_client.api_call("chat.postMessage",
                                        channel=message.channel,
                                        text=message.text,
                                        thread_ts=message.original_ts,
-                                       attachments=message.attachments,
+                                       attachments=json.dumps(
+                                           message.attachments,
+                                           default=lambda o: o.__dict__),
                                        as_user=True)
         else:
             self.slack_client.api_call("chat.postMessage",
                                        channel=message.channel,
                                        text=message.text,
-                                       attachments=message.attachments,
+                                       attachments=json.dumps(
+                                           message.attachments,
+                                           default=lambda o: o.__dict__),
                                        as_user=True)
 
     def send_reaction(self, response: Response) -> None:
@@ -323,15 +328,15 @@ class Phial():
                                    file=attachment.content)
 
     def _execute_response(self,
-                          response: Union[str, Response, Attachment]) -> None:
+                          response: Union[str, Response, Attachment,
+                                          List[MessageAttachment]]) -> None:
         '''Execute the response of a command function'''
         if response is None:
             return  # Do nothing if command function returns nothing
         if isinstance(response, str):
             self.send_message(Response(text=response, channel=command.channel))
 
-        elif (isinstance(response, list) and
-              all(isinstance(x, MessageAttachment) for x in response)):
+        elif (isinstance(response, list) and len(response) > 0):
             self.send_message(Response(attachments=response,
                               channel=command.channel))
 

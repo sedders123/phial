@@ -343,7 +343,8 @@ class TestSendMessage(TestPhialBot):
         self.bot.slack_client.api_call.assert_called_with('chat.postMessage',
                                                           channel='channel_id',
                                                           text='Hi test',
-                                                          as_user=True)
+                                                          as_user=True,
+                                                          attachments='null')
 
     def test_send_reply(self):
         self.bot.slack_client = MagicMock()
@@ -358,7 +359,8 @@ class TestSendMessage(TestPhialBot):
                                 channel='channel_id',
                                 text='Hi test',
                                 thread_ts='timestamp',
-                                as_user=True)
+                                as_user=True,
+                                attachments='null')
 
 
 class TestSendReaction(TestPhialBot):
