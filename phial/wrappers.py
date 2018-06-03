@@ -158,6 +158,9 @@ class Response():
                           will put the text response in a thread
         reation(str): A valid slack emoji name. NOTE: will only work when
                       original_ts is populated
+        attachments(List[MessageAttachments]): A list of MessageAttachment
+                                              objects to be attached to the
+                                              message
 
     Examples:
         The following would send a message to a slack channel when executed ::
