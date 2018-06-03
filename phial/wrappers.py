@@ -1,4 +1,4 @@
-from typing import Dict, Pattern, IO, Optional
+from typing import Dict, Pattern, IO, Optional, List
 
 
 class Message():
@@ -68,85 +68,6 @@ class Command():
         return self.__dict__ == other.__dict__
 
 
-class Response():
-    '''
-    When returned in a command function will send a message, or reaction to
-    slack depending on contents.
-
-    Attributes:
-        channel(str): The Slack channel ID the response will be sent to
-        text(str): The response contents
-        original_ts(str): The timestamp of the original message. If populated
-                          will put the text response in a thread
-        reation(str): A valid slack emoji name. NOTE: will only work when
-                      original_ts is populated
-
-    Examples:
-        The following would send a message to a slack channel when executed ::
-
-            @slackbot.command('ping')
-            def ping():
-                return Response(text="Pong", channel='channel_id')
-
-        The following would send a reply to a message in a thread ::
-
-            @slackbot.command('hello')
-            def hello():
-                return Response(text="hi",
-                                channel='channel_id',
-                                original_ts='original_ts')
-
-        The following would send a reaction to a message ::
-
-            @slackbot.command('react')
-            def react():
-                return Response(reaction="x",
-                                channel='channel_id',
-                                original_ts='original_ts')
-
-    '''
-    def __init__(self,
-                 channel: str,
-                 text: Optional[str] = None,
-                 original_ts: Optional[str] = None,
-                 attachments: Optional[list] = None,
-                 reaction: Optional[str] = None) -> None:
-        self.channel = channel
-        self.text = text
-        self.original_ts = original_ts
-        self.reaction = reaction
-        self.attachments = attachments
-
-    def __repr__(self) -> str:
-        return "<Response: {0}>".format(self.text)
-
-    def __eq__(self, other: object) -> bool:
-        return self.__dict__ == other.__dict__
-
-
-class Attachment():
-    '''
-    When returned in a command function will send an attachment to Slack
-
-    Attributes:
-        channel(str): The Slack channel ID the file will be sent to
-        filename(str): The filename of the file
-        content(`io.BufferedReader`): The file to send to Slack. Open file
-                                      using open('<file>', 'rb')
-
-    '''
-    def __init__(self,
-                 channel: str,
-                 filename: Optional[str] = None,
-                 content: Optional[IO[bytes]] = None) -> None:
-        self.channel = channel
-        self.filename = filename
-        self.content = content
-
-    def __repr__(self) -> str:
-        return "<Attachment in {0} >".format(self.channel)
-
-
 class MessageAttachmentField():
     '''
     Displays field in message attachment
@@ -204,7 +125,7 @@ class MessageAttachment():
                  text: Optional[str] = None,
                  image_url: Optional[str] = None,
                  thumb_url: Optional[str] = None,
-                 fields: Optional[list] = None,
+                 fields: Optional[List[MessageAttachmentField]] = None,
                  footer: Optional[str] = None,
                  footer_icon: Optional[str] = None) -> None:
         self.fallback = fallback
@@ -223,3 +144,82 @@ class MessageAttachment():
 
     def __repr__(self) -> str:
         return "<Message Attachment with text {0} >".format(self.text)
+
+
+class Response():
+    '''
+    When returned in a command function will send a message, or reaction to
+    slack depending on contents.
+
+    Attributes:
+        channel(str): The Slack channel ID the response will be sent to
+        text(str): The response contents
+        original_ts(str): The timestamp of the original message. If populated
+                          will put the text response in a thread
+        reation(str): A valid slack emoji name. NOTE: will only work when
+                      original_ts is populated
+
+    Examples:
+        The following would send a message to a slack channel when executed ::
+
+            @slackbot.command('ping')
+            def ping():
+                return Response(text="Pong", channel='channel_id')
+
+        The following would send a reply to a message in a thread ::
+
+            @slackbot.command('hello')
+            def hello():
+                return Response(text="hi",
+                                channel='channel_id',
+                                original_ts='original_ts')
+
+        The following would send a reaction to a message ::
+
+            @slackbot.command('react')
+            def react():
+                return Response(reaction="x",
+                                channel='channel_id',
+                                original_ts='original_ts')
+
+    '''
+    def __init__(self,
+                 channel: str,
+                 text: Optional[str] = None,
+                 original_ts: Optional[str] = None,
+                 attachments: Optional[List[MessageAttachment]] = None,
+                 reaction: Optional[str] = None) -> None:
+        self.channel = channel
+        self.text = text
+        self.original_ts = original_ts
+        self.reaction = reaction
+        self.attachments = attachments
+
+    def __repr__(self) -> str:
+        return "<Response: {0}>".format(self.text)
+
+    def __eq__(self, other: object) -> bool:
+        return self.__dict__ == other.__dict__
+
+
+class Attachment():
+    '''
+    When returned in a command function will send an attachment to Slack
+
+    Attributes:
+        channel(str): The Slack channel ID the file will be sent to
+        filename(str): The filename of the file
+        content(`io.BufferedReader`): The file to send to Slack. Open file
+                                      using open('<file>', 'rb')
+
+    '''
+    def __init__(self,
+                 channel: str,
+                 filename: Optional[str] = None,
+                 content: Optional[IO[bytes]] = None) -> None:
+        self.channel = channel
+        self.filename = filename
+        self.content = content
+
+    def __repr__(self) -> str:
+        return "<Attachment in {0} >".format(self.channel)

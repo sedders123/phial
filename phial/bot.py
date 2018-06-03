@@ -279,7 +279,6 @@ class Phial():
             message(Response): message object to be sent to Slack
 
         '''
-
         if message.original_ts:
             self.slack_client.api_call("chat.postMessage",
                                        channel=message.channel,
@@ -336,7 +335,8 @@ class Phial():
         if isinstance(response, str):
             self.send_message(Response(text=response, channel=command.channel))
 
-        elif (isinstance(response, list) and len(response) > 0):
+        elif (isinstance(response, list) and len(response) > 0
+              and all(isinstance(x, MessageAttachment) for x in response)):
             self.send_message(Response(attachments=response,
                               channel=command.channel))
 
