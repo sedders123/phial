@@ -335,11 +335,6 @@ class Phial():
         if isinstance(response, str):
             self.send_message(Response(text=response, channel=command.channel))
 
-        elif (isinstance(response, list) and len(response) > 0
-              and all(isinstance(x, MessageAttachment) for x in response)):
-            self.send_message(Response(attachments=response,
-                              channel=command.channel))
-
         elif not isinstance(response, Response) and not isinstance(response,
                                                                    Attachment):
             raise ValueError('Only Response or Attachment objects can be ' +
@@ -351,7 +346,7 @@ class Phial():
                                  + 'Reaction, Text')
             if response.original_ts and response.reaction:
                 self.send_reaction(response)
-            elif response.text:
+            elif response.text or response.attachments:
                 self.send_message(response)
         if isinstance(response, Attachment):
             if not response.content:
