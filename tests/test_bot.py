@@ -1,6 +1,7 @@
 import unittest
 from unittest.mock import MagicMock, mock_open
-from phial import Phial, command, Response, Attachment, g
+from phial import (Phial, command, Response, Attachment,
+                   MessageAttachment, MessageAttachmentField, g)
 import phial.wrappers
 import phial.globals
 import re
@@ -361,6 +362,56 @@ class TestSendMessage(TestPhialBot):
                                 thread_ts='timestamp',
                                 as_user=True,
                                 attachments='null')
+
+
+class TestSendMessageWithMessageAttachments(TestPhialBot):
+    '''Test phial's send_message function with message attachments'''
+
+    def test_send_message(self):
+        self.bot.slack_client = MagicMock()
+        self.bot.slack_client.api_call = MagicMock(return_value="test")
+        message = Response(channel="channel_id",
+                           attachments=[MessageAttachment(
+                                fallback="fallback",
+                                author_name="John Doe",
+                                author_link="https://example.com/author",
+                                author_icon="https://example.com/author.jpg",
+                                color="#36a64f",
+                                title="Title",
+                                title_link="https://example.com",
+                                image_url="https://example.com/image.jpg",
+                                text="Go to Example Website",
+                                footer="Footer text",
+                                footer_icon="https://example.com/footer.jpg",
+                                thumb_url="https://example.com/thumb.jpg",
+                                fields=[
+                                    MessageAttachmentField(
+                                        title="Established",
+                                        value="2008",
+                                        short=False),
+                                    MessageAttachmentField(
+                                        title="Users",
+                                        value="27 Million",
+                                        short=True)])])
+        self.bot.send_message(message)
+
+        attachments = """[{"fallback": "fallback", "color": "#36a64f",
+ "author_name": "John Doe", "author_link": "https://example.com/author",
+ "author_icon": "https://example.com/author.jpg", "title": "Title",
+ "title_link": "https://example.com", "text":
+ "Go to Example Website", "image_url": "https://example.com/image.jpg",
+ "thumb_url": "https://example.com/thumb.jpg", "fields": [{"title":
+ "Established", "value": "2008", "short": false},
+ {"title": "Users", "value": "27 Million",
+ "short": true}], "footer": "Footer text", "footer_icon":
+ "https://example.com/footer.jpg"}]""".replace('\n', "")
+
+        self.bot.slack_client.api_call.assert_called_with('chat.postMessage',
+                                                          channel='channel_id',
+                                                          as_user=True,
+                                                          attachments=(
+                                                           attachments),
+                                                          text=None)
 
 
 class TestSendReaction(TestPhialBot):
