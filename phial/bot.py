@@ -4,7 +4,7 @@ from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
 import logging
 import json
 from .globals import _command_ctx_stack, command, _global_ctx_stack
-from .wrappers import Command, Response, Message, Attachment, MessageAttachment
+from .wrappers import Command, Response, Message, Attachment
 
 
 class Phial():
@@ -327,8 +327,7 @@ class Phial():
                                    file=attachment.content)
 
     def _execute_response(self,
-                          response: Union[str, Response, Attachment,
-                                          List[MessageAttachment]]) -> None:
+                          response: Union[str, Response, Attachment]) -> None:
         '''Execute the response of a command function'''
         if response is None:
             return  # Do nothing if command function returns nothing
