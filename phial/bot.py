@@ -2,6 +2,7 @@ from slackclient import SlackClient  # type: ignore
 import re
 from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
 import logging
+import json
 from .globals import _command_ctx_stack, command, _global_ctx_stack
 from .wrappers import Command, Response, Message, Attachment
 
@@ -283,11 +284,17 @@ class Phial():
                                        channel=message.channel,
                                        text=message.text,
                                        thread_ts=message.original_ts,
+                                       attachments=json.dumps(
+                                           message.attachments,
+                                           default=lambda o: o.__dict__),
                                        as_user=True)
         else:
             self.slack_client.api_call("chat.postMessage",
                                        channel=message.channel,
                                        text=message.text,
+                                       attachments=json.dumps(
+                                           message.attachments,
+                                           default=lambda o: o.__dict__),
                                        as_user=True)
 
     def send_reaction(self, response: Response) -> None:
@@ -338,7 +345,7 @@ class Phial():
                                  + 'Reaction, Text')
             if response.original_ts and response.reaction:
                 self.send_reaction(response)
-            elif response.text:
+            elif response.text or response.attachments:
                 self.send_message(response)
         if isinstance(response, Attachment):
             if not response.content:

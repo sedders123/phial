@@ -1,9 +1,11 @@
 import unittest
 from unittest.mock import MagicMock, mock_open
-from phial import Phial, command, Response, Attachment, g
+from phial import (Phial, command, Response, Attachment,
+                   MessageAttachment, MessageAttachmentField, g)
 import phial.wrappers
 import phial.globals
 import re
+import json
 from .helpers import MockTrueFunc
 
 
@@ -343,7 +345,8 @@ class TestSendMessage(TestPhialBot):
         self.bot.slack_client.api_call.assert_called_with('chat.postMessage',
                                                           channel='channel_id',
                                                           text='Hi test',
-                                                          as_user=True)
+                                                          as_user=True,
+                                                          attachments='null')
 
     def test_send_reply(self):
         self.bot.slack_client = MagicMock()
@@ -358,7 +361,76 @@ class TestSendMessage(TestPhialBot):
                                 channel='channel_id',
                                 text='Hi test',
                                 thread_ts='timestamp',
-                                as_user=True)
+                                as_user=True,
+                                attachments='null')
+
+
+class TestSendMessageWithMessageAttachments(TestPhialBot):
+    '''Test phial's send_message function with message attachments'''
+
+    def test_send_message(self):
+        self.bot.slack_client = MagicMock()
+        message = Response(channel="channel_id",
+                           attachments=[MessageAttachment(
+                                fallback="fallback",
+                                author_name="John Doe",
+                                author_link="https://example.com/author",
+                                author_icon="https://example.com/author.jpg",
+                                color="#36a64f",
+                                title="Title",
+                                title_link="https://example.com",
+                                image_url="https://example.com/image.jpg",
+                                text="Go to Example Website",
+                                footer="Footer text",
+                                footer_icon="https://example.com/footer.jpg",
+                                thumb_url="https://example.com/thumb.jpg",
+                                fields=[
+                                    MessageAttachmentField(
+                                        title="Established",
+                                        value="2008",
+                                        short=False),
+                                    MessageAttachmentField(
+                                        title="Users",
+                                        value="27 Million",
+                                        short=True)])])
+        self.bot.send_message(message)
+
+        attachments = """
+        [
+            {
+                "fallback":"fallback",
+                "color":"#36a64f",
+                "author_name":"John Doe",
+                "author_link":"https://example.com/author",
+                "author_icon":"https://example.com/author.jpg",
+                "title":"Title",
+                "title_link":"https://example.com",
+                "text":"Go to Example Website",
+                "image_url":"https://example.com/image.jpg",
+                "thumb_url":"https://example.com/thumb.jpg",
+                "fields":[
+                    {
+                        "title":"Established",
+                        "value":"2008",
+                        "short":false
+                    },
+                    {
+                        "title":"Users",
+                        "value":"27 Million",
+                        "short":true
+                    }
+                ],
+                "footer":"Footer text",
+                "footer_icon":"https://example.com/footer.jpg"
+            }
+        ]
+"""
+        self.bot.slack_client.api_call.assert_called_with(
+                'chat.postMessage',
+                channel='channel_id',
+                as_user=True,
+                attachments=json.dumps(json.loads(attachments)),
+                text=None)
 
 
 class TestSendReaction(TestPhialBot):
@@ -449,6 +521,35 @@ class TestExecuteResponse(TestPhialBot):
                                 content=mock_open())
         self.bot._execute_response(attachment)
         self.bot.upload_attachment.assert_called_with(attachment)
+
+    def test_send_message_attachments(self):
+        self.bot.send_message = MagicMock()
+        response = Response(channel="channel_id",
+                            attachments=[MessageAttachment(
+                                fallback="fallback",
+                                author_name="John Doe",
+                                author_link="https://example.com/author",
+                                author_icon="https://example.com/author.jpg",
+                                color="#36a64f",
+                                title="Title",
+                                title_link="https://example.com",
+                                image_url="https://example.com/image.jpg",
+                                text="Go to Example Website",
+                                footer="Footer text",
+                                footer_icon="https://example.com/footer.jpg",
+                                thumb_url="https://example.com/thumb.jpg",
+                                fields=[
+                                    MessageAttachmentField(
+                                        title="Established",
+                                        value="2008",
+                                        short=False),
+                                    MessageAttachmentField(
+                                        title="Users",
+                                        value="27 Million",
+                                        short=True)])])
+
+        self.bot._execute_response(response)
+        self.bot.send_message.assert_called_with(response)
 
     def test_errors_on_invalid_response(self):
         with self.assertRaises(ValueError) as context:

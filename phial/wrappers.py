@@ -1,4 +1,4 @@
-from typing import Dict, Pattern, IO, Optional
+from typing import Dict, Pattern, IO, Optional, List
 
 
 class Message():
@@ -68,6 +68,84 @@ class Command():
         return self.__dict__ == other.__dict__
 
 
+class MessageAttachmentField():
+    '''
+    Displays field in message attachment
+
+    Attributes:
+        title(str): The title of the field
+        value(str): The value of the field
+        short(bool): If false, 2 fields will be displayed on the same line
+
+    '''
+    def __init__(self,
+                 title: Optional[str] = None,
+                 value: Optional[str] = None,
+                 short: Optional[bool] = None) -> None:
+        self.title = title
+        self.value = value
+        self.short = short
+
+    def __repr__(self) -> str:
+        return "<Message Attachment Field with title {0} >".format(self.title)
+
+
+class MessageAttachment():
+    '''
+    Displays a message attachment
+
+    Attributes:
+        fallback(str): Plain text summary of the attachment
+        color(str): Hex code beginning with a '#' for the side bar colour
+        author_name(str): Small text to display the authors name
+        author_link(str): URL for link on authors name
+        author_icon(str): URL for 16x16 icon beside the authors name
+        title(str): The title of the attachment
+        title_link(str): A URL for the attachment title
+        text(str): The main text body of an attachment
+        image_url(str): URL to an image file that will be displayed with
+                        an attachment
+        thumb_url(str): URL to an image file that will be displayed as a
+                        thumbnail on the right side of a message attachment
+        fields(list): A list of MessageAttachmentFields to display on the
+                      attachment
+        footer(str): Small text to help contextualize and identify an
+                     attachment
+        footer_icon(str): URL for 16x16 icon beside the footer
+
+    '''
+    def __init__(self,
+                 fallback: Optional[str] = None,
+                 color: Optional[str] = None,
+                 author_name: Optional[str] = None,
+                 author_link: Optional[str] = None,
+                 author_icon: Optional[str] = None,
+                 title: Optional[str] = None,
+                 title_link: Optional[str] = None,
+                 text: Optional[str] = None,
+                 image_url: Optional[str] = None,
+                 thumb_url: Optional[str] = None,
+                 fields: Optional[List[MessageAttachmentField]] = None,
+                 footer: Optional[str] = None,
+                 footer_icon: Optional[str] = None) -> None:
+        self.fallback = fallback
+        self.color = color
+        self.author_name = author_name
+        self.author_link = author_link
+        self.author_icon = author_icon
+        self.title = title
+        self.title_link = title_link
+        self.text = text
+        self.image_url = image_url
+        self.thumb_url = thumb_url
+        self.fields = fields
+        self.footer = footer
+        self.footer_icon = footer_icon
+
+    def __repr__(self) -> str:
+        return "<Message Attachment with text {0} >".format(self.text)
+
+
 class Response():
     '''
     When returned in a command function will send a message, or reaction to
@@ -80,6 +158,9 @@ class Response():
                           will put the text response in a thread
         reation(str): A valid slack emoji name. NOTE: will only work when
                       original_ts is populated
+        attachments(List[MessageAttachments]): A list of MessageAttachment
+                                              objects to be attached to the
+                                              message
 
     Examples:
         The following would send a message to a slack channel when executed ::
@@ -109,11 +190,13 @@ class Response():
                  channel: str,
                  text: Optional[str] = None,
                  original_ts: Optional[str] = None,
+                 attachments: Optional[List[MessageAttachment]] = None,
                  reaction: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
         self.reaction = reaction
+        self.attachments = attachments
 
     def __repr__(self) -> str:
         return "<Response: {0}>".format(self.text)
