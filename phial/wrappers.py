@@ -164,6 +164,8 @@ class Response():
                           List[Dict[str, Dict[str, str]]]]):
                           A list of MessageAttachment objects to be attached
                           to the message
+        ephemeral(bool): Whether to send the message as an ephemeral message
+        user(str): The user id to display the ephemeral message to
 
     Examples:
         The following would send a message to a slack channel when executed ::
@@ -195,12 +197,16 @@ class Response():
                  original_ts: Optional[str] = None,
                  attachments: Optional[Union[List[MessageAttachment],
                                        List[MessageAttachmentJson]]] = None,
-                 reaction: Optional[str] = None) -> None:
+                 reaction: Optional[str] = None,
+                 ephemeral: Optional[bool] = False,
+                 user: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
         self.reaction = reaction
         self.attachments = attachments
+        self.ephemeral = ephemeral
+        self.user = user
 
     def __repr__(self) -> str:
         return "<Response: {0}>".format(self.text)
