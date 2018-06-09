@@ -1,4 +1,4 @@
-from typing import Dict, Pattern, IO, Optional, List
+from typing import Dict, Pattern, IO, Optional, List, Union
 
 
 class Message():
@@ -158,9 +158,10 @@ class Response():
                           will put the text response in a thread
         reation(str): A valid slack emoji name. NOTE: will only work when
                       original_ts is populated
-        attachments(List[MessageAttachments]): A list of MessageAttachment
-                                              objects to be attached to the
-                                              message
+        attachments(Union[List[MessageAttachment],
+                          List[Dict[str, Dict[str, str]]]]):
+                          A list of MessageAttachment objects to be attached
+                          to the message
 
     Examples:
         The following would send a message to a slack channel when executed ::
@@ -190,7 +191,12 @@ class Response():
                  channel: str,
                  text: Optional[str] = None,
                  original_ts: Optional[str] = None,
-                 attachments: Optional[List[MessageAttachment]] = None,
+                 attachments: Union[List[MessageAttachment],
+                                    List[Dict[str,
+                                         Union[str, Union[str,
+                                                          Dict[str,
+                                                               str]]]]],
+                                    None] = None,
                  reaction: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text

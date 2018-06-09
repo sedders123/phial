@@ -433,6 +433,79 @@ class TestSendMessageWithMessageAttachments(TestPhialBot):
                 text=None)
 
 
+class TestSendMessageWithMessageAttachmentsDictionary(TestPhialBot):
+    '''Test phial's send_message function with message attachments
+       passed in as a dictionary'''
+
+    def test_send_message(self):
+        self.bot.slack_client = MagicMock()
+        message = Response(channel="channel_id",
+                           attachments=[{
+                               "fallback": "fallback",
+                               "author_name": "John Doe",
+                               "author_link": "https://example.com/author",
+                               "author_icon": "https://example.com/author.jpg",
+                               "color": "#36a64f",
+                               "title": "Title",
+                               "title_link": "https://example.com",
+                               "image_url": "https://example.com/image.jpg",
+                               "text": "Go to Example Website",
+                               "footer": "Footer text",
+                               "footer_icon": "https://example.com/footer.jpg",
+                               "thumb_url": "https://example.com/thumb.jpg",
+                               "fields": [
+                                   {
+                                       "title": "Established",
+                                       "value": "2008",
+                                       "short": False
+                                   },
+                                   {
+                                       "title": "Users",
+                                       "value": "27 Million",
+                                       "short": True
+                                   }
+                               ]
+                           }])
+        self.bot.send_message(message)
+
+        attachments = """
+        [
+            {
+                "fallback":"fallback",
+                "author_name":"John Doe",
+                "author_link":"https://example.com/author",
+                "author_icon":"https://example.com/author.jpg",
+                "color":"#36a64f",
+                "title":"Title",
+                "title_link":"https://example.com",
+                "image_url":"https://example.com/image.jpg",
+                "text":"Go to Example Website",
+                "footer":"Footer text",
+                "footer_icon":"https://example.com/footer.jpg",
+                "thumb_url":"https://example.com/thumb.jpg",
+                "fields":[
+                    {
+                        "title":"Established",
+                        "value":"2008",
+                        "short":false
+                    },
+                    {
+                        "title":"Users",
+                        "value":"27 Million",
+                        "short":true
+                    }
+                ]
+            }
+        ]
+"""
+        self.bot.slack_client.api_call.assert_called_with(
+                'chat.postMessage',
+                channel='channel_id',
+                as_user=True,
+                attachments=json.dumps(json.loads(attachments)),
+                text=None)
+
+
 class TestSendReaction(TestPhialBot):
     '''Test phial's send_message function'''
 
