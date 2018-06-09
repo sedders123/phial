@@ -193,8 +193,8 @@ class Response():
                  channel: str,
                  text: Optional[str] = None,
                  original_ts: Optional[str] = None,
-                 attachments: Union[List[MessageAttachment],
-                                    List[MessageAttachmentJson], None] = None,
+                 attachments: Optional[Union[List[MessageAttachment],
+                                       List[MessageAttachmentJson]]] = None,
                  reaction: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text
