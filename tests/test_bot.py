@@ -468,7 +468,7 @@ class TestSendMessageWithMessageAttachmentsDictionary(TestPhialBot):
                            }])
         self.bot.send_message(message)
 
-        attachments = """
+        expected_attachments = """
         [
             {
                 "fallback":"fallback",
@@ -502,7 +502,7 @@ class TestSendMessageWithMessageAttachmentsDictionary(TestPhialBot):
                 'chat.postMessage',
                 channel='channel_id',
                 as_user=True,
-                attachments=json.dumps(json.loads(attachments)),
+                attachments=json.dumps(json.loads(expected_attachments)),
                 text=None)
 
 

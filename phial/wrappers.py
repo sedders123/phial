@@ -1,5 +1,7 @@
 from typing import Dict, Pattern, IO, Optional, List, Union
 
+MessageAttachmentJson = Dict[str, Union[str, Union[str, Dict[str, str]]]]
+
 
 class Message():
     '''
@@ -192,11 +194,7 @@ class Response():
                  text: Optional[str] = None,
                  original_ts: Optional[str] = None,
                  attachments: Union[List[MessageAttachment],
-                                    List[Dict[str,
-                                         Union[str, Union[str,
-                                                          Dict[str,
-                                                               str]]]]],
-                                    None] = None,
+                                    List[MessageAttachmentJson], None] = None,
                  reaction: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text
