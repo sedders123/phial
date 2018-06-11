@@ -198,7 +198,7 @@ class Response():
                  attachments: Optional[Union[List[MessageAttachment],
                                        List[MessageAttachmentJson]]] = None,
                  reaction: Optional[str] = None,
-                 ephemeral: Optional[bool] = False,
+                 ephemeral: bool = False,
                  user: Optional[str] = None) -> None:
         self.channel = channel
         self.text = text

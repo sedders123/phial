@@ -513,7 +513,7 @@ class TestSendMessageWithMessageAttachmentsDictionary(TestPhialBot):
 class TestSendEphemeralMessage(TestPhialBot):
     '''Test phial's send_message function when sending an ephemeral message'''
 
-    def test_send_message(self):
+    def test_ephemeral(self):
         self.bot.slack_client = MagicMock()
         message = Response(channel="channel_id",
                            ephemeral=True,
@@ -529,12 +529,7 @@ class TestSendEphemeralMessage(TestPhialBot):
                 text='Test text',
                 user='user_id')
 
-
-class TestSendMessageDefaultsEphemeralToFalse(TestPhialBot):
-    '''Test phial's send_message function does not send ephemeral
-       messages by default'''
-
-    def test_send_message(self):
+    def test_ephemeral_defaults_to_false(self):
         self.bot.slack_client = MagicMock()
         message = Response(channel="channel_id",
                            text="Test text")
