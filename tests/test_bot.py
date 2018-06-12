@@ -346,7 +346,8 @@ class TestSendMessage(TestPhialBot):
                                                           channel='channel_id',
                                                           text='Hi test',
                                                           as_user=True,
-                                                          attachments='null')
+                                                          attachments='null',
+                                                          user=None)
 
     def test_send_reply(self):
         self.bot.slack_client = MagicMock()
@@ -362,7 +363,8 @@ class TestSendMessage(TestPhialBot):
                                 text='Hi test',
                                 thread_ts='timestamp',
                                 as_user=True,
-                                attachments='null')
+                                attachments='null',
+                                user=None)
 
 
 class TestSendMessageWithMessageAttachments(TestPhialBot):
@@ -430,7 +432,8 @@ class TestSendMessageWithMessageAttachments(TestPhialBot):
                 channel='channel_id',
                 as_user=True,
                 attachments=json.dumps(json.loads(attachments)),
-                text=None)
+                text=None,
+                user=None)
 
 
 class TestSendMessageWithMessageAttachmentsDictionary(TestPhialBot):
@@ -503,7 +506,42 @@ class TestSendMessageWithMessageAttachmentsDictionary(TestPhialBot):
                 channel='channel_id',
                 as_user=True,
                 attachments=json.dumps(json.loads(expected_attachments)),
-                text=None)
+                text=None,
+                user=None)
+
+
+class TestSendEphemeralMessage(TestPhialBot):
+    '''Test phial's send_message function when sending an ephemeral message'''
+
+    def test_ephemeral(self):
+        self.bot.slack_client = MagicMock()
+        message = Response(channel="channel_id",
+                           ephemeral=True,
+                           text="Test text",
+                           user="user_id")
+        self.bot.send_message(message)
+
+        self.bot.slack_client.api_call.assert_called_with(
+                'chat.postEphemeral',
+                channel='channel_id',
+                as_user=True,
+                attachments='null',
+                text='Test text',
+                user='user_id')
+
+    def test_ephemeral_defaults_to_false(self):
+        self.bot.slack_client = MagicMock()
+        message = Response(channel="channel_id",
+                           text="Test text")
+        self.bot.send_message(message)
+
+        self.bot.slack_client.api_call.assert_called_with(
+                'chat.postMessage',
+                channel='channel_id',
+                as_user=True,
+                attachments='null',
+                text='Test text',
+                user=None)
 
 
 class TestSendReaction(TestPhialBot):

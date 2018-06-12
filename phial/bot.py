@@ -279,22 +279,28 @@ class Phial():
             message(Response): message object to be sent to Slack
 
         '''
+
+        api_method = ('chat.postEphemeral' if message.ephemeral
+                      else 'chat.postMessage')
+
         if message.original_ts:
-            self.slack_client.api_call("chat.postMessage",
+            self.slack_client.api_call(api_method,
                                        channel=message.channel,
                                        text=message.text,
                                        thread_ts=message.original_ts,
                                        attachments=json.dumps(
                                            message.attachments,
                                            default=lambda o: o.__dict__),
+                                       user=message.user,
                                        as_user=True)
         else:
-            self.slack_client.api_call("chat.postMessage",
+            self.slack_client.api_call(api_method,
                                        channel=message.channel,
                                        text=message.text,
                                        attachments=json.dumps(
                                            message.attachments,
                                            default=lambda o: o.__dict__),
+                                       user=message.user,
                                        as_user=True)
 
     def send_reaction(self, response: Response) -> None:
