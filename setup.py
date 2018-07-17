@@ -36,7 +36,7 @@ setup(
     keywords=['Slack', 'bot', 'Slackbot'],
     install_requires=[
         'slackclient==1.2.1',
-        'Werkzeug==0.12.2',
+        'Werkzeug==0.14.1',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
