@@ -1,7 +1,7 @@
 from phial import Phial
 
 
-def help_command(_bot: Phial):
+def help_command(_bot: Phial) -> str:
     '''List all regsitered commmands'''
     help_text = ""
     for command in _bot.commands:
