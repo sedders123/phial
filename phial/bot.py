@@ -26,6 +26,7 @@ class Phial():
                  logger: logging.Logger = logging.getLogger(__name__)) -> None:
         self.slack_client = SlackClient(token)
         self.commands = {}  # type: Dict
+        self.command_names = {}  # type: Dict
         self.middleware_functions = []  # type: List
         self.config = config
         self.running = False
@@ -77,6 +78,7 @@ class Phial():
         command_pattern = self._build_command_pattern(command_pattern_template,
                                                       case_sensitive)
         if command_pattern not in self.commands:
+            self.command_names[command_pattern] = command_pattern_template
             self.commands[command_pattern] = command_func
             self.logger.debug("Command {0} added"
                               .format(command_pattern_template))
@@ -302,8 +304,8 @@ class Phial():
         if command is None:
             return  # Do nothing if no command
         _command_ctx_stack.push(command)
-        return self.commands[command.command_pattern](**command
-                                                      .args)
+        return self.commands[command.command_pattern](_bot=self,
+                                                      **command.args)
 
     def _parse_slack_output(self,
                             slack_rtm_output: List[Dict])-> Optional[Message]:
@@ -428,7 +430,7 @@ class Phial():
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
-                message = func(message)
+                message = func(message, _bot=self)
 
         # If message has been intercepted or is a bot message return early
         if not message or message.bot_id:
