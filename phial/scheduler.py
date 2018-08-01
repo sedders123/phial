@@ -1,8 +1,9 @@
-from typing import Callable, Optional, List  # noqa: F401
+from typing import Callable, Optional, List, TypeVar  # noqa: F401
 from datetime import timedelta, datetime
 from collections import namedtuple
 
 Time = namedtuple("Time", ['hours', 'minutes', 'seconds'])
+TSchedule = TypeVar("TSchedule", bound='Schedule')
 
 
 class Schedule:
@@ -15,13 +16,16 @@ class Schedule:
         self._seconds = 0
 
     def day(self):
+        # type: () -> Schedule
         return self.days(1)
 
-    def days(self, value: int):
+    def days(self, value):
+        # type: (int) -> Schedule
         self._days = value
         return self
 
-    def at(self, hours: int, minutes: int, seconds: int = 0):
+    def at(self, hours, minutes, seconds=0):
+        # type: (int, int, int) -> Schedule
         if self._hours or self._minutes:
             raise Exception("At can only be used on day(s)")
         if not self._days:
@@ -30,23 +34,29 @@ class Schedule:
         return self
 
     def hour(self):
+        # type: () -> Schedule
         return self.hours(1)
 
-    def hours(self, value: int):
+    def hours(self, value):
+        # type: (int) -> Schedule
         self._hours = value
         return self
 
     def minute(self):
+        # type: () -> Schedule
         return self.minutes(1)
 
-    def minutes(self, value: int):
+    def minutes(self, value):
+        # type: (int) -> Schedule
         self._minutes = value
         return self
 
     def second(self):
+        # type: () -> Schedule
         return self.seconds(1)
 
-    def seconds(self, value: int):
+    def seconds(self, value):
+        # type: (int) -> Schedule
         self._seconds = value
         return self
 
@@ -80,7 +90,7 @@ class Job:
 
 
 class Scheduler:
-    def __init__(self):
+    def __init__(self) -> None:
         self.jobs = []  # type: List[Job]
 
     def add_job(self, job: Job) -> None:
