@@ -5,7 +5,7 @@ import logging
 import json
 from phial.globals import _command_ctx_stack, command, _global_ctx_stack
 from phial.wrappers import Command, Response, Message, Attachment
-from phial.scheduler import Scheduler, Schedule, Job
+from phial.scheduler import Scheduler, Schedule, ScheduledJob
 
 
 class Phial():
@@ -231,6 +231,22 @@ class Phial():
         return self.command(command_pattern_template, case_sensitive)
 
     def scheduled(self, schedule: Schedule) -> Callable:
+        '''
+        A decorator that is used to register an scheduled function.
+        This does the same as :meth:`add_scheduled` but is used as a
+        decorator.
+
+        Args:
+            schedule(Schedule): The schedule used to run the function
+
+        Example:
+            ::
+
+                @bot.scheduled(Schedule().every().day())
+                def scheuled_beep():
+                    bot.send_message(Response(text="Beep",
+                                              channel="channel-id">))
+        '''
         def decorator(f: Callable) -> Callable:
             self.add_scheduled(schedule, f)
             return f
@@ -238,11 +254,34 @@ class Phial():
 
     def add_scheduled(self, schedule: Schedule,
                       scheduled_func: Callable) -> None:
+        '''
+        Adds a scheduled function to the bot. This is the same as
+        :meth:`scheduled`.
+
+        ::
+
+            @bot.scheduled(Schedule().every().day())
+            def scheuled_beep():
+                bot.send_message(Response(text="Beep",
+                                            channel="channel-id">))
+
+        Is the same as ::
+
+            def scheuled_beep():
+                bot.send_message(Response(text="Beep",
+                                            channel="channel-id">))
+            bot.add_scheduled(Schedule().every().day(), scheuled_beep)
+
+        Args:
+            schedule(Schedule): The schedule used to run the function
+            scheduled_func(func): The function to be run in accordance to the
+                                  schedule
+        '''
         self.logger.debug("Schedule {0} added"
                           .format(getattr(scheduled_func,
                                           '__name__',
                                           repr(scheduled_func))))
-        job = Job(schedule, scheduled_func)
+        job = ScheduledJob(schedule, scheduled_func)
         self.scheduler.add_job(job)
 
     def _create_command(self,

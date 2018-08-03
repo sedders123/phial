@@ -12,6 +12,14 @@ phial\.bot module
     :undoc-members:
     :show-inheritance:
 
+phial\.scheduler module
+----------------------
+
+.. automodule:: phial.scheduler
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 phial\.wrappers module
 ----------------------
 

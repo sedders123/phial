@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 from datetime import datetime, timedelta
-from phial.scheduler import Scheduler, Schedule, Job
+from phial.scheduler import Scheduler, Schedule, ScheduledJob
 
 
 class TestSchedules(unittest.TestCase):
@@ -88,12 +88,12 @@ class TestSchedules(unittest.TestCase):
             Schedule().every().at(12, 00)
 
 
-class TestJobs(unittest.TestCase):
+class TestScheduledJobs(unittest.TestCase):
     def test_job_create_correctly(self):
         def job_func():
             pass
         schedule = Schedule().every().day().at(12, 00)
-        job = Job(schedule, job_func)
+        job = ScheduledJob(schedule, job_func)
 
         expected_time = (datetime.now()
                          + timedelta(days=1)).replace(hour=12, minute=0,
@@ -106,7 +106,7 @@ class TestJobs(unittest.TestCase):
     def test_job_run_correctly(self):
         test_func = MagicMock()
         schedule = Schedule().every().day().at(12, 00)
-        job = Job(schedule, test_func)
+        job = ScheduledJob(schedule, test_func)
 
         job.run()
         test_func.assert_called_once()
@@ -120,7 +120,7 @@ class TestScheduler(unittest.TestCase):
     def test_adds_job_correctly(self):
         test_func = MagicMock()
         schedule = Schedule().every().day().at(12, 00)
-        job = Job(schedule, test_func)
+        job = ScheduledJob(schedule, test_func)
 
         scheduler = Scheduler()
         scheduler.add_job(job)
@@ -130,7 +130,7 @@ class TestScheduler(unittest.TestCase):
     def test_runs_jobs_correctly(self):
         test_func = MagicMock()
         schedule = Schedule().every().day().at(12, 00)
-        job = Job(schedule, test_func)
+        job = ScheduledJob(schedule, test_func)
 
         job.should_run = MagicMock(return_value=True)
 
