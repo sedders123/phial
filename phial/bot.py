@@ -420,5 +420,6 @@ class Phial():
                                                    .rtm_read())
                 if message:
                     self._handle_message(message)
+                self.scheduler.run_pending()
             except Exception as e:
                 self.logger.exception("Error: {0}".format(e))

@@ -27,9 +27,11 @@ class Schedule:
     def at(self, hours, minutes, seconds=0):
         # type: (int, int, int) -> Schedule
         if self._hours or self._minutes:
-            raise Exception("At can only be used on day(s)")
+            raise Exception("'at' can only be used on day(s)")
         if not self._days:
-            raise Exception("At can only be used on day(s)")
+            raise Exception("'at' can only be used on day(s)")
+        if self._at:
+            raise Exception("'at' can only be set once")
         self._at = Time(hours, minutes, seconds)
         return self
 
