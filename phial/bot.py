@@ -236,7 +236,8 @@ class Phial():
             return f
         return decorator
 
-    def add_scheduled(self, schedule: Schedule, scheduled_func: Callable) -> None:
+    def add_scheduled(self, schedule: Schedule,
+                      scheduled_func: Callable) -> None:
         self.logger.debug("Middleware {0} added"
                           .format(getattr(scheduled_func,
                                           '__name__',
