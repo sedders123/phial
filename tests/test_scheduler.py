@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import MagicMock
 from datetime import datetime, timedelta
-from phial.scheduler import Schedule, Job
+from phial.scheduler import Scheduler, Schedule, Job
 
 
 class TestSchedules(unittest.TestCase):
@@ -109,4 +109,33 @@ class TestJobs(unittest.TestCase):
         job = Job(schedule, test_func)
 
         job.run()
-        test_func.assert_called()
+        test_func.assert_called_once()
+
+
+class TestScheduler(unittest.TestCase):
+    def test_creates_correctly(self):
+        scheduler = Scheduler()
+        self.assertEqual(len(scheduler.jobs), 0)
+
+    def test_adds_job_correctly(self):
+        test_func = MagicMock()
+        schedule = Schedule().every().day().at(12, 00)
+        job = Job(schedule, test_func)
+
+        scheduler = Scheduler()
+        scheduler.add_job(job)
+
+        self.assertIn(job, scheduler.jobs)
+
+    def test_runs_jobs_correctly(self):
+        test_func = MagicMock()
+        schedule = Schedule().every().day().at(12, 00)
+        job = Job(schedule, test_func)
+
+        job.should_run = MagicMock(return_value=True)
+
+        scheduler = Scheduler()
+        scheduler.add_job(job)
+
+        scheduler.run_pending()
+        test_func.assert_called_once()
