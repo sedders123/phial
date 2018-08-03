@@ -413,13 +413,13 @@ class TestSendMessageWithMessageAttachments(TestPhialBot):
                 "thumb_url":"https://example.com/thumb.jpg",
                 "fields":[
                     {
-                        "value":"2008",
                         "title":"Established",
+                        "value":"2008",
                         "short":false
                     },
                     {
-                        "value":"27 Million",
                         "title":"Users",
+                        "value":"27 Million",
                         "short":true
                     }
                 ],
