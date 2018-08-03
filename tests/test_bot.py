@@ -4,7 +4,7 @@ from phial import (Phial, command, Response, Attachment,
                    MessageAttachment, MessageAttachmentField, g)
 import phial.wrappers
 import phial.globals
-from phial.scheduler import Job, Schedule
+from phial.scheduler import Schedule
 import re
 import json
 from .helpers import MockTrueFunc
@@ -734,6 +734,7 @@ class TestMiddleware(TestPhialBot):
         self.bot._handle_message(message)
         middleware_test.assert_called_once_with(message)
 
+
 class TestScheduledJobs(TestPhialBot):
     '''Test phial's scheduled jobs'''
 
@@ -742,7 +743,7 @@ class TestScheduledJobs(TestPhialBot):
         def scheduled_func(message):
             return message
 
-        scheduled_funcs = [func for func in 
+        scheduled_funcs = [func for func in
                            [job.func for job in self.bot.scheduler.jobs]]
         self.assertTrue(scheduled_func in scheduled_funcs)
 
@@ -751,7 +752,7 @@ class TestScheduledJobs(TestPhialBot):
             return message
 
         self.bot.add_scheduled(Schedule().second(), scheduled_func)
-        scheduled_funcs = [func for func in 
+        scheduled_funcs = [func for func in
                            [job.func for job in self.bot.scheduler.jobs]]
         self.assertTrue(scheduled_func in scheduled_funcs)
 
