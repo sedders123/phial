@@ -15,6 +15,10 @@ class Schedule:
         self._minutes = 0
         self._seconds = 0
 
+    def every(self):
+        # type: () -> Schedule
+        return self
+
     def day(self):
         # type: () -> Schedule
         return self.days(1)

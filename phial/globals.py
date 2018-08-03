@@ -1,6 +1,6 @@
 from werkzeug.local import LocalStack, LocalProxy
 from typing import cast, Dict
-from .wrappers import Command
+from phial.wrappers import Command
 
 
 def _find_command() -> Command:
