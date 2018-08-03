@@ -3,8 +3,9 @@ import re
 from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
 import logging
 import json
-from .globals import _command_ctx_stack, command, _global_ctx_stack
-from .wrappers import Command, Response, Message, Attachment
+from phial.globals import _command_ctx_stack, command, _global_ctx_stack
+from phial.wrappers import Command, Response, Message, Attachment
+from phial.scheduler import Scheduler, Schedule, Job
 
 
 class Phial():
@@ -29,6 +30,7 @@ class Phial():
         self.config = config
         self.running = False
         self.logger = logger
+        self.scheduler = Scheduler()
 
         _global_ctx_stack.push({})
 
@@ -227,6 +229,20 @@ class Phial():
                     return "world"
         '''
         return self.command(command_pattern_template, case_sensitive)
+
+    def scheduled(self, schedule: Schedule) -> Callable:
+        def decorator(f: Callable) -> Callable:
+            self.add_scheduled(schedule, f)
+            return f
+        return decorator
+
+    def add_scheduled(self, schedule: Schedule, scheduled_func: Callable) -> None:
+        self.logger.debug("Middleware {0} added"
+                          .format(getattr(scheduled_func,
+                                          '__name__',
+                                          repr(scheduled_func))))
+        job = Job(schedule, scheduled_func)
+        self.scheduler.add_job(job)
 
     def _create_command(self,
                         command_message: Message) -> Optional[Command]:
