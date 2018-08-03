@@ -112,5 +112,5 @@ class TestJobs(unittest.TestCase):
                                                       second=0, microsecond=0)
 
         self.assertEqual(job.func, job_func)
-        self.assertEquals(job.next_run, expected_time)
+        self.assertEqual(job.next_run, expected_time)
         self.assertFalse(job.should_run())

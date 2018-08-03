@@ -206,7 +206,7 @@ class TestCreateCommand(TestPhialBot):
                                                   {},
                                                   'user',
                                                   command_message)
-        self.assertEquals(command, expected_command)
+        self.assertEqual(command, expected_command)
 
     def test_basic_functionality_with_args(self):
         command_patern = re.compile('^test (?P<one>.+)$')
@@ -221,7 +221,7 @@ class TestCreateCommand(TestPhialBot):
                                                   {'one': 'first'},
                                                   'user',
                                                   command_message)
-        self.assertEquals(command, expected_command)
+        self.assertEqual(command, expected_command)
 
     def test_errors_when_no_command_match(self):
         with self.assertRaises(ValueError) as context:
@@ -309,7 +309,7 @@ class TestParseSlackOutput(TestPhialBot):
                                                           'channel_id',
                                                           'user_id',
                                                           'timestamp')
-        self.assertEquals(command_message, expected_command_message)
+        self.assertEqual(command_message, expected_command_message)
 
     def test_returns_message_correctly_for_normal_message(self):
         sample_slack_output = [{'text': 'test', 'channel': 'channel_id',
@@ -771,6 +771,10 @@ class TestHandleMessage(TestPhialBot):
         self.bot._handle_message(message)
         test.assert_not_called()
 
+    def test_handle_message_returns_none(self):
+        response = self.bot._handle_message(None)
+        self.assertEqual(response, None)
+
 
 class TestRun(TestPhialBot):
     '''Test phial's run function'''
@@ -835,7 +839,7 @@ class TestGlobalContext(unittest.TestCase):
             g['test'] = "test value"
 
         def second_command_function():
-            self.assertEquals(g['test'], "test value")
+            self.assertEqual(g['test'], "test value")
 
         bot.add_command('test', command_function)
         message = phial.wrappers.Message(text="!test",
