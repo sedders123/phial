@@ -238,7 +238,7 @@ class Phial():
 
     def add_scheduled(self, schedule: Schedule,
                       scheduled_func: Callable) -> None:
-        self.logger.debug("Middleware {0} added"
+        self.logger.debug("Schedule {0} added"
                           .format(getattr(scheduled_func,
                                           '__name__',
                                           repr(scheduled_func))))

@@ -4,6 +4,7 @@ from phial import (Phial, command, Response, Attachment,
                    MessageAttachment, MessageAttachmentField, g)
 import phial.wrappers
 import phial.globals
+from phial.scheduler import Job, Schedule
 import re
 import json
 from .helpers import MockTrueFunc
@@ -412,13 +413,13 @@ class TestSendMessageWithMessageAttachments(TestPhialBot):
                 "thumb_url":"https://example.com/thumb.jpg",
                 "fields":[
                     {
-                        "title":"Established",
                         "value":"2008",
+                        "title":"Established",
                         "short":false
                     },
                     {
-                        "title":"Users",
                         "value":"27 Million",
+                        "title":"Users",
                         "short":true
                     }
                 ],
@@ -732,6 +733,27 @@ class TestMiddleware(TestPhialBot):
         self.bot.add_command('test', test)
         self.bot._handle_message(message)
         middleware_test.assert_called_once_with(message)
+
+class TestScheduledJobs(TestPhialBot):
+    '''Test phial's scheduled jobs'''
+
+    def test_decarator(self):
+        @self.bot.scheduled(Schedule().second())
+        def scheduled_func(message):
+            return message
+
+        scheduled_funcs = [func for func in 
+                           [job.func for job in self.bot.scheduler.jobs]]
+        self.assertTrue(scheduled_func in scheduled_funcs)
+
+    def test_add_function(self):
+        def scheduled_func(message):
+            return message
+
+        self.bot.add_scheduled(Schedule().second(), scheduled_func)
+        scheduled_funcs = [func for func in 
+                           [job.func for job in self.bot.scheduler.jobs]]
+        self.assertTrue(scheduled_func in scheduled_funcs)
 
 
 class TestHandleMessage(TestPhialBot):
