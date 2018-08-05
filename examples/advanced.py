@@ -1,9 +1,10 @@
-from phial import Phial, command, Response
+from phial import Phial, command, Response, Schedule
 from multiprocessing import Process
 from time import sleep
 import logging
 
 slackbot = Phial('token-goes-here')
+SCHEDULED_CHANNEL = "channel-id"
 
 
 @slackbot.command('cent(er|re)')
@@ -53,6 +54,12 @@ def background_processing():
 def log_message(message):
     logging.info(message)
     return message
+
+
+@slackbot.scheduled(Schedule().seconds(30))
+def shceduled_function():
+    slackbot.send_message(Response(text="Hey! Hey Listen!",
+                                   channel=SCHEDULED_CHANNEL))
 
 
 if __name__ == '__main__':
