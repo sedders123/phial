@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/sedders123/phial/releases/tag/0.3.0) - 2018-08-05
+### Added
+ - Scheduled functions
+ - Send [Message Attachments](https://api.slack.com/docs/message-attachments)
+ - Send [ephemeral](https://api.slack.com/methods/chat.postEphemeral) messages
+ - Type hints
+ - Support for logging
+
+## [0.2.1](https://github.com/sedders123/phial/releases/tag/0.2.0) - 2018-04-09
+### Changed
+- Upgraded to slackclient 1.2.1
+- Lowered minimum Python version to 3.4
+
 ## [0.2.0](https://github.com/sedders123/phial/releases/tag/0.2.0) - 2018-04-05
 ### Added
 - Optional Case Sensitivity for commands. Commands are now no longer case sensitive by default, they have an optional parameter to turn on case sensitivity if desired.
