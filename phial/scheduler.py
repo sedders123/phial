@@ -3,14 +3,13 @@ from datetime import timedelta, datetime
 from collections import namedtuple
 
 Time = namedtuple("Time", ['hour', 'minute', 'second'])
-TSchedule = TypeVar("TSchedule", bound='Schedule')
 
 
 class Schedule:
     '''
     A schedule stores the relative time for something to happen.
 
-    It can be used to compute when the next occurence of an event
+    It can be used to compute when the next event of an event
     should occur.
     '''
     def __init__(self) -> None:
@@ -23,7 +22,7 @@ class Schedule:
     def every(self):
         # type: () -> Schedule
         '''
-        Syntatic sugar to allow the creation of schedules to be more
+        Syntatic sugar to allow the declaration of schedules to be more
         like English.
         ::
 
@@ -34,7 +33,7 @@ class Schedule:
     def day(self):
         # type: () -> Schedule
         '''
-        Adds a day to the relative time till the next occurence
+        Adds a day to the relative time till the next event
         ::
 
             schedule = Schedule().every().day()
@@ -45,13 +44,13 @@ class Schedule:
         # type: (int) -> Schedule
         '''
         Adds the specified number of days to the relative time till the next
-        occurence.
+        event.
         ::
 
             schedule = Schedule().every().days(2)
 
         Args:
-            value(int): The number of days to wait between occurences
+            value(int): The number of days to wait between events
         '''
         self._days = value
         return self
@@ -66,11 +65,11 @@ class Schedule:
             schedule = Schedule().every().day().at(12,00)
 
         Args:
-            hour(int): The hour of day the next occurence should happen,
+            hour(int): The hour of day the next event should happen,
                        when combined with the minute
-            minute(int): The minute of day the next occurence should happen,
+            minute(int): The minute of day the next event should happen,
                          when combined with the hour
-            second(int, optional): The second of day the next occurence should
+            second(int, optional): The second of day the next event should
                                    happen, when combined with the hour and
                                    minute.
                                    Defaults to 0
@@ -87,7 +86,7 @@ class Schedule:
     def hour(self):
         # type: () -> Schedule
         '''
-        Adds an hour to the relative time till the next occurence.
+        Adds an hour to the relative time till the next event.
         ::
 
             schedule = Schedule().every().hour()
@@ -98,13 +97,13 @@ class Schedule:
         # type: (int) -> Schedule
         '''
         Adds the specified number of hours to the relative time till the next
-        occurence.
+        event.
         ::
 
             schedule = Schedule().every().hours(2)
 
         Args:
-            value(int): The number of hours to wait between occurences
+            value(int): The number of hours to wait between events
         '''
         self._hours = value
         return self
@@ -112,7 +111,7 @@ class Schedule:
     def minute(self):
         # type: () -> Schedule
         '''
-        Adds a minute to the relative time till the next occurence
+        Adds a minute to the relative time till the next event
         ::
 
             schedule = Schedule().every().minute()
@@ -123,13 +122,13 @@ class Schedule:
         # type: (int) -> Schedule
         '''
         Adds the specified number of minutes to the relative time till the next
-        occurence.
+        event.
         ::
 
             schedule = Schedule().every().minutes(2)
 
         Args:
-            value(int): The number of minutes to wait between occurences
+            value(int): The number of minutes to wait between events
         '''
         self._minutes = value
         return self
@@ -137,7 +136,7 @@ class Schedule:
     def second(self):
         # type: () -> Schedule
         '''
-        Adds a second to the relative time till the next occurence
+        Adds a second to the relative time till the next event
         ::
 
             schedule = Schedule().every().second()
@@ -148,27 +147,27 @@ class Schedule:
         # type: (int) -> Schedule
         '''
         Adds the specified number of seconds to the relative time till the next
-        occurence.
+        event.
         ::
 
             schedule = Schedule().every().seconds(2)
 
         Args:
-            value(int): The number of seconds to wait between occurences
+            value(int): The number of seconds to wait between events
         '''
         self._seconds = value
         return self
 
     def get_next_run_time(self, last_run: datetime) -> datetime:
         '''
-        Calculates the next time to run, base on the last time the
-        occurence was run.
+        Calculates the next time to run, based on the last time the
+        event was run.
 
         Args:
-            last_run(datetime): The last time the occurence happened
+            last_run(datetime): The last time the event happened
 
         Returns:
-            A :obj:`datetime` of when the occurence should next happen
+            A :obj:`datetime` of when the event should next happen
         '''
         if self._at:
             next_day = last_run + timedelta(days=self._days)
@@ -198,13 +197,13 @@ class ScheduledJob:
         Checks whether the function needs to be run based on the schedule.
 
         Returns:
-            A :obj:`bool` of wheter or not to run
+            A :obj:`bool` of whether or not to run
         '''
         return self.next_run <= datetime.now()
 
     def run(self) -> None:
         '''
-        Runs the function and calculates the next run time
+        Runs the function and calculates + stores the next run time
         '''
         self.func()
         self.next_run = self.schedule.get_next_run_time(datetime.now())

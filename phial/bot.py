@@ -232,7 +232,7 @@ class Phial():
 
     def scheduled(self, schedule: Schedule) -> Callable:
         '''
-        A decorator that is used to register an scheduled function.
+        A decorator that is used to register a scheduled function.
         This does the same as :meth:`add_scheduled` but is used as a
         decorator.
 
@@ -243,7 +243,7 @@ class Phial():
             ::
 
                 @bot.scheduled(Schedule().every().day())
-                def scheuled_beep():
+                def scheduled_beep():
                     bot.send_message(Response(text="Beep",
                                               channel="channel-id">))
         '''
@@ -261,16 +261,16 @@ class Phial():
         ::
 
             @bot.scheduled(Schedule().every().day())
-            def scheuled_beep():
+            def scheduled_beep():
                 bot.send_message(Response(text="Beep",
                                             channel="channel-id">))
 
         Is the same as ::
 
-            def scheuled_beep():
+            def scheduled_beep():
                 bot.send_message(Response(text="Beep",
                                             channel="channel-id">))
-            bot.add_scheduled(Schedule().every().day(), scheuled_beep)
+            bot.add_scheduled(Schedule().every().day(), scheduled_beep)
 
         Args:
             schedule(Schedule): The schedule used to run the function
