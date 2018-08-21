@@ -14,9 +14,9 @@ Minimal code to reproduce the bug.
 A clear and concise description of what you expected to happen.
 
 **Actual Behaviour**
-A clear and concise of description of what *actually* happened.
+A clear and concise description of what *actually* happened.
 
-Include any stack traces or error messages here
+Include any error messages here
 
 **Versions (please complete the following information):**
  - OS: [e.g. Ubuntu 18.04]
