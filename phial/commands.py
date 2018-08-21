@@ -13,5 +13,10 @@ def help_command(bot: 'Phial') -> str:
         # GitHub Issue: https://github.com/python/mypy/issues/2087
         command_doc = bot.commands[command]._help  # type: ignore
         command_name = bot.command_names[command]
+
+        help_text = bot.config.get('baseHelpText', "")
+        if help_text:
+            help_text += "\n"
+
         help_text += "*{0}* - {1}\n".format(command_name, command_doc)
     return help_text

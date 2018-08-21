@@ -18,8 +18,9 @@ class Phial():
 
     #: Default configuration
     default_config = {
-        'prefix': '!',
-        'registerHelpCommand': True
+        'prefix': "!",
+        'registerHelpCommand': True,
+        'baseHelpText': "All available commands:"
     }
 
     def __init__(self,
