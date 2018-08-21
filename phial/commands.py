@@ -1,7 +1,10 @@
-from phial import Phial
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from phial import Phial  # noqa
 
 
-def help_command(bot: Phial) -> str:
+def help_command(bot: 'Phial') -> str:
     '''List all regsitered commmands'''
     help_text = ""
     for command in bot.commands:
