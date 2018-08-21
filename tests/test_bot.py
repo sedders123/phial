@@ -55,7 +55,8 @@ class TestCommandDecarator(TestPhialBot):
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
                                                 test_command_function,
-                                                False)
+                                                False,
+                                                None)
 
 
 class TestAliasDecarator(TestPhialBot):
@@ -78,7 +79,8 @@ class TestAliasDecarator(TestPhialBot):
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
                                                 test_command_function,
-                                                False)
+                                                False,
+                                                None)
 
     def test_command_decorator_calls_add_command_case_sensitive(self):
         self.bot.add_command = MagicMock()
@@ -88,7 +90,8 @@ class TestAliasDecarator(TestPhialBot):
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
                                                 test_command_function,
-                                                True)
+                                                True,
+                                                None)
 
 
 class TestAddCommand(TestPhialBot):
