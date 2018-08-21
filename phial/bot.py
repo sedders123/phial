@@ -329,8 +329,7 @@ class Phial():
         if command is None:
             return  # Do nothing if no command
         _command_ctx_stack.push(command)
-        return self.commands[command.command_pattern](_bot=self,
-                                                      **command.args)
+        return self.commands[command.command_pattern](**command.args)
 
     def _parse_slack_output(self,
                             slack_rtm_output: List[Dict])-> Optional[Message]:
@@ -455,7 +454,7 @@ class Phial():
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
-                message = func(message, _bot=self)
+                message = func(message)
 
         # If message has been intercepted or is a bot message return early
         if not message or message.bot_id:
