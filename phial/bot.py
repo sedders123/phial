@@ -43,8 +43,10 @@ class Phial():
         Register any standard commands respecting the configuration provided
         '''
         if self.config['registerHelpCommand']:
+            # The command function has to be a lambda as we wish to delay
+            # execution until all commands have been registered.
             self.add_command("help", lambda: help_command(self),
-                             help_text_override="Help command")
+                             help_text_override="List all available commmands")
 
     @staticmethod
     def _build_command_pattern(command: str,
@@ -93,8 +95,8 @@ class Phial():
         command_pattern = self._build_command_pattern(command_pattern_template,
                                                       case_sensitive)
 
-        # Have ignore the type of the line below as mypy can not currently deal
-        # with 'extending' functions to have extra attributes
+        # Have to ignore the type of the line below as mypy can not currently
+        # deal with 'extending' functions to have extra attributes
         # GitHub Issue: https://github.com/python/mypy/issues/2087
         command_func._help = (help_text_override if  # type: ignore
                               help_text_override is not None
