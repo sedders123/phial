@@ -3,6 +3,7 @@ import re
 from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
 import logging
 import json
+from phial.commands import help_command
 from phial.globals import _command_ctx_stack, command, _global_ctx_stack
 from phial.wrappers import Command, Response, Message, Attachment
 from phial.scheduler import Scheduler, Schedule, ScheduledJob
@@ -17,7 +18,8 @@ class Phial():
 
     #: Default configuration
     default_config = {
-        'prefix': '!'
+        'prefix': '!',
+        'registerHelpCommand': True
     }
 
     def __init__(self,
@@ -25,15 +27,24 @@ class Phial():
                  config: dict = default_config,
                  logger: logging.Logger = logging.getLogger(__name__)) -> None:
         self.slack_client = SlackClient(token)
-        self.commands = {}  # type: Dict
-        self.command_names = {}  # type: Dict
-        self.middleware_functions = []  # type: List
+        self.commands = {}  # type: Dict[Pattern[str], Callable]
+        self.command_names = {}  # type: Dict[Pattern[str], str]
+        self.middleware_functions = []  # type: List[Callable]
         self.config = config
         self.running = False
         self.logger = logger
         self.scheduler = Scheduler()
 
         _global_ctx_stack.push({})
+        self._register_standard_commands()
+
+    def _register_standard_commands(self) -> None:
+        '''
+        Register any standard commands respecting the configuration provided
+        '''
+        if self.config['registerHelpCommand']:
+            self.add_command("help", lambda: help_command(self),
+                             help_text_override="Help command")
 
     @staticmethod
     def _build_command_pattern(command: str,
@@ -46,7 +57,8 @@ class Phial():
     def add_command(self,
                     command_pattern_template: str,
                     command_func: Callable,
-                    case_sensitive: bool = False) -> None:
+                    case_sensitive: bool = False,
+                    help_text_override: Optional[str]=None) -> None:
         '''
         Creates a command pattern and adds a command function to the bot. This
         is the same as :meth:`command`.
@@ -71,12 +83,23 @@ class Phial():
             case_sensitive(bool, optional): Whether or not the command is case
                                             sensitive.
                                             Defaults to False
+            help_text_override(str, optional): Text that should be used as a
+                                               description of the comand using
+                                               the inbuilt !help function
         Raises:
             ValueError
                 If command with the same name already registered
         '''
         command_pattern = self._build_command_pattern(command_pattern_template,
                                                       case_sensitive)
+
+        # Have ignore the type of the line below as mypy can not currently deal
+        # with 'extending' functions to have extra attributes
+        # GitHub Issue: https://github.com/python/mypy/issues/2087
+        command_func._help = (help_text_override if  # type: ignore
+                              help_text_override is not None
+                              else command.__doc__)
+
         if command_pattern not in self.commands:
             self.command_names[command_pattern] = command_pattern_template
             self.commands[command_pattern] = command_func

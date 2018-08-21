@@ -1,9 +1,7 @@
-from phial import Phial, command, Response, Attachment, g, help_command
+from phial import Phial, command, Response, Attachment, g
 import os
 
 slackbot = Phial('token-goes-here')
-
-slackbot.add_command("help", help_command)
 
 
 @slackbot.command('ping')
