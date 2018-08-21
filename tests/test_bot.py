@@ -55,7 +55,8 @@ class TestCommandDecarator(TestPhialBot):
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
                                                 test_command_function,
-                                                False)
+                                                False,
+                                                None)
 
 
 class TestAliasDecarator(TestPhialBot):
@@ -78,7 +79,8 @@ class TestAliasDecarator(TestPhialBot):
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
                                                 test_command_function,
-                                                False)
+                                                False,
+                                                None)
 
     def test_command_decorator_calls_add_command_case_sensitive(self):
         self.bot.add_command = MagicMock()
@@ -88,7 +90,8 @@ class TestAliasDecarator(TestPhialBot):
             return 'test'
         self.bot.add_command.assert_called_with('test_add_called',
                                                 test_command_function,
-                                                True)
+                                                True,
+                                                None)
 
 
 class TestAddCommand(TestPhialBot):
@@ -113,6 +116,21 @@ class TestAddCommand(TestPhialBot):
             self.bot.add_command('duplicate', command_function)
 
         self.assertTrue('already exists' in str(context.exception))
+
+    def test_override_help_text_works(self):
+        def test_command():
+            '''This should be overidden'''
+            pass
+
+        help_text = "Actual help text"
+        self.bot.add_command("test", test_command,
+                             help_text_override=help_text)
+
+        expected_command_pattern = self.bot._build_command_pattern("test",
+                                                                   False)
+
+        self.assertEqual(self.bot.commands[expected_command_pattern]._help,
+                         help_text)
 
 
 class TestBuildCommandPattern(TestPhialBot):
@@ -774,6 +792,13 @@ class TestHandleMessage(TestPhialBot):
     def test_handle_message_returns_none(self):
         response = self.bot._handle_message(None)
         self.assertEqual(response, None)
+
+
+class TestStandardCommands(TestPhialBot):
+    '''Tests any built-in commands'''
+
+    def test_help_command_registered(self):
+        self.assertIn("help", self.bot.command_names.values())
 
 
 class TestRun(TestPhialBot):
