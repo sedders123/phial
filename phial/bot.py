@@ -107,7 +107,7 @@ class Phial():
         # GitHub Issue: https://github.com/python/mypy/issues/2087
         command_func._help = (help_text_override if  # type: ignore
                               help_text_override is not None
-                              else command.__doc__)
+                              else command_func.__doc__)
 
         if command_pattern not in self.commands:
             self.command_names[command_pattern] = command_pattern_template
