@@ -87,10 +87,10 @@ class Phial():
                                             sensitive.
                                             Defaults to False
             help_text_override(str, optional): Text that should be used as a
-                                               description of the comand using
+                                               description of the command using
                                                the inbuilt !help function.
 
-                                               If not overriden the commands
+                                               If not overriden the command's
                                                docstring will be used as the
                                                help text.
 
@@ -159,10 +159,10 @@ class Phial():
                                 sensitive.
                                 Defaults to False
             help_text_override(str, optional): Text that should be used as a
-                                               description of the comand using
+                                               description of the command using
                                                the inbuilt !help function.
 
-                                               If not overriden the commands
+                                               If not overriden the command's
                                                docstring will be used as the
                                                help text.
 
