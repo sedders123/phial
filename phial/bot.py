@@ -87,7 +87,13 @@ class Phial():
                                             Defaults to False
             help_text_override(str, optional): Text that should be used as a
                                                description of the comand using
-                                               the inbuilt !help function
+                                               the inbuilt !help function.
+
+                                               If not overriden the commands
+                                               docstring will be used as the
+                                               help text.
+
+                                               Defaults to None
         Raises:
             ValueError
                 If command with the same name already registered
@@ -138,7 +144,8 @@ class Phial():
 
     def command(self,
                 command_pattern_template: str,
-                case_sensitive: bool = False) -> Callable:
+                case_sensitive: bool = False,
+                help_text_override: Optional[str]=None) -> Callable:
         '''
         A decorator that is used to register a command function for a given
         command. This does the same as :meth:`add_command` but is used as a
@@ -150,6 +157,15 @@ class Phial():
             case_sensitive(bool, optional): Whether or not the command is case
                                 sensitive.
                                 Defaults to False
+            help_text_override(str, optional): Text that should be used as a
+                                               description of the comand using
+                                               the inbuilt !help function.
+
+                                               If not overriden the commands
+                                               docstring will be used as the
+                                               help text.
+
+                                               Defaults to None
 
         Example:
             ::
@@ -164,7 +180,8 @@ class Phial():
 
         '''
         def decorator(f: Callable) -> Callable:
-            self.add_command(command_pattern_template, f, case_sensitive)
+            self.add_command(command_pattern_template, f, case_sensitive,
+                             help_text_override)
             return f
         return decorator
 
