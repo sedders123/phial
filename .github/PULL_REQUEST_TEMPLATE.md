@@ -23,3 +23,4 @@ If you're unsure about any of these, don't hesitate to ask. We're here to help!
 - [ ] All new and existing tests passed.
 - [ ] I have updated the Changelog to reflect my changes
 - [ ] I have added an example of how to use my changes to the examples directory (delete if not necessary)
+- [ ] Has the changes been tested against a real Slack instance?
