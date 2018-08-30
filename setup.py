@@ -35,8 +35,8 @@ setup(
     python_requires='>=3.4',
     keywords=['Slack', 'bot', 'Slackbot'],
     install_requires=[
-        'slackclient==1.2.1',
-        'Werkzeug==0.14.1',
+        'slackclient>=1.2.1',
+        'Werkzeug>=0.14.1',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
