@@ -58,6 +58,7 @@ class TestCommandDecarator(TestPhialBot):
                                                 False,
                                                 None)
 
+
 class TestFallbackCommandDecarator(TestPhialBot):
     '''Tests for phial's fallback command decorator'''
 
@@ -341,7 +342,6 @@ class TestHandleCommand(TestPhialBot):
         result = self.bot._handle_command(None)
 
         self.assertEqual(result, None)
-
 
 
 class TestCommandContextWorksCorrectly(TestPhialBot):

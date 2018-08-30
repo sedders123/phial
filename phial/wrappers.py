@@ -50,9 +50,9 @@ class Command():
         message_text(`Message`): The message that initiated the command
     '''
     def __init__(self,
-                 command_pattern: Pattern[str],
+                 command_pattern: Optional[Pattern[str]],
                  channel: str,
-                 args: Dict,
+                 args: Optional[Dict],
                  user: str,
                  message: Message) -> None:
         self.command_pattern = command_pattern

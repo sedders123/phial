@@ -70,6 +70,9 @@ def case_sensitive():
     '''Simple command which replies with a message'''
     return "You typed caseSensitive"
 
+@slackbot.fallback_command()
+def fallback_command(command):
+    return "Thats a not a command"
 
 if __name__ == '__main__':
     slackbot.run()

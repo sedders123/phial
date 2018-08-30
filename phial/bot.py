@@ -383,7 +383,15 @@ class Phial():
     def _create_command(self,
                         command_message: Message) -> Optional[Command]:
         '''Creates an instance of a command'''
-        command_match = self.get_command_match(command_message.text)
+        try:
+            command_match = self.get_command_match(command_message.text)
+        except ValueError:
+            # Command not registered.
+            return Command(None,
+                           command_message.channel,
+                           None,
+                           command_message.user,
+                           command_message)
         if command_match:
             kwargs, command_pattern = command_match
             return Command(command_pattern,
@@ -397,14 +405,23 @@ class Phial():
         '''Executes a given command'''
         if command is None:
             return  # Do nothing if no command
-        command_func = self.commands.get(command.command_pattern, None)
+
+        if command.command_pattern is None:
+            command_func = None
+        else:
+            command_func = self.commands.get(command.command_pattern, None)
+
         if command_func is None:
             # If no command found warn and then return early
             self.logger.warn("Command for pattern {0} not found"
                              .format(command.command_pattern))
             if self.fallback_command_func is None:
                 return
+            _command_ctx_stack.push(command)
             return self.fallback_command_func(command)
+        if command.args is None:
+            self.logger.exception("Command has no args")
+            raise ValueError("")
         _command_ctx_stack.push(command)
         return command_func(**command.args)
 
@@ -542,6 +559,7 @@ class Phial():
         try:
             command = self._create_command(message)
             response = self._handle_command(command)
+            print(response)
             self._execute_response(response)
         except ValueError as err:
             self.logger.exception('ValueError: {}'.format(err))
