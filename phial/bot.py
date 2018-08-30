@@ -5,8 +5,8 @@ import logging
 import json
 from phial.commands import help_command
 from phial.globals import _command_ctx_stack, command, _global_ctx_stack
-from phial.wrappers import Command, Response, Message, Attachment
 from phial.scheduler import Scheduler, Schedule, ScheduledJob
+from phial.wrappers import Command, Response, Message, Attachment
 
 
 class Phial():
@@ -34,6 +34,7 @@ class Phial():
         self.config = config
         self.running = False
         self.scheduler = Scheduler()
+        self.fallback_command_func = None  # type: Optional[Callable]
         if logger is None:
             logger = logging.getLogger(__name__)
             if not logger.hasHandlers():
@@ -150,6 +151,48 @@ class Phial():
                 return m.groupdict(), command_pattern
         raise ValueError('Command "{}" has not been registered'
                          .format(text))
+
+    def fallback_command(self) -> Callable:
+        '''
+        A decorator that is used to register a command function for use
+        when a user tries to execute a command that doesn't exist
+
+        Example:
+            ::
+
+                @bot.fallback_command()
+                def error_handler(attempted_command: Command):
+                    return "Oops that command doesn't seem to exist"
+
+        '''
+        def decorator(f: Callable) -> Callable:
+            self.add_fallback_command(f)
+            return f
+        return decorator
+
+    def add_fallback_command(self, command_func):
+        '''
+        Registers a fallback function to run when a user tries to execute a
+        command that doesn't exist. This is the same as
+        :meth:`fallback_command`.
+
+        ::
+
+            @bot.fallback_command()
+            def error_handler(attempted_command: Command):
+                return "Oops that command doesn't seem to exist"
+
+        Is the same as ::
+
+            def error_handler(attempted_command: Command):
+                return "Oops that command doesn't seem to exist"
+
+            bot.add_fallback_command(error_handler)
+
+        Args:
+            command_func(func): The function to be set as the fallback
+        '''
+        self.fallback_command_func = command_func
 
     def command(self,
                 command_pattern_template: str,
@@ -354,8 +397,16 @@ class Phial():
         '''Executes a given command'''
         if command is None:
             return  # Do nothing if no command
+        command_func = self.commands[command.command_pattern]
+        if command_func is None:
+            # If no command found warn and then return early
+            self.logger.warn("Command for pattern {0} not found"
+                             .format(command.command_pattern))
+            if self.fallback_command_func is None:
+                return
+            return self.fallback_command_func(command)
         _command_ctx_stack.push(command)
-        return self.commands[command.command_pattern](**command.args)
+        return command_func(**command.args)
 
     def _parse_slack_output(self,
                             slack_rtm_output: List[Dict])-> Optional[Message]:
