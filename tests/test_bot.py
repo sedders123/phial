@@ -58,6 +58,25 @@ class TestCommandDecarator(TestPhialBot):
                                                 False,
                                                 None)
 
+class TestFallbackCommandDecarator(TestPhialBot):
+    '''Tests for phial's fallback command decorator'''
+
+    def test_fallback_command_decorator_functionality(self):
+        @self.bot.fallback_command()
+        def command_function(command):
+            return 'oops'
+
+        self.assertEqual(self.bot.fallback_command_func,
+                         command_function)
+
+    def test_fallback_command_decorator_calls_add_fallback_command(self):
+        self.bot.add_fallback_command = MagicMock()
+
+        @self.bot.fallback_command()
+        def command_function(command):
+            return 'oops'
+        self.bot.add_fallback_command.assert_called_with(command_function)
+
 
 class TestAliasDecarator(TestPhialBot):
     '''Tests for phial's alias decorator'''
@@ -131,6 +150,51 @@ class TestAddCommand(TestPhialBot):
 
         self.assertEqual(self.bot.commands[expected_command_pattern]._help,
                          help_text)
+
+
+class TestFallbackCommand(TestPhialBot):
+    '''Tests for phial's add_fallback_command function'''
+
+    def test_add_fallback_command_functionality(self):
+        def command_function():
+            return 'oops'
+        self.bot.add_fallback_command(command_function)
+
+        self.assertEqual(self.bot.fallback_command_func,
+                         command_function)
+
+    def test_fallback_command_works_correctly(self):
+        def command_function(command):
+            return "oops"
+        self.bot.add_fallback_command(command_function)
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
+        command_patern = re.compile('^test$')
+        command = phial.wrappers.Command(command_patern,
+                                         'channel_id',
+                                         {},
+                                         'user',
+                                         message)
+
+        result = self.bot._handle_command(command)
+        self.assertEqual(result, "oops")
+
+    def test_no_fallback_command_does_nothing(self):
+        message = phial.wrappers.Message(text="!test",
+                                         channel="channel_id",
+                                         user="user",
+                                         timestamp="timestamp")
+        command_patern = re.compile('^test$')
+        command = phial.wrappers.Command(command_patern,
+                                         'channel_id',
+                                         {},
+                                         'user',
+                                         message)
+
+        result = self.bot._handle_command(command)
+        self.assertEqual(result, None)
 
 
 class TestBuildCommandPattern(TestPhialBot):
@@ -272,6 +336,12 @@ class TestHandleCommand(TestPhialBot):
         self.bot._handle_command(command_instance)
 
         self.assertTrue(test_func.called)
+
+    def test_handle_command_does_nothing_when_called_with_none(self):
+        result = self.bot._handle_command(None)
+
+        self.assertEqual(result, None)
+
 
 
 class TestCommandContextWorksCorrectly(TestPhialBot):

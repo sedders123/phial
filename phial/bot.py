@@ -170,7 +170,7 @@ class Phial():
             return f
         return decorator
 
-    def add_fallback_command(self, command_func):
+    def add_fallback_command(self, command_func: Callable) -> None:
         '''
         Registers a fallback function to run when a user tries to execute a
         command that doesn't exist. This is the same as
@@ -397,7 +397,7 @@ class Phial():
         '''Executes a given command'''
         if command is None:
             return  # Do nothing if no command
-        command_func = self.commands[command.command_pattern]
+        command_func = self.commands.get(command.command_pattern, None)
         if command_func is None:
             # If no command found warn and then return early
             self.logger.warn("Command for pattern {0} not found"
