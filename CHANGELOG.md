@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
  - Built-in help command. Uses docstrings as help text unless overridden
+ - Added the ability to specify a 'fallback' command for when a user attempts to use an invalid command
 ### Changed
  - Default logger level changed to INFO
 
