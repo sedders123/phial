@@ -413,15 +413,15 @@ class Phial():
 
         if command_func is None:
             # If no command found warn and then return early
-            self.logger.warn("Command for pattern {0} not found"
-                             .format(command.command_pattern))
+            self.logger.warn("Command {0} not found"
+                             .format(command.message.text))
             if self.fallback_command_func is None:
                 return
             _command_ctx_stack.push(command)
             return self.fallback_command_func(command)
         if command.args is None:
             self.logger.exception("Command has no args")
-            raise ValueError("")
+            raise ValueError("Command has no args")
         _command_ctx_stack.push(command)
         return command_func(**command.args)
 
@@ -559,7 +559,6 @@ class Phial():
         try:
             command = self._create_command(message)
             response = self._handle_command(command)
-            print(response)
             self._execute_response(response)
         except ValueError as err:
             self.logger.exception('ValueError: {}'.format(err))

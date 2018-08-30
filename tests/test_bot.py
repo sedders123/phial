@@ -306,15 +306,18 @@ class TestCreateCommand(TestPhialBot):
                                                   command_message)
         self.assertEqual(command, expected_command)
 
-    def test_errors_when_no_command_match(self):
-        with self.assertRaises(ValueError) as context:
-            command_message = phial.wrappers.Message('!test',
-                                                     'channel_id',
-                                                     'user',
-                                                     'timestamp')
-            self.bot._create_command(command_message)
-        self.assertTrue('Command "test" has not been registered'
-                        in str(context.exception))
+    def test_returns_partialcommand_when_no__command_match(self):
+        command_message = phial.wrappers.Message('!test',
+                                                 'channel_id',
+                                                 'user',
+                                                 'timestamp')
+        expected_result = phial.wrappers.Command(None,
+                                                 'channel_id',
+                                                 None,
+                                                 'user',
+                                                 command_message)
+        result = self.bot._create_command(command_message)
+        self.assertEqual(result, expected_result)
 
 
 class TestHandleCommand(TestPhialBot):
@@ -915,8 +918,8 @@ class TestRun(TestPhialBot):
                                               'timestamp')
         self.bot._parse_slack_output = MagicMock(return_value=test_command)
 
-        expected_msg = 'ValueError: Command "test" has not been registered'
-        with self.assertLogs(logger='phial.bot', level='ERROR') as cm:
+        expected_msg = 'Command !test not found'
+        with self.assertLogs(logger='phial.bot', level='WARN') as cm:
             self.bot.run()
 
             error = cm.output[0]
