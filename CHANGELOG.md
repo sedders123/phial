@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## [Unreleased]
 ### Added
  - Built-in help command. Uses docstrings as help text unless overridden
+### Changed
+ - Default logger level changed to INFO
 
 ## [0.3.0](https://github.com/sedders123/phial/releases/tag/0.3.0) - 2018-08-05
 ### Added

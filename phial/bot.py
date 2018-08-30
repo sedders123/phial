@@ -26,15 +26,23 @@ class Phial():
     def __init__(self,
                  token: str,
                  config: dict = default_config,
-                 logger: logging.Logger = logging.getLogger(__name__)) -> None:
+                 logger: Optional[logging.Logger] = None) -> None:
         self.slack_client = SlackClient(token)
         self.commands = {}  # type: Dict[Pattern[str], Callable]
         self.command_names = {}  # type: Dict[Pattern[str], str]
         self.middleware_functions = []  # type: List[Callable]
         self.config = config
         self.running = False
-        self.logger = logger
         self.scheduler = Scheduler()
+        if logger is None:
+            logger = logging.getLogger(__name__)
+            if not logger.hasHandlers():
+                handler = logging.StreamHandler()
+                formatter = logging.Formatter(fmt="%(asctime)s - %(message)s")
+                handler.setFormatter(formatter)
+                logger.addHandler(handler)
+            logger.setLevel(logging.INFO)
+        self.logger = logger
 
         _global_ctx_stack.push({})
         self._register_standard_commands()
