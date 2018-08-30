@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.4.0](https://github.com/sedders123/phial/releases/tag/0.3.0) - 2018-08-30
 ### Added
  - Built-in help command. Uses docstrings as help text unless overridden
  - Added the ability to specify a 'fallback' command for when a user attempts to use an invalid command
