@@ -14,6 +14,7 @@ def help_command(bot: 'Phial') -> str:
         # deal with 'extending' functions to have extra attributes
         # GitHub Issue: https://github.com/python/mypy/issues/2087
         command_doc = bot.commands[command]._help  # type: ignore
+        escaped_command_doc = command_doc.strip()
         command_name = bot.command_names[command]
-        help_text += "*{0}* - {1}\n".format(command_name, command_doc)
+        help_text += "*{0}* - {1}\n".format(command_name, escaped_command_doc)
     return help_text

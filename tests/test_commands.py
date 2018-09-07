@@ -50,3 +50,33 @@ class TestHelpCommand(unittest.TestCase):
 
         help_text = help_command(bot)
         self.assertEqual(help_text, expected_help_text)
+
+    def test_help_command_strips_newlines(self):
+        bot = MagicMock()
+        command = MagicMock()
+
+        command._help = "\nTest description\n"
+
+        bot.commands = {"test_pattern": command}
+        bot.command_names = {"test_pattern": "test"}
+        bot.config = {'baseHelpText': "Base text"}
+
+        expected_help_text = "Base text\n*test* - Test description\n"
+
+        help_text = help_command(bot)
+        self.assertEqual(help_text, expected_help_text)
+
+    def test_help_command_strips_whitespace(self):
+        bot = MagicMock()
+        command = MagicMock()
+
+        command._help = "\n     Test description     \n"
+
+        bot.commands = {"test_pattern": command}
+        bot.command_names = {"test_pattern": "test"}
+        bot.config = {'baseHelpText': "Base text"}
+
+        expected_help_text = "Base text\n*test* - Test description\n"
+
+        help_text = help_command(bot)
+        self.assertEqual(help_text, expected_help_text)
