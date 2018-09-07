@@ -3,6 +3,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from phial import Phial  # noqa
 
+NEW_LINE_SEPERATOR = "<NEW_LINE_SEPERATOR>"
 
 def help_command(bot: 'Phial') -> str:
     '''List all regsitered commmands'''
@@ -14,7 +15,9 @@ def help_command(bot: 'Phial') -> str:
         # deal with 'extending' functions to have extra attributes
         # GitHub Issue: https://github.com/python/mypy/issues/2087
         command_doc = bot.commands[command]._help  # type: ignore
-        escaped_command_doc = command_doc.strip()
+        stripped_command_doc = command_doc.strip()
+        escaped_command_doc = stripped_command_doc.replace("\n",NEW_LINE_SEPERATOR) \
+            .replace(NEW_LINE_SEPERATOR * 2, "\n").replace(NEW_LINE_SEPERATOR, "")
         command_name = bot.command_names[command]
         help_text += "*{0}* - {1}\n".format(command_name, escaped_command_doc)
     return help_text
