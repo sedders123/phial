@@ -10,6 +10,15 @@ def ping():
     return "Pong"
 
 
+@slackbot.command('pong')
+def pong():
+    '''
+    Simple command which replies with a message. Has a mutiline
+    docstring.
+    '''
+    return "Ping"
+
+
 @slackbot.command('hello <name>')
 def hello(name):
     '''Simple command with argument which replies to a message'''
