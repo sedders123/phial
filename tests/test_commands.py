@@ -95,3 +95,21 @@ class TestHelpCommand(unittest.TestCase):
 
         help_text = help_command(bot)
         self.assertEqual(help_text, expected_help_text)
+
+    def test_help_command_parses_multiline_docstring_correctty(self):
+        bot = MagicMock()
+        command = MagicMock()
+
+        command._help = """
+        Test of multiline
+        docstring
+        """
+
+        bot.commands = {"test_pattern": command}
+        bot.command_names = {"test_pattern": "test"}
+        bot.config = {'baseHelpText': "Base text"}
+
+        expected_help_text = "Base text\n*test* - Test of multiline docstring\n"
+
+        help_text = help_command(bot)
+        self.assertEqual(help_text, expected_help_text)
