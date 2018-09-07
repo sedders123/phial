@@ -91,7 +91,8 @@ class TestHelpCommand(unittest.TestCase):
         bot.command_names = {"test_pattern": "test"}
         bot.config = {'baseHelpText': "Base text"}
 
-        expected_help_text = "Base text\n*test* - Test description\n on a new line\n"
+        expected_help_text = "Base text\n*test* - Test description\n" \
+                             + " on a new line\n"
 
         help_text = help_command(bot)
         self.assertEqual(help_text, expected_help_text)
@@ -109,7 +110,8 @@ class TestHelpCommand(unittest.TestCase):
         bot.command_names = {"test_pattern": "test"}
         bot.config = {'baseHelpText': "Base text"}
 
-        expected_help_text = "Base text\n*test* - Test of multiline docstring\n"
+        expected_help_text = "Base text\n*test* - Test of multiline" \
+                             + " docstring\n"
 
         help_text = help_command(bot)
         self.assertEqual(help_text, expected_help_text)
