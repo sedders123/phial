@@ -205,44 +205,77 @@ class TestBuildCommandPattern(TestPhialBot):
         command_template = 'test'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           False)
-        expected_result = re.compile('^test$', re.IGNORECASE)
-        self.assertTrue(command_pattern == expected_result)
+        match = command_pattern.match("test")
+        self.assertTrue(match is not None)
 
     def test_build_command_pattern_single_substition_ignore_case(self):
         command_template = 'test <one>'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           False)
-        expected_result = re.compile('^test (?P<one>.+)$', re.IGNORECASE)
-        self.assertTrue(command_pattern == expected_result)
+        match_dict = command_pattern.match("test one").groupdict()
+        self.assertTrue(match_dict['one'] is not None)
 
     def test_build_command_pattern_multiple_substition_ignore_case(self):
         command_template = 'test <one> <two>'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           False)
-        expected_result = re.compile('^test (?P<one>.+) (?P<two>.+)$',
-                                     re.IGNORECASE)
-        self.assertTrue(command_pattern == expected_result)
+        match_dict = command_pattern.match("test one two").groupdict()
+        self.assertTrue(match_dict['one'] is not None)
+        self.assertTrue(match_dict['two'] is not None)
 
     def test_build_command_pattern_no_substition_case_sensitive(self):
         command_template = 'tEst'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           True)
-        expected_result = re.compile('^tEst$')
-        self.assertTrue(command_pattern == expected_result)
+        self.assertTrue(command_pattern.match("tEst") is not None)
+        self.assertTrue(command_pattern.match("Test") is None)
+
 
     def test_build_command_pattern_single_substition_case_sensitive(self):
         command_template = 'tEst <one>'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           True)
-        expected_result = re.compile('^tEst (?P<one>.+)$')
-        self.assertTrue(command_pattern == expected_result)
+
+        match_dict = command_pattern.match("tEst one").groupdict()
+        self.assertTrue(match_dict['one'] is not None)
+        self.assertTrue(command_pattern.match("Test one") is None)
 
     def test_build_command_pattern_multiple_substition_case_sensitive(self):
         command_template = 'tEst <one> <two>'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           True)
-        expected_result = re.compile('^tEst (?P<one>.+) (?P<two>.+)$')
-        self.assertTrue(command_pattern == expected_result)
+        match_dict = command_pattern.match("tEst one two").groupdict()
+        self.assertTrue(match_dict['one'] is not None)
+        self.assertTrue(match_dict['two'] is not None)
+        self.assertTrue(command_pattern.match("Test one") is None)
+
+    def test_build_command_allows_quotation_marks(self):
+        command_template = 'test <one> <two>'
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          False)
+        match_dict = command_pattern.match("test \"one two\" three").groupdict()
+        print(match_dict)
+        self.assertTrue(match_dict['one'] == "one two")
+        self.assertTrue(match_dict['two'] == "three")
+
+    def test_build_command_allows_all_params_with_quotation_marks(self):
+        command_template = 'test <one> <two>'
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          False)
+        match_dict = command_pattern.match("test \"one two\" \"three\"").groupdict()
+        print(match_dict)
+        self.assertTrue(match_dict['one'] == "one two")
+        self.assertTrue(match_dict['two'] == "three")
+
+    def test_build_command_allows_multiple_params_with_quotation_marks(self):
+        command_template = 'test <one> <two> <three>'
+        command_pattern = self.bot._build_command_pattern(command_template,
+                                                          False)
+        match_dict = command_pattern.match("test \"one two\" three \"four\"").groupdict()
+        print(match_dict)
+        self.assertTrue(match_dict['one'] == "one two")
+        self.assertTrue(match_dict['two'] == "three")
+        self.assertTrue(match_dict['three'] == "four")
 
 
 class TestGetCommandMatch(TestPhialBot):
