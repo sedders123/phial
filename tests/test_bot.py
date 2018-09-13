@@ -230,7 +230,6 @@ class TestBuildCommandPattern(TestPhialBot):
         self.assertTrue(command_pattern.match("tEst") is not None)
         self.assertTrue(command_pattern.match("Test") is None)
 
-
     def test_build_command_pattern_single_substition_case_sensitive(self):
         command_template = 'tEst <one>'
         command_pattern = self.bot._build_command_pattern(command_template,
@@ -253,7 +252,8 @@ class TestBuildCommandPattern(TestPhialBot):
         command_template = 'test <one> <two>'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           False)
-        match_dict = command_pattern.match("test \"one two\" three").groupdict()
+        match_dict = command_pattern.match("test \"one two\" three") \
+            .groupdict()
         print(match_dict)
         self.assertTrue(match_dict['one'] == "one two")
         self.assertTrue(match_dict['two'] == "three")
@@ -262,7 +262,8 @@ class TestBuildCommandPattern(TestPhialBot):
         command_template = 'test <one> <two>'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           False)
-        match_dict = command_pattern.match("test \"one two\" \"three\"").groupdict()
+        match_dict = command_pattern.match("test \"one two\" \"three\"") \
+            .groupdict()
         print(match_dict)
         self.assertTrue(match_dict['one'] == "one two")
         self.assertTrue(match_dict['two'] == "three")
@@ -271,7 +272,8 @@ class TestBuildCommandPattern(TestPhialBot):
         command_template = 'test <one> <two> <three>'
         command_pattern = self.bot._build_command_pattern(command_template,
                                                           False)
-        match_dict = command_pattern.match("test \"one two\" three \"four\"").groupdict()
+        match_dict = command_pattern.match("test \"one two\" three \"four\"") \
+            .groupdict()
         print(match_dict)
         self.assertTrue(match_dict['one'] == "one two")
         self.assertTrue(match_dict['two'] == "three")
