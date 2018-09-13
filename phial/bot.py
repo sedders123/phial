@@ -62,7 +62,9 @@ class Phial():
     def _build_command_pattern(command: str,
                                case_sensitive: bool) -> Pattern[str]:
         '''Creates the command pattern regexs'''
-        command_regex = re.sub(r'(<\w+>)', r'(?P\1.+)', command)
+
+        command = re.sub(r'(<\w+>)', r'(\"?\1\"?)', command)
+        command_regex = re.sub(r'(<\w+>)', r'(?P\1[^"]*)', command)
         return re.compile("^{}$".format(command_regex),
                           0 if case_sensitive else re.IGNORECASE)
 

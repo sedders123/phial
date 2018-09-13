@@ -25,6 +25,13 @@ def hello(name):
     return Response(text="Hi {0}".format(name), channel=command.channel)
 
 
+@slackbot.command('hello <name> <from_>')
+def hello(name, from_):
+    '''Simple command with two arguments which replies to a message'''
+    return Response(text="Hi {0}, from {1}".format(name, from_),
+                    channel=command.channel)
+
+
 @slackbot.command('react')
 def react():
     '''Simple command that reacts to the original message'''
