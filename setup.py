@@ -3,7 +3,7 @@ from setuptools.command.install import install
 import os
 import sys
 
-VERSION = '0.4.0'
+VERSION = '0.5.0'
 
 
 class VerifyVersionCommand(install):
