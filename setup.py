@@ -52,5 +52,10 @@ setup(
     ],
     cmdclass={
         'verify': VerifyVersionCommand,
-    }
+    },
+    project_urls={
+        'CI: Circle': 'https://circleci.com/gh/sedders123/phial',
+        'GitHub: Issues': 'https://github.com/sedders123/phial/issues',
+        'Documentation': 'https://phial.readthedocs.io/en/develop/'
+    },
 )
