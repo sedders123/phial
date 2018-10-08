@@ -20,7 +20,8 @@ class Phial():
     default_config = {
         'prefix': "!",
         'registerHelpCommand': True,
-        'baseHelpText': "All available commands:"
+        'baseHelpText': "All available commands:",
+        'autoReconnect': True
     }
 
     def __init__(self,
@@ -42,6 +43,7 @@ class Phial():
                 formatter = logging.Formatter(fmt="%(asctime)s - %(message)s")
                 handler.setFormatter(formatter)
                 logger.addHandler(handler)
+                logger.propagate = False
             logger.setLevel(logging.INFO)
         self.logger = logger
 
@@ -571,7 +573,8 @@ class Phial():
         '''Connects to slack client and handles incoming messages'''
         self.running = True
         slack_client = self.slack_client
-        if not slack_client.rtm_connect():
+        auto_reconnect = self.config['autoReconnect']
+        if not slack_client.rtm_connect(auto_reconnect=auto_reconnect):
             raise ValueError("Connection failed. Invalid Token or bot ID")
 
         self.logger.info("Phial connected and running!")
