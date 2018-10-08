@@ -7,6 +7,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 ### Changed
  - SlackClient now attempts to auto reconnect by default. This can be turned off in the settings.
+ - Logs outputted using the default logger no longer duplicate.
 
 ## [0.5.0](https://github.com/sedders123/phial/releases/tag/0.5.0) - 2018-09-14
 ### Changed
