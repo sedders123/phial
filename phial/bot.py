@@ -574,7 +574,8 @@ class Phial():
         self.running = True
         slack_client = self.slack_client
         auto_reconnect = self.config['autoReconnect']
-        if not slack_client.rtm_connect(auto_reconnect=auto_reconnect):
+        if not slack_client.rtm_connect(auto_reconnect=auto_reconnect,
+                                        with_team_state=False):
             raise ValueError("Connection failed. Invalid Token or bot ID")
 
         self.logger.info("Phial connected and running!")

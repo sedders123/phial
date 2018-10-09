@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
  - SlackClient now attempts to auto reconnect by default. This can be turned off in the settings.
  - Logs outputted using the default logger no longer duplicate.
+ - SlackClient no longer asks for team state as phial does not use this. Should speed up connection times espically in larger teams.
 
 ## [0.5.0](https://github.com/sedders123/phial/releases/tag/0.5.0) - 2018-09-14
 ### Changed
