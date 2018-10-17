@@ -35,6 +35,35 @@ class TestPhialBot(unittest.TestCase):
                         in self.bot.commands)
 
 
+class TestPhialBotConfig(TestPhialBot):
+    '''Tests for phial's config'''
+
+    def test_uses_default_config_when_specified(self):
+        bot = Phial('test-token')
+        self.assertEqual(bot.config, Phial.default_config)
+
+    def test_config_override(self):
+        bot = Phial('test-token', config={
+            'prefix': "/",
+            'registerHelpCommand': False,
+            'baseHelpText': "All commands:",
+            'autoReconnect': False
+        })
+        self.assertEqual(bot.config, {
+            'prefix': "/",
+            'registerHelpCommand': False,
+            'baseHelpText': "All commands:",
+            'autoReconnect': False
+        })
+
+    def test_partial_config_override(self):
+        bot = Phial('test-token', config={
+            'prefix': "/",
+        })
+        self.assertEqual(bot.config['prefix'], '/')
+        self.assertEqual(bot.config['baseHelpText'], "All available commands:")
+
+
 class TestCommandDecarator(TestPhialBot):
     '''Tests for phial's command decorator'''
 

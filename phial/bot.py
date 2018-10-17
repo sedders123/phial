@@ -32,7 +32,8 @@ class Phial():
         self.commands = {}  # type: Dict[Pattern[str], Callable]
         self.command_names = {}  # type: Dict[Pattern[str], str]
         self.middleware_functions = []  # type: List[Callable]
-        self.config = config
+        self.config = dict(self.default_config)
+        self.config.update(config)
         self.running = False
         self.scheduler = Scheduler()
         self.fallback_command_func = None  # type: Optional[Callable]
