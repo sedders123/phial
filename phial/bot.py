@@ -1,6 +1,7 @@
 from slackclient import SlackClient  # type: ignore
 import re
-from typing import Dict, List, Pattern, Callable, Union, Tuple, Any, Optional
+from typing import (Dict, List, Pattern, Callable, Union, Tuple, Any, Optional,
+                    cast)
 import logging
 import json
 from phial.commands import help_command
@@ -146,8 +147,9 @@ class Phial():
             A :obj:`dict` object with kwargs and the command pattern if a match
             is found otherwise :obj:`None`
         '''
-        if self.config['prefix']:
-            if not text.startswith(self.config['prefix']):
+        prefix = cast(str, self.config['prefix'])
+        if prefix:
+            if not text.startswith(prefix):
                 return None
             text = text[1:]
         for command_pattern in self.commands:

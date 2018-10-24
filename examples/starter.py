@@ -88,7 +88,7 @@ def case_sensitive():
 
 @slackbot.fallback_command()
 def fallback_command(command):
-    return "Thats a not a command"
+    return "Thats not a command"
 
 if __name__ == '__main__':
     slackbot.run()
