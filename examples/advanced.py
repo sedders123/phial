@@ -1,4 +1,4 @@
-from phial import Phial, command, Response, Schedule
+from phial import Phial, command, Response, Schedule, MessageAttachment, MessageAttachmentField
 from multiprocessing import Process
 from time import sleep
 import logging
@@ -61,6 +61,20 @@ def shceduled_function():
     slackbot.send_message(Response(text="Hey! Hey Listen!",
                                    channel=SCHEDULED_CHANNEL))
 
+@slackbot.command('message-with-attachment')
+def get_message_with_attachment():
+    attachments = [
+        MessageAttachment(
+            title="Here's a message, it has 2 attachment fields",
+            title_link="https://api.slack.com/docs/message-attachments"
+            text="This message has some text!",
+            fields=[
+                MessageAttachmentField(title="Here's the first attachment field", value="And here's it's body", short=True),
+                MessageAttachmentField(title="...And here's the second", value="And here's it's body", short=True)
+            ]
+        )
+    ]
+    return attachments
 
 if __name__ == '__main__':
     FORMAT = '%(asctime)-15s %(message)s'
