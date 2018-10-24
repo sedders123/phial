@@ -1,4 +1,4 @@
-from phial import Phial, command, Response, Attachment, g, MessageAttachment, MessageAttachmentField
+from phial import Phial, command, Response, Attachment, g
 import os
 
 slackbot = Phial('token-goes-here')
