@@ -76,7 +76,7 @@ class Phial():
                     command_pattern_template: str,
                     command_func: Callable,
                     case_sensitive: bool = False,
-                    help_text_override: Optional[str]=None) -> None:
+                    help_text_override: Optional[str] = None) -> None:
         '''
         Creates a command pattern and adds a command function to the bot. This
         is the same as :meth:`command`.
@@ -204,7 +204,7 @@ class Phial():
     def command(self,
                 command_pattern_template: str,
                 case_sensitive: bool = False,
-                help_text_override: Optional[str]=None) -> Callable:
+                help_text_override: Optional[str] = None) -> Callable:
         '''
         A decorator that is used to register a command function for a given
         command. This does the same as :meth:`add_command` but is used as a
@@ -305,7 +305,7 @@ class Phial():
 
     def alias(self,
               command_pattern_template: str,
-              case_sensitive: bool =False) -> Callable:
+              case_sensitive: bool = False) -> Callable:
         '''
         A decorator that is used to register an alias for a command.
         Internally this is the same as :meth:`command`.
