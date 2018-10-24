@@ -86,9 +86,25 @@ def case_sensitive():
     '''Simple command which replies with a message'''
     return "You typed caseSensitive"
 
+
+@slackbot.command('messageWithAttachment')
+def get_message_with_attachment():
+    '''
+        A command that posts a message with a Slack attachment    
+        Read more: https://api.slack.com/docs/message-attachments
+    '''
+    attachments = [{
+        "title": "Here's the title of the attachment",
+        "text": "...and here's the text",
+        "footer": "Teeny tiny footer text"
+    }]
+    return Response(channel=command.channel, attachments=attachments)
+
+
 @slackbot.fallback_command()
 def fallback_command(command):
     return "Thats not a command"
+
 
 if __name__ == '__main__':
     slackbot.run()
