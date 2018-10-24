@@ -61,12 +61,13 @@ def shceduled_function():
     slackbot.send_message(Response(text="Hey! Hey Listen!",
                                    channel=SCHEDULED_CHANNEL))
 
-@slackbot.command('message-with-attachment')
+@slackbot.command('messageWithAttachment')
 def get_message_with_attachment():
+    '''A command that posts a message with a Slack attachment'''
     attachments = [
         MessageAttachment(
             title="Here's a message, it has 2 attachment fields",
-            title_link="https://api.slack.com/docs/message-attachments"
+            title_link="https://api.slack.com/docs/message-attachments",
             text="This message has some text!",
             fields=[
                 MessageAttachmentField(title="Here's the first attachment field", value="And here's it's body", short=True),
@@ -74,7 +75,7 @@ def get_message_with_attachment():
             ]
         )
     ]
-    return attachments
+    return Response(channel=command.channel, attachments=attachments)
 
 if __name__ == '__main__':
     FORMAT = '%(asctime)-15s %(message)s'
