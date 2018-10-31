@@ -170,11 +170,13 @@ class Schedule:
             A :obj:`datetime` of when the event should next happen
         '''
         if self._at:
-            next_day = last_run + timedelta(days=self._days)
-            return next_day.replace(hour=self._at.hour,
-                                    minute=self._at.minute,
-                                    second=self._at.second,
-                                    microsecond=0)
+            next_run = last_run.replace(hour=self._at.hour,
+                                        minute=self._at.minute,
+                                        second=self._at.second,
+                                        microsecond=0)
+            if next_run <= datetime.now():
+                next_run += timedelta(days=self._days)
+            return next_run
 
         return last_run + timedelta(days=self._days,
                                     hours=self._hours,
