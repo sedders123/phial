@@ -8,18 +8,18 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
  - Allow configuration to be partially updated ([@RealOrangeOne](https://github.com/RealOrangeOne) in [#81](https://github.com/sedders123/phial/pull/81))
 ### Fixed
- - Scheduled events using `every().day().at()`, now run on the day that the program is started on. ([@runz0rd](https://github.com/runz0rd) in [#90](https://github.com/sedders123/phial/pull/90))
+ - Scheduled events using `every().day().at()`, now run on the day that the program is started on ([@runz0rd](https://github.com/runz0rd) in [#90](https://github.com/sedders123/phial/pull/90))
 
 ## [0.6.0](https://github.com/sedders123/phial/releases/tag/0.6.0) - 2018-10-10
 ### Changed
- - SlackClient now attempts to auto reconnect by default. This can be turned off in the settings.
- - Logs outputted using the default logger no longer duplicate.
- - SlackClient no longer asks for team state as phial does not use this. Should speed up connection times espically in larger teams.
+ - SlackClient now attempts to auto reconnect by default. This can be turned off in the settings
+ - Logs outputted using the default logger no longer duplicate
+ - SlackClient no longer asks for team state as phial does not use this. Should speed up connection times espically in larger teams
 
 ## [0.5.0](https://github.com/sedders123/phial/releases/tag/0.5.0) - 2018-09-14
 ### Changed
- - Help command now works better with multiline doc strings. The command now ignores single new lines and converts double new lines into single new lines, similar to markdown.
- - Parameters of commands can now be wrapped in double quotation marks to allow for values containing whitespace.
+ - Help command now works better with multiline doc strings. The command now ignores single new lines and converts double new lines into single new lines, similar to markdown
+ - Parameters of commands can now be wrapped in double quotation marks to allow for values containing whitespace
 
 ## [0.4.0](https://github.com/sedders123/phial/releases/tag/0.4.0) - 2018-08-30
 ### Added
@@ -43,7 +43,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [0.2.0](https://github.com/sedders123/phial/releases/tag/0.2.0) - 2018-04-05
 ### Added
-- Optional Case Sensitivity for commands. Commands are now no longer case sensitive by default, they have an optional parameter to turn on case sensitivity if desired.
+- Optional Case Sensitivity for commands. Commands are now no longer case sensitive by default, they have an optional parameter to turn on case sensitivity if desired
 ### Changed
 - Minimum Python version now 3.4
 
