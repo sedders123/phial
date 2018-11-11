@@ -12,7 +12,9 @@ class Message():
         text(str): The message contents
         channel(str): The Slack channel ID the message was sent from
         user(str): The user who sent the message
-        timestamp(str): The messages timestamp
+        timestamp(str): The message's timestamp
+        team(str): The Team ID of the Slack workspace the message was
+                   sent from
         bot_id(str, optional): If the message was sent by a bot
                                the ID of that bot.
                                Defaults to None.
@@ -50,7 +52,11 @@ class Command():
         channel(str): The Slack channel ID the command was called from
         args(dict): Any arguments passed to the command
         user(str): The Slack User ID of the user who intiated the command
-        message_text(`Message`): The message that initiated the command
+        message(`Message`): The message that initiated the command
+        message_ts(str): The timestamp of the message that initiated the
+                         command
+        team(str): The Team ID of the Slack workspace the command was
+                   called from
     '''
     def __init__(self,
                  command_pattern: Optional[Pattern[str]],
