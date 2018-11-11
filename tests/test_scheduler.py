@@ -1,6 +1,7 @@
 import unittest
-from unittest.mock import MagicMock
 from datetime import datetime, timedelta
+from freezegun import freeze_time
+from unittest.mock import MagicMock
 from phial.scheduler import Scheduler, Schedule, ScheduledJob
 
 
@@ -61,7 +62,19 @@ class TestSchedules(unittest.TestCase):
         expected_datetime = now + timedelta(seconds=2)
         assert next_run == expected_datetime
 
-    def test_at(self):
+    @freeze_time('2018-01-01 10:00:00')
+    def test_at_before_time(self):
+        schedule = Schedule().every().day().at(12, 00)
+        now = datetime.now()
+        next_run = schedule.get_next_run_time(now)
+        expected_datetime = (now).replace(hour=12,
+                                          minute=0,
+                                          second=0,
+                                          microsecond=0)
+        assert next_run == expected_datetime
+
+    @freeze_time('2018-01-01 13:00:00')
+    def test_at_after_time(self):
         schedule = Schedule().every().day().at(12, 00)
         now = datetime.now()
         next_run = schedule.get_next_run_time(now)

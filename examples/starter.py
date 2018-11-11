@@ -90,7 +90,7 @@ def case_sensitive():
 @slackbot.command('messageWithAttachment')
 def get_message_with_attachment():
     '''
-        A command that posts a message with a Slack attachment    
+        A command that posts a message with a Slack attachment
         Read more: https://api.slack.com/docs/message-attachments
     '''
     attachments = [{

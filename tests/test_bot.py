@@ -200,13 +200,15 @@ class TestFallbackCommand(TestPhialBot):
         message = phial.wrappers.Message(text="!test",
                                          channel="channel_id",
                                          user="user",
-                                         timestamp="timestamp")
+                                         timestamp="timestamp",
+                                         team="team")
         command_patern = re.compile('^test$')
         command = phial.wrappers.Command(command_patern,
                                          'channel_id',
                                          {},
                                          'user',
-                                         message)
+                                         message,
+                                         'team')
 
         result = self.bot._handle_command(command)
         self.assertEqual(result, "oops")
@@ -215,13 +217,15 @@ class TestFallbackCommand(TestPhialBot):
         message = phial.wrappers.Message(text="!test",
                                          channel="channel_id",
                                          user="user",
-                                         timestamp="timestamp")
+                                         timestamp="timestamp",
+                                         team="team")
         command_patern = re.compile('^test$')
         command = phial.wrappers.Command(command_patern,
                                          'channel_id',
                                          {},
                                          'user',
-                                         message)
+                                         message,
+                                         'team')
 
         result = self.bot._handle_command(command)
         self.assertEqual(result, None)
@@ -346,13 +350,15 @@ class TestCreateCommand(TestPhialBot):
         command_message = phial.wrappers.Message('!test',
                                                  'channel_id',
                                                  'user',
-                                                 'timestamp')
+                                                 'timestamp',
+                                                 'team')
         command = self.bot._create_command(command_message)
         expected_command = phial.wrappers.Command(command_patern,
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  command_message)
+                                                  command_message,
+                                                  'team')
         self.assertEqual(command, expected_command)
 
     def test_basic_functionality_with_args(self):
@@ -361,25 +367,29 @@ class TestCreateCommand(TestPhialBot):
         command_message = phial.wrappers.Message('!test first',
                                                  'channel_id',
                                                  'user',
-                                                 'timestamp')
+                                                 'timestamp',
+                                                 'team')
         command = self.bot._create_command(command_message)
         expected_command = phial.wrappers.Command(command_patern,
                                                   'channel_id',
                                                   {'one': 'first'},
                                                   'user',
-                                                  command_message)
+                                                  command_message,
+                                                  'team')
         self.assertEqual(command, expected_command)
 
     def test_returns_partialcommand_when_no__command_match(self):
         command_message = phial.wrappers.Message('!test',
                                                  'channel_id',
                                                  'user',
-                                                 'timestamp')
+                                                 'timestamp',
+                                                 'team')
         expected_result = phial.wrappers.Command(None,
                                                  'channel_id',
                                                  None,
                                                  'user',
-                                                 command_message)
+                                                 command_message,
+                                                 'team')
         result = self.bot._create_command(command_message)
         self.assertEqual(result, expected_result)
 
@@ -394,13 +404,15 @@ class TestHandleCommand(TestPhialBot):
         message = phial.wrappers.Message(text="!test",
                                          channel="channel_id",
                                          user="user",
-                                         timestamp="timestamp")
+                                         timestamp="timestamp",
+                                         team="team")
         command_patern = self.bot._build_command_pattern('test', False)
         command_instance = phial.wrappers.Command(command_patern,
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  message)
+                                                  message,
+                                                  'team')
         self.bot._handle_command(command_instance)
 
         self.assertTrue(test_func.called)
@@ -425,12 +437,14 @@ class TestCommandContextWorksCorrectly(TestPhialBot):
         message = phial.wrappers.Message(text="!test",
                                          channel="channel_id",
                                          user="user",
-                                         timestamp="timestamp")
+                                         timestamp="timestamp",
+                                         team="team")
         command_instance = phial.wrappers.Command(command_pattern,
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  message)
+                                                  message,
+                                                  "team")
         self.bot._handle_command(command_instance)
 
     def test_command_context_pops_correctly(self):
@@ -441,7 +455,8 @@ class TestCommandContextWorksCorrectly(TestPhialBot):
         command_instance = phial.wrappers.Message('!test',
                                                   'channel_id',
                                                   'user',
-                                                  'timestamp')
+                                                  'timestamp',
+                                                  'team')
         self.bot._handle_message(command_instance)
 
         with self.assertRaises(RuntimeError) as context:
@@ -457,18 +472,21 @@ class TestParseSlackOutput(TestPhialBot):
                                 'text': '!test',
                                 'channel': 'channel_id',
                                 'user': 'user_id',
-                                'ts': 'timestamp'
+                                'ts': 'timestamp',
+                                'team': 'team'
                                }]
         command_message = self.bot._parse_slack_output(sample_slack_output)
         expected_command_message = phial.wrappers.Message('!test',
                                                           'channel_id',
                                                           'user_id',
-                                                          'timestamp')
+                                                          'timestamp',
+                                                          'team')
         self.assertEqual(command_message, expected_command_message)
 
     def test_returns_message_correctly_for_normal_message(self):
         sample_slack_output = [{'text': 'test', 'channel': 'channel_id',
-                                'user': 'user', 'ts': 'timestamp'}]
+                                'user': 'user', 'ts': 'timestamp',
+                                'team': 'team'}]
         command_message = self.bot._parse_slack_output(sample_slack_output)
         self.assertTrue(type(command_message) is phial.wrappers.Message)
 
@@ -483,7 +501,8 @@ class TestParseSlackOutput(TestPhialBot):
                                 'channel': 'channel_id',
                                 'user': 'user_id',
                                 'ts': 'timestamp',
-                                'bot_id': 'bot_id'
+                                'bot_id': 'bot_id',
+                                'team': 'team'
                               }]
         command_message = self.bot._parse_slack_output(sample_slack_output)
         self.assertEqual(command_message.bot_id, 'bot_id')
@@ -747,12 +766,14 @@ class TestExecuteResponse(TestPhialBot):
         message = phial.wrappers.Message(text="!test",
                                          channel="channel_id",
                                          user="user",
-                                         timestamp="timestamp")
+                                         timestamp="timestamp",
+                                         team="team")
         command_instance = phial.wrappers.Command(command_pattern="base",
                                                   channel="channel_id",
                                                   args={},
                                                   user="user",
-                                                  message=message)
+                                                  message=message,
+                                                  team="team")
         phial.globals._command_ctx_stack.push(command_instance)
         self.bot._execute_response("string")
         expected_response = Response(text='string', channel='channel_id')
@@ -872,7 +893,8 @@ class TestMiddleware(TestPhialBot):
         message = phial.wrappers.Message('!test',
                                          'channel_id',
                                          'user',
-                                         'timestamp')
+                                         'timestamp',
+                                         'team')
         self.bot._handle_message(message)
         middleware_test.assert_called_once_with(message)
         test.assert_not_called()
@@ -881,7 +903,8 @@ class TestMiddleware(TestPhialBot):
         message = phial.wrappers.Message('!test',
                                          'channel_id',
                                          'user',
-                                         'timestamp')
+                                         'timestamp',
+                                         'team')
         middleware_test = MagicMock(return_value=message)
         self.bot.add_middleware(middleware_test)
         test = MagicMock()
@@ -920,7 +943,8 @@ class TestHandleMessage(TestPhialBot):
                                          'channel_id',
                                          'user',
                                          'timestamp',
-                                         'bot_id')
+                                         'bot_id',
+                                         'team')
         test = MagicMock()
         self.bot.add_command('test', test)
         self.bot._handle_message(message)
@@ -951,13 +975,15 @@ class TestRun(TestPhialBot):
         command_message = phial.wrappers.Message('!test',
                                                  'channel_id',
                                                  'user',
-                                                 'timestamp')
+                                                 'timestamp',
+                                                 'team')
         self.bot._parse_slack_output = MagicMock(return_value=command_message)
         test_command = phial.wrappers.Command(re.compile('^test$'),
                                               'channel_id',
                                               {},
                                               'user_id',
-                                              command_message)
+                                              command_message,
+                                              'team')
         self.bot._create_command = MagicMock(return_value=test_command)
         self.bot._handle_command = MagicMock(return_value=None)
 
@@ -979,7 +1005,8 @@ class TestRun(TestPhialBot):
         test_command = phial.wrappers.Message('!test',
                                               'channel_id',
                                               'user_id',
-                                              'timestamp')
+                                              'timestamp',
+                                              'team')
         self.bot._parse_slack_output = MagicMock(return_value=test_command)
 
         expected_msg = 'Command !test not found'
@@ -1007,18 +1034,21 @@ class TestGlobalContext(unittest.TestCase):
         message = phial.wrappers.Message(text="!test",
                                          channel="channel_id",
                                          user="user",
-                                         timestamp="timestamp")
+                                         timestamp="timestamp",
+                                         team="team")
         command_instance = phial.wrappers.Command(command_pattern1,
                                                   'channel_id',
                                                   {},
                                                   'user',
-                                                  message)
+                                                  message,
+                                                  'team')
         bot.add_command('test2', second_command_function)
         second_command_instance = phial.wrappers.Command(command_pattern2,
                                                          'channel_id',
                                                          {},
                                                          'user',
-                                                         message)
+                                                         message,
+                                                         'team')
         bot._handle_command(command_instance)
         bot._handle_command(second_command_instance)
 

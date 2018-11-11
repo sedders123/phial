@@ -398,14 +398,16 @@ class Phial():
                            command_message.channel,
                            None,
                            command_message.user,
-                           command_message)
+                           command_message,
+                           command_message.team)
         if command_match:
             kwargs, command_pattern = command_match
             return Command(command_pattern,
                            command_message.channel,
                            kwargs,
                            command_message.user,
-                           command_message)
+                           command_message,
+                           command_message.team)
         return None
 
     def _handle_command(self, command: Optional[Command]) -> Any:
@@ -451,6 +453,7 @@ class Phial():
                                    output['channel'],
                                    output['user'],
                                    output['ts'],
+                                   output['team'],
                                    bot_id)
         return None
 
