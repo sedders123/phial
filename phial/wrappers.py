@@ -22,17 +22,20 @@ class Message():
                  channel: str,
                  user: str,
                  timestamp: str,
+                 team: str,
                  bot_id: Optional[str] = None) -> None:
         self.text = text
         self.channel = channel
         self.user = user
         self.timestamp = timestamp
+        self.team = team
         self.bot_id = bot_id
 
     def __repr__(self) -> str:
-        return "<Message: {0} in {1} at {2}>".format(self.text,
-                                                     self.channel,
-                                                     self.timestamp)
+        return "<Message: {0} in {1}:{2} at {3}>".format(self.text,
+                                                         self.channel,
+                                                         self.team,
+                                                         self.timestamp)
 
     def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
@@ -54,17 +57,21 @@ class Command():
                  channel: str,
                  args: Optional[Dict],
                  user: str,
-                 message: Message) -> None:
+                 message: Message,
+                 team: str) -> None:
         self.command_pattern = command_pattern
         self.channel = channel
         self.args = args
         self.user = user
         self.message = message
         self.message_ts = message.timestamp
+        self.team = team
 
     def __repr__(self) -> str:
-        return "<Command: {0}, {1} in {2}>".format(self.message,
-                                                   self.args, self.channel)
+        return "<Command: {0}, {1} in {2}:{3}>".format(self.message.text,
+                                                       self.args,
+                                                       self.channel,
+                                                       self.team)
 
     def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
