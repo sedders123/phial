@@ -102,6 +102,7 @@ class TestSchedules(unittest.TestCase):
 
 
 class TestScheduledJobs(unittest.TestCase):
+    @freeze_time('2018-01-01 13:00:00')
     def test_job_create_correctly(self):
         def job_func():
             pass
