@@ -17,8 +17,8 @@ class TestHelpCommand(unittest.TestCase):
 
         help_text = help_command(bot)
         self.assertEqual(help_text, expected_help_text)
-        
-     def test_help_command_allows_no_help_text(self):
+
+    def test_help_command_allows_no_help_text(self):
         bot = MagicMock()
         bot.config = {}
         command = MagicMock()
