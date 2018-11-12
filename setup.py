@@ -37,6 +37,7 @@ setup(
     install_requires=[
         'slackclient>=1.2.1',
         'Werkzeug>=0.14.1',
+        'typing>=3.6.6'
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
