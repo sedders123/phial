@@ -1,3 +1,5 @@
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsedders123%2Fphial.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsedders123%2Fphial?ref=badge_shield)
+
 phial
 =====
 
@@ -90,3 +92,7 @@ Erlenmeyer Flask by Iconic from the Noun Project - `CC BY
    :target: https://coveralls.io/github/sedders123/phial?branch=develop
 .. |PyPi| image:: https://badge.fury.io/py/phial-slack.svg
     :target: https://badge.fury.io/py/phial-slack
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Fsedders123%2Fphial.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Fsedders123%2Fphial?ref=badge_large)
