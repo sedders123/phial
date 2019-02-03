@@ -4,6 +4,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.7.1](https://github.com/sedders123/phial/releases/tag/0.7.1) - 2019-02-03
+### Changed
+ - Allow consumers of the pacakge to use phial's type hints
+
 ## [0.7.0](https://github.com/sedders123/phial/releases/tag/0.7.0) - 2018-11-13
 ### Added
  - Add `team` attribute to `Message` and `Command` models. This stores the ID of the Slack Team that the call originated from.
