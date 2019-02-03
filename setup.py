@@ -28,6 +28,7 @@ setup(
     author_email='sedders123@gmail.com',
     description='A Slack bot framework',
     long_description=open('README.rst').read(),
+    package_data={"phial": ["py.typed"]},
     packages=['phial'],
     include_package_data=True,
     zip_safe=False,
