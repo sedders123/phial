@@ -435,7 +435,7 @@ class Phial():
         return command_func(**command.args)
 
     def _parse_slack_output(self,
-                            slack_rtm_output: List[Dict])-> Optional[Message]:
+                            slack_rtm_output: List[Dict]) -> Optional[Message]:
         """
             The Slack Real Time Messaging API is an events firehose.
             This function parses the JSON form Slack into phial Messages
