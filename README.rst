@@ -76,7 +76,7 @@ or raise an Issue
 Licenses
 --------
 
-phial - MIT © 2017 James Seden Smith
+phial - MIT © 2019 James Seden Smith
 
 Erlenmeyer Flask by Iconic from the Noun Project - `CC BY
 3.0 <https://creativecommons.org/licenses/by/3.0/>`__ (used in
