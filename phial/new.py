@@ -24,48 +24,6 @@ def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
 
 
 class Response():
-    '''
-    When returned in a command function will send a message, or reaction to
-    slack depending on contents.
-
-    Attributes:
-        channel(str): The Slack channel ID the response will be sent to
-        text(str): The response contents
-        original_ts(str): The timestamp of the original message. If populated
-                          will put the text response in a thread
-        reation(str): A valid slack emoji name. NOTE: will only work when
-                      original_ts is populated
-        attachments(Union[List[MessageAttachment],
-                          List[Dict[str, Dict[str, str]]]]):
-                          A list of MessageAttachment objects to be attached
-                          to the message
-        ephemeral(bool): Whether to send the message as an ephemeral message
-        user(str): The user id to display the ephemeral message to
-
-    Examples:
-        The following would send a message to a slack channel when executed ::
-
-            @slackbot.command('ping')
-            def ping():
-                return Response(text="Pong", channel='channel_id')
-
-        The following would send a reply to a message in a thread ::
-
-            @slackbot.command('hello')
-            def hello():
-                return Response(text="hi",
-                                channel='channel_id',
-                                original_ts='original_ts')
-
-        The following would send a reaction to a message ::
-
-            @slackbot.command('react')
-            def react():
-                return Response(reaction="x",
-                                channel='channel_id',
-                                original_ts='original_ts')
-
-    '''
     def __init__(self,
                  channel: str,
                  text: Optional[str] = None,
@@ -89,16 +47,6 @@ class Response():
 
 
 class Attachment():
-    '''
-    When returned in a command function will send an attachment to Slack
-
-    Attributes:
-        channel(str): The Slack channel ID the file will be sent to
-        filename(str): The filename of the file
-        content(`io.BufferedReader`): The file to send to Slack. Open file
-                                      using open('<file>', 'rb')
-
-    '''
     def __init__(self,
                  channel: str,
                  filename: Optional[str] = None,
@@ -112,7 +60,6 @@ class Attachment():
 
 
 class Message():
-    """Slack message"""
     def __init__(self,
                  text: str,
                  channel: str,
@@ -138,19 +85,25 @@ class Message():
 
 
 class Command:
-    """A command that a user can execute"""
     def __init__(self,
                  pattern: str,
                  func: Callable[..., PhialResponse],
                  case_sensitive: bool = False):
         self.pattern = self._build_pattern_regex(pattern, case_sensitive)
+        self.alias_patterns = self._get_alias_patterns(func)
         self.func = func
         self.case_sensitive = case_sensitive
+
+    def _get_alias_patterns(self, func: Callable) -> List[Pattern]:
+        patterns: List[Pattern] = []
+        if hasattr(func, 'alias_patterns'):
+            for pattern in func.alias_patterns:  # type: ignore
+                patterns.append(self._build_pattern_regex(pattern))
+        return patterns
 
     @staticmethod
     def _build_pattern_regex(pattern: str,
                              case_sensitive: bool = False) -> Pattern[str]:
-        '''Creates the command pattern regexs'''
         command = re.sub(r'(<\w+>)', r'(\"?\1\"?)', pattern)
         command_regex = re.sub(r'(<\w+>)', r'(?P\1[^"]*)', command)
         return re.compile("^{}$".format(command_regex),
@@ -161,6 +114,11 @@ class Command:
         match = self.pattern.match(message.text)
         if match:
             return match.groupdict()
+        # Only check aliases if main pattern does not match
+        for alias in self.alias_patterns:
+            match = alias.match(message.text)
+            if match:
+                return match.groupdict()
         return None
 
 
@@ -196,6 +154,16 @@ class Phial:
                 case_sensitive: bool = False) -> Callable:
         def decorator(f: Callable) -> Callable:
             self.add_command(pattern, f, case_sensitive)
+            return f
+        return decorator
+
+    def alias(self, pattern: str) -> Callable:
+        pattern = "{0}{1}".format(self.config["prefix"], pattern)
+
+        def decorator(f: Callable) -> Callable:
+            if not hasattr(f, 'alias_patterns'):
+                f.alias_patterns = []  # type: ignore
+            f.alias_patterns.append(pattern)  # type: ignore
             return f
         return decorator
 
@@ -327,15 +295,18 @@ class Phial:
                 print("Error {0}".format(e))
 
 
-def command_one() -> str:
-    return ":tada:"
+# test = Phial('token')
 
 
-def command_two(test: str) -> None:
-    print("Here {0}".format(test))
+# @test.command("test")
+# @test.alias("foo")
+# def command_one() -> str:
+#     return ":tada:"
 
 
-test = Phial('token')
-test.add_command("test", command_one)
-test.add_command("test2 <test>", command_two)
-test.run()
+# def command_two(test: str) -> None:
+#     print("Here {0}".format(test))
+
+
+# test.add_command("test2 <test>", command_two)
+# test.run()
