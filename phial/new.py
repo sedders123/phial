@@ -181,6 +181,7 @@ class Phial:
         self.middleware_functions: List[Callable
                                         [[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
+        self.fallback_func: Optional[Callable[[], PhialResponse]] = None
 
     def add_command(self,
                     pattern: str,
@@ -190,9 +191,32 @@ class Phial:
         command = Command(pattern, func, case_sensitive)
         self.commands.append(command)
 
+    def command(self,
+                pattern: str,
+                case_sensitive: bool = False) -> Callable:
+        def decorator(f: Callable) -> Callable:
+            self.add_command(pattern, f, case_sensitive)
+            return f
+        return decorator
+
+    def add_fallback(self, func: Callable) -> None:
+        self.fallback_func = func
+
+    def fallback(self) -> Callable:
+        def decorator(f: Callable) -> Callable:
+            self.add_fallback(f)
+            return f
+        return decorator
+
     def add_middleware(self,
                        func: Callable[[Message], Optional[Message]]) -> None:
         self.middleware_functions.append(func)
+
+    def middleware(self) -> Callable:
+        def decorator(f: Callable) -> Callable:
+            self.add_middleware(f)
+            return f
+        return decorator
 
     def add_scheduled(self,
                       schedule: Schedule,
@@ -201,14 +225,6 @@ class Phial:
         self.scheduler.add_job(job)
 
     def send_message(self, message: Response) -> None:
-        '''
-        Takes a response object and then sends the message to Slack
-
-        Args:
-            message(Response): message object to be sent to Slack
-
-        '''
-
         api_method = ('chat.postEphemeral' if message.ephemeral
                       else 'chat.postMessage')
 
@@ -227,14 +243,7 @@ class Phial:
                                        as_user=True)
 
     def send_reaction(self, response: Response) -> None:
-        '''
-        Takes a `Response` object and then sends the reaction to Slack
 
-        Args:
-            response(Response): response object containing the reaction to be
-                                sent to Slack
-
-        '''
         self.slack_client.api_call("reactions.add",
                                    channel=response.channel,
                                    timestamp=response.original_ts,
@@ -242,14 +251,6 @@ class Phial:
                                    as_user=True)
 
     def upload_attachment(self, attachment: Attachment) -> None:
-        '''
-        Takes an `Attachment` object and then uploads the contents to Slack
-
-        Args:
-            attachment(Attachment): attachment object containing the file to be
-                                    uploaded to Slack
-
-        '''
         self.slack_client.api_call('files.upload',
                                    channels=attachment.channel,
                                    filename=attachment.filename,
@@ -307,6 +308,10 @@ class Phial:
                 response = command.func(**kwargs)
                 self._send_response(response, message.channel)
                 return
+        # If we are here then no commands have matched
+        if self.fallback_func is not None:
+            response = self.fallback_func()
+            self._send_response(response, message.channel)
 
     def run(self) -> None:
         auto_reconnect = self.config['autoReconnect']
