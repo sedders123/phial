@@ -15,11 +15,11 @@ def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
                 if 'bot_id' in output:
                     bot_id = output['bot_id']
                 return Message(output['text'],
-                                output['channel'],
-                                output['user'],
-                                output['ts'],
-                                output['team'],
-                                bot_id)
+                               output['channel'],
+                               output['user'],
+                               output['ts'],
+                               output['team'],
+                               bot_id)
     return None
 
 
@@ -139,7 +139,10 @@ class Message():
 
 class Command:
     """A command that a user can execute"""
-    def __init__(self, pattern: str, func: Callable[..., PhialResponse], case_sensitive: bool = False):
+    def __init__(self,
+                 pattern: str,
+                 func: Callable[..., PhialResponse],
+                 case_sensitive: bool = False):
         self.pattern = self._build_pattern_regex(pattern, case_sensitive)
         self.func = func
         self.case_sensitive = case_sensitive
@@ -175,15 +178,20 @@ class Phial:
         self.slack_client = SlackClient(token)
         self.commands: List[Command] = []
         self.config: Dict = config
-        self.middleware_functions: List[Callable[[Message], Optional[Message]]] = []
+        self.middleware_functions: List[Callable
+                                        [[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
 
-    def add_command(self, pattern: str, func: Callable, case_sensitive: bool = False) -> None:
+    def add_command(self,
+                    pattern: str,
+                    func: Callable,
+                    case_sensitive: bool = False) -> None:
         pattern = "{0}{1}".format(self.config["prefix"], pattern)
         command = Command(pattern, func, case_sensitive)
         self.commands.append(command)
 
-    def add_middleware(self, func: Callable[[Message], Optional[Message]]) -> None:
+    def add_middleware(self,
+                       func: Callable[[Message], Optional[Message]]) -> None:
         self.middleware_functions.append(func)
 
     def add_scheduled(self,
