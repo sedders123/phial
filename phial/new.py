@@ -1,25 +1,26 @@
 from slackclient import SlackClient  # type: ignore
 from typing import Callable, List, Optional, Pattern, Dict, Union, IO
 import re
+from phial.scheduler import Scheduler, Schedule, ScheduledJob
 
 PhialResponse = Union[None, str, 'Response', 'Attachment']
 
 
 def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
-        output_list = slack_rtm_output
-        if output_list and len(output_list) > 0:
-            for output in output_list:
-                if(output and 'text' in output):
-                    bot_id = None
-                    if 'bot_id' in output:
-                        bot_id = output['bot_id']
-                    return Message(output['text'],
-                                   output['channel'],
-                                   output['user'],
-                                   output['ts'],
-                                   output['team'],
-                                   bot_id)
-        return None
+    output_list = slack_rtm_output
+    if output_list and len(output_list) > 0:
+        for output in output_list:
+            if(output and 'text' in output):
+                bot_id = None
+                if 'bot_id' in output:
+                    bot_id = output['bot_id']
+                return Message(output['text'],
+                                output['channel'],
+                                output['user'],
+                                output['ts'],
+                                output['team'],
+                                bot_id)
+    return None
 
 
 class Response():
@@ -138,12 +139,13 @@ class Message():
 
 class Command:
     """A command that a user can execute"""
-    def __init__(self, pattern: str, func: Callable[..., PhialResponse]):
-        self.pattern = self._build_pattern_regex(pattern)
+    def __init__(self, pattern: str, func: Callable[..., PhialResponse], case_sensitive: bool = False):
+        self.pattern = self._build_pattern_regex(pattern, case_sensitive)
         self.func = func
+        self.case_sensitive = case_sensitive
 
-    def _build_pattern_regex(self,
-                             pattern: str,
+    @staticmethod
+    def _build_pattern_regex(pattern: str,
                              case_sensitive: bool = False) -> Pattern[str]:
         '''Creates the command pattern regexs'''
         command = re.sub(r'(<\w+>)', r'(\"?\1\"?)', pattern)
@@ -173,11 +175,22 @@ class Phial:
         self.slack_client = SlackClient(token)
         self.commands: List[Command] = []
         self.config: Dict = config
+        self.middleware_functions: List[Callable[[Message], Optional[Message]]] = []
+        self.scheduler = Scheduler()
 
-    def add_command(self, pattern: str, func: Callable) -> None:
+    def add_command(self, pattern: str, func: Callable, case_sensitive: bool = False) -> None:
         pattern = "{0}{1}".format(self.config["prefix"], pattern)
-        command = Command(pattern, func)
+        command = Command(pattern, func, case_sensitive)
         self.commands.append(command)
+
+    def add_middleware(self, func: Callable[[Message], Optional[Message]]) -> None:
+        self.middleware_functions.append(func)
+
+    def add_scheduled(self,
+                      schedule: Schedule,
+                      scheduled_func: Callable) -> None:
+        job = ScheduledJob(schedule, scheduled_func)
+        self.scheduler.add_job(job)
 
     def send_message(self, message: Response) -> None:
         '''
@@ -268,8 +281,18 @@ class Phial:
     def _handle_message(self, message: Optional[Message]) -> None:
         if not message:
             return
-        # TODO: Pass through middleware
 
+        # Run middleware functions
+        for func in self.middleware_functions:
+            if message:
+                message = func(message)
+
+        # If message has been intercepted or is a bot message return early
+        if not message or message.bot_id:
+            return
+
+        # If message has not been intercepted continue with standard message
+        # handling
         for command in self.commands:
             kwargs = command.pattern_matches(message)
             if kwargs is not None:
@@ -286,6 +309,7 @@ class Phial:
             try:
                 message = parse_slack_output(self.slack_client.rtm_read())
                 self._handle_message(message)
+                self.scheduler.run_pending()
             except Exception as e:
                 print("Error {0}".format(e))
 
