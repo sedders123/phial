@@ -1,7 +1,8 @@
 from slackclient import SlackClient  # type: ignore
-from typing import Callable, List, Optional, Pattern, Dict, Union, IO
+from typing import Callable, List, Optional, Pattern, Dict, Union, IO, cast
 import re
 from phial.scheduler import Scheduler, Schedule, ScheduledJob
+from phial.utils import parse_help_text
 
 PhialResponse = Union[None, str, 'Response', 'Attachment']
 
@@ -21,6 +22,22 @@ def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
                                output['team'],
                                bot_id)
     return None
+
+
+def help_command(bot: 'Phial') -> str:
+    help_text = cast(str, bot.config.get('baseHelpText', ""))
+    if help_text:
+        help_text += "\n"
+    for command in bot.commands:
+        command_doc = command.help_text
+        if not command_doc:
+            # If no help text default to blank string
+            command_doc = ""
+        command_help_text = parse_help_text(command_doc)
+        # command_name = bot.command_names[command]
+        help_text += "*{0}* - {1}\n".format(command.pattern_string,
+                                            command_help_text)
+    return help_text
 
 
 class Response():
@@ -88,11 +105,14 @@ class Command:
     def __init__(self,
                  pattern: str,
                  func: Callable[..., PhialResponse],
-                 case_sensitive: bool = False):
+                 case_sensitive: bool = False,
+                 help_text_override: Optional[str] = None):
+        self.pattern_string = pattern
         self.pattern = self._build_pattern_regex(pattern, case_sensitive)
         self.alias_patterns = self._get_alias_patterns(func)
         self.func = func
         self.case_sensitive = case_sensitive
+        self.help_text_override = help_text_override
 
     def _get_alias_patterns(self, func: Callable) -> List[Pattern]:
         patterns: List[Pattern] = []
@@ -114,12 +134,20 @@ class Command:
         match = self.pattern.match(message.text)
         if match:
             return match.groupdict()
+
         # Only check aliases if main pattern does not match
         for alias in self.alias_patterns:
             match = alias.match(message.text)
             if match:
                 return match.groupdict()
+
         return None
+
+    @property
+    def help_text(self) -> Optional[str]:
+        if self.help_text_override is not None:
+            return self.help_text_override
+        return self.func.__doc__
 
 
 class Phial:
@@ -144,9 +172,10 @@ class Phial:
     def add_command(self,
                     pattern: str,
                     func: Callable,
-                    case_sensitive: bool = False) -> None:
+                    case_sensitive: bool = False,
+                    help_text_override: Optional[str] = None) -> None:
         pattern = "{0}{1}".format(self.config["prefix"], pattern)
-        command = Command(pattern, func, case_sensitive)
+        command = Command(pattern, func, case_sensitive, help_text_override)
         self.commands.append(command)
 
     def command(self,
@@ -224,6 +253,13 @@ class Phial:
                                    filename=attachment.filename,
                                    file=attachment.content)
 
+    def _register_standard_commands(self) -> None:
+        if self.config['registerHelpCommand']:
+            # The command function has to be a lambda as we wish to delay
+            # execution until all commands have been registered.
+            self.add_command("help", lambda: help_command(self),
+                             help_text_override="List all available commmands")
+
     def _send_response(self,
                        response: PhialResponse,
                        original_channel: str) -> None:
@@ -282,6 +318,7 @@ class Phial:
             self._send_response(response, message.channel)
 
     def run(self) -> None:
+        self._register_standard_commands()
         auto_reconnect = self.config['autoReconnect']
         if not self.slack_client.rtm_connect(auto_reconnect=auto_reconnect,
                                              with_team_state=False):
@@ -301,6 +338,9 @@ class Phial:
 # @test.command("test")
 # @test.alias("foo")
 # def command_one() -> str:
+#     """
+#     From multiline docstring
+#     """
 #     return ":tada:"
 
 
