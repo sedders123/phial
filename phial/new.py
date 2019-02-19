@@ -3,6 +3,7 @@ from typing import Callable, List, Optional, Pattern, Dict, Union, IO, cast
 import re
 from phial.scheduler import Scheduler, Schedule, ScheduledJob
 from phial.utils import parse_help_text
+import logging
 
 PhialResponse = Union[None, str, 'Response', 'Attachment']
 
@@ -160,7 +161,10 @@ class Phial:
         'autoReconnect': True
     }
 
-    def __init__(self, token: str, config: Dict = default_config) -> None:
+    def __init__(self,
+                 token: str,
+                 config: Dict = default_config,
+                 logger: Optional[logging.Logger] = None) -> None:
         self.slack_client = SlackClient(token)
         self.commands: List[Command] = []
         self.config: Dict = config
@@ -168,6 +172,17 @@ class Phial:
                                         [[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
         self.fallback_func: Optional[Callable[[], PhialResponse]] = None
+        if logger is None:
+            logger = logging.getLogger(__name__)
+            if not logger.hasHandlers():
+                handler = logging.StreamHandler()
+                formatter = logging.Formatter(fmt="%(asctime)s - %(message)s")
+                handler.setFormatter(formatter)
+                logger.addHandler(handler)
+                logger.propagate = False
+            logger.setLevel(logging.INFO)
+        self.logger = logger
+        self._register_standard_commands()
 
     def add_command(self,
                     pattern: str,
@@ -175,8 +190,18 @@ class Phial:
                     case_sensitive: bool = False,
                     help_text_override: Optional[str] = None) -> None:
         pattern = "{0}{1}".format(self.config["prefix"], pattern)
+
+        # Validate command does not already exist
+        for existing_command in self.commands:
+            if pattern == existing_command.pattern_string:
+                raise ValueError('Command {0} already exists'
+                                 .format(pattern.split("<")[0]))
+
+        # Create and add command
         command = Command(pattern, func, case_sensitive, help_text_override)
         self.commands.append(command)
+        self.logger.debug("Command {0} added"
+                          .format(pattern))
 
     def command(self,
                 pattern: str,
@@ -208,6 +233,8 @@ class Phial:
     def add_middleware(self,
                        func: Callable[[Message], Optional[Message]]) -> None:
         self.middleware_functions.append(func)
+        self.logger.debug("Middleware {0} added"
+                          .format(getattr(func, '__name__', repr(func))))
 
     def middleware(self) -> Callable:
         def decorator(f: Callable) -> Callable:
@@ -217,9 +244,11 @@ class Phial:
 
     def add_scheduled(self,
                       schedule: Schedule,
-                      scheduled_func: Callable) -> None:
-        job = ScheduledJob(schedule, scheduled_func)
+                      func: Callable) -> None:
+        job = ScheduledJob(schedule, func)
         self.scheduler.add_job(job)
+        self.logger.debug("Schedule {0} added"
+                          .format(getattr(func, '__name__', repr(func))))
 
     def send_message(self, message: Response) -> None:
         api_method = ('chat.postEphemeral' if message.ephemeral
@@ -312,24 +341,27 @@ class Phial:
                 response = command.func(**kwargs)
                 self._send_response(response, message.channel)
                 return
+
         # If we are here then no commands have matched
+        self.logger.warn("Command {0} not found".format(message.text))
         if self.fallback_func is not None:
             response = self.fallback_func()
             self._send_response(response, message.channel)
 
     def run(self) -> None:
-        self._register_standard_commands()
         auto_reconnect = self.config['autoReconnect']
         if not self.slack_client.rtm_connect(auto_reconnect=auto_reconnect,
                                              with_team_state=False):
             raise ValueError("Connection failed. Invalid Token or bot ID")
+
+        self.logger.info("Phial connected and running!")
         while True:
             try:
                 message = parse_slack_output(self.slack_client.rtm_read())
                 self._handle_message(message)
                 self.scheduler.run_pending()
             except Exception as e:
-                print("Error {0}".format(e))
+                self.logger.exception("Error {0}".format(e))
 
 
 # test = Phial('token')
