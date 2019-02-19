@@ -5,6 +5,7 @@ from phial.scheduler import Scheduler, Schedule, ScheduledJob
 from phial.utils import parse_help_text
 import logging
 from werkzeug.local import LocalStack, LocalProxy
+import json
 
 PhialResponse = Union[None, str, 'Response', 'Attachment']
 
@@ -61,14 +62,15 @@ class Response():
                  original_ts: Optional[str] = None,
                  reaction: Optional[str] = None,
                  ephemeral: bool = False,
-                 user: Optional[str] = None) -> None:
-        # TODO: Readd message attachments
+                 user: Optional[str] = None,
+                 attachments: Optional[Dict] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
         self.reaction = reaction
         self.ephemeral = ephemeral
         self.user = user
+        self.attachments = attachments
 
     def __repr__(self) -> str:
         return "<Response: {0}>".format(self.text)
@@ -272,12 +274,16 @@ class Phial:
                                        channel=message.channel,
                                        text=message.text,
                                        thread_ts=message.original_ts,
+                                       attachments=json.dumps(
+                                           message.attachments),
                                        user=message.user,
                                        as_user=True)
         else:
             self.slack_client.api_call(api_method,
                                        channel=message.channel,
                                        text=message.text,
+                                       attachments=json.dumps(
+                                           message.attachments),
                                        user=message.user,
                                        as_user=True)
 
