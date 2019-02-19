@@ -19,7 +19,7 @@ class Schedule:
     def day(self) -> 'Schedule':
         return self.days(1)
 
-    def days(self, value) -> 'Schedule':
+    def days(self, value: int) -> 'Schedule':
         self._days = value
         return self
 
