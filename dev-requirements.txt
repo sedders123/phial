@@ -1,7 +1,7 @@
 sphinx==1.8.4
 sphinxcontrib-napoleon==0.7
 flake8==3.7.5
-coveralls
+coveralls==1.6.0
 twine==1.13.0
 mypy==0.670
 freezegun==0.3.11
