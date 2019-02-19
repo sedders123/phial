@@ -110,6 +110,12 @@ class Phial:
         self.logger.debug("Schedule {0} added"
                           .format(getattr(func, '__name__', repr(func))))
 
+    def scheduled(self, schedule: Schedule) -> Callable:
+        def decorator(f: Callable) -> Callable:
+            self.add_scheduled(schedule, f)
+            return f
+        return decorator
+
     def send_message(self, message: Response) -> None:
         api_method = ('chat.postEphemeral' if message.ephemeral
                       else 'chat.postMessage')
