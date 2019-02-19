@@ -31,7 +31,7 @@ class Attachment():
     def __init__(self,
                  channel: str,
                  filename: Optional[str] = None,
-                 content: Optional[IO[bytes]] = None) -> None:
+                 content: Optional[IO] = None) -> None:
         self.channel = channel
         self.filename = filename
         self.content = content
