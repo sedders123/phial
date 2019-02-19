@@ -6,3 +6,4 @@ twine==1.13.0
 mypy==0.670
 freezegun==0.3.11
 pytest==4.3.0
+pytest-cov==2.6.1
