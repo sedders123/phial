@@ -1,8 +1,8 @@
 sphinx==1.8.4
 sphinxcontrib-napoleon==0.7
 flake8==3.7.5
-nose==1.3.7
 coveralls
 twine==1.13.0
 mypy==0.670
 freezegun==0.3.11
+pytest==4.3.0

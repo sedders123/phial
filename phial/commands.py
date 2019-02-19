@@ -6,6 +6,7 @@ if TYPE_CHECKING:
 
 
 def help_command(bot: 'Phial') -> str:
+    print(bot.config)
     help_text = cast(str, bot.config.get('baseHelpText', ""))
     if help_text:
         help_text += "\n"

@@ -48,8 +48,8 @@ class Phial:
                     func: Callable,
                     case_sensitive: bool = False,
                     help_text_override: Optional[str] = None) -> None:
-        pattern = "{0}{1}".format(self.config["prefix"], pattern)
-
+        pattern = "{0}{1}".format(self.config["prefix"] if "prefix"
+                                  in self.config else "", pattern)
         # Validate command does not already exist
         for existing_command in self.commands:
             if pattern == existing_command.pattern_string:
@@ -71,7 +71,8 @@ class Phial:
         return decorator
 
     def alias(self, pattern: str) -> Callable:
-        pattern = "{0}{1}".format(self.config["prefix"], pattern)
+        pattern = "{0}{1}".format(self.config["prefix"] if "prefix"
+                                  in self.config else "", pattern)
 
         def decorator(f: Callable) -> Callable:
             if not hasattr(f, 'alias_patterns'):
@@ -146,7 +147,8 @@ class Phial:
                                    file=attachment.content)
 
     def _register_standard_commands(self) -> None:
-        if self.config['registerHelpCommand']:
+        if ("registerHelpCommand" in self.config and self.
+                config['registerHelpCommand']):
             # The command function has to be a lambda as we wish to delay
             # execution until all commands have been registered.
             self.add_command("help", lambda: help_command(self),

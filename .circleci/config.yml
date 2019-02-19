@@ -48,7 +48,7 @@ jobs:
           name: Run Tests
           command: |
             . venv/bin/activate
-            nosetests --with-coverage --cover-inclusive --cover-package=phial
+             pytest tests --cov=phial --cov-report xml
 
       - run:
           name: Upload coverage

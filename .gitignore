@@ -134,3 +134,4 @@ pip-selfcheck.json
 .vscode/
 .mypy_cache/
 .noseids
+.pytest_cache/
