@@ -9,6 +9,10 @@ def test_send_message(monkeypatch: Any) -> None:
         assert args[1] == "chat.postMessage"
         assert kwargs["channel"] == "channel"
         assert kwargs["text"] == "message"
+        assert kwargs["attachments"] == 'null'
+
+        assert kwargs["user"] is None
+        assert "thread_ts" not in kwargs
 
     wildpatch(slackclient.SlackClient, 'api_call', mock_api_call)
 
@@ -23,7 +27,6 @@ def test_send_full_message(monkeypatch: Any) -> None:
         assert args[1] == "chat.postMessage"
         assert kwargs["channel"] == "channel"
         assert kwargs["text"] == "message"
-        assert kwargs["user"] == "user"
         assert kwargs["user"] == "user"
         assert kwargs["thread_ts"] == "orig_time"
         assert type(kwargs["attachments"]) is str  # Serialised to JSON
