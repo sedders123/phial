@@ -346,6 +346,11 @@ class Phial:
         if not message or message.bot_id:
             return
 
+        # If message should have a prefix but doesn't return early
+        if (self.config["prefix"] is not None and not
+                message.text.startswith(self.config["prefix"])):
+            return
+
         # If message has not been intercepted continue with standard message
         # handling
         for command in self.commands:
@@ -399,6 +404,11 @@ class Phial:
 
 # def command_two(test: str) -> None:
 #     print("Here {0}".format(test))
+
+
+# @test.fallback()
+# def fallback():
+#     return "beep"
 
 
 # test.add_command("test2 <test>", command_two)
