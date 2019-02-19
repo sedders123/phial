@@ -24,6 +24,8 @@ def test_send_full_message(monkeypatch: Any) -> None:
         assert kwargs["channel"] == "channel"
         assert kwargs["text"] == "message"
         assert kwargs["user"] == "user"
+        assert kwargs["user"] == "user"
+        assert kwargs["thread_ts"] == "orig_time"
         assert type(kwargs["attachments"]) is str  # Serialised to JSON
 
         assert "reaction" not in kwargs
