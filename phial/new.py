@@ -4,8 +4,21 @@ import re
 from phial.scheduler import Scheduler, Schedule, ScheduledJob
 from phial.utils import parse_help_text
 import logging
+from werkzeug.local import LocalStack, LocalProxy
 
 PhialResponse = Union[None, str, 'Response', 'Attachment']
+
+
+def _find_command() -> 'Message':
+    '''Gets the command from the context stack'''
+    top = _command_ctx_stack.top
+    if top is None:
+        raise RuntimeError('Not in a context with a command')
+    return cast('Message', top)
+
+
+_command_ctx_stack = LocalStack()  # type: ignore
+command: 'Message' = cast('Message', LocalProxy(_find_command))
 
 
 def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
@@ -338,15 +351,23 @@ class Phial:
         for command in self.commands:
             kwargs = command.pattern_matches(message)
             if kwargs is not None:
-                response = command.func(**kwargs)
-                self._send_response(response, message.channel)
-                return
+                try:
+                    _command_ctx_stack.push(message)
+                    response = command.func(**kwargs)
+                    self._send_response(response, message.channel)
+                    return
+                finally:
+                    _command_ctx_stack.pop()
 
         # If we are here then no commands have matched
         self.logger.warn("Command {0} not found".format(message.text))
         if self.fallback_func is not None:
-            response = self.fallback_func()
-            self._send_response(response, message.channel)
+            try:
+                _command_ctx_stack.push(message)
+                response = self.fallback_func()
+                self._send_response(response, message.channel)
+            finally:
+                _command_ctx_stack.pop()
 
     def run(self) -> None:
         auto_reconnect = self.config['autoReconnect']
@@ -373,7 +394,7 @@ class Phial:
 #     """
 #     From multiline docstring
 #     """
-#     return ":tada:"
+#     return ":tada:" + str(command.timestamp)
 
 
 # def command_two(test: str) -> None:
