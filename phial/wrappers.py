@@ -37,7 +37,7 @@ class Attachment():
         self.content = content
 
     def __repr__(self) -> str:
-        return "<Attachment in {0} >".format(self.channel)
+        return "<Attachment in {0}>".format(self.channel)
 
 
 class Message():
@@ -77,6 +77,9 @@ class Command:
         self.func = func
         self.case_sensitive = case_sensitive
         self.help_text_override = help_text_override
+
+    def __repr__(self) -> str:
+        return "<Command: {0}>".format(self.pattern_string)
 
     def _get_alias_patterns(self, func: Callable) -> List[Pattern]:
         patterns: List[Pattern] = []
