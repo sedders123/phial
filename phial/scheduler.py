@@ -6,6 +6,12 @@ Time = namedtuple("Time", ['hour', 'minute', 'second'])
 
 
 class Schedule:
+    """
+    A schedule stores the relative time for something to happen.
+
+    It can be used to compute when the next instance of an event
+    should occur.
+    """
     def __init__(self) -> None:
         self._days = 0
         self._at = None  # type: Optional[Time]
@@ -14,16 +20,57 @@ class Schedule:
         self._seconds = 0
 
     def every(self) -> 'Schedule':
+        """
+        Syntatic sugar to allow the declaration of schedules to be more
+        like an English sentence.
+
+        ::
+
+            schedule = Schedule().every().day()
+        """
         return self
 
     def day(self) -> 'Schedule':
+        """
+        Adds a day to the relative time till the next event
+
+        ::
+
+            schedule = Schedule().every().day()
+        """
         return self.days(1)
 
     def days(self, value: int) -> 'Schedule':
+        """
+        Adds the specified number of days to the relative time till the next
+        event.
+        ::
+
+            schedule = Schedule().every().days(2)
+
+        :param value: The number of days to wait between events
+        """
         self._days = value
         return self
 
     def at(self, hour: int, minute: int, second: int = 0) -> 'Schedule':
+        """
+        Specifies the time of day the next occurnce will happen.
+        NOTE: 'at' can only be used with :meth:`day`.
+        ::
+
+            schedule = Schedule().every().day().at(12,00)
+
+        :param hour: The hour of day the next event should happen,
+                     when combined with the minute
+        :param minute: The minute of day the next event should happen,
+                       when combined with the hour
+        :param second: The second of day the next event should
+                       happen, when combined with the hour and
+                       minute.
+
+                       Defaults to 0
+        """
         if self._hours or self._minutes:
             raise Exception("'at' can only be used on day(s)")
         if not self._days:
