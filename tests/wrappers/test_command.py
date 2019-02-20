@@ -125,6 +125,17 @@ def test_command_pattern_matches() -> None:
     assert command.pattern_matches(message) == {}
 
 
+def test_command_pattern_matches_returns_values() -> None:
+    def test(val: str) -> None:
+        pass
+
+    command = Command('test <val>', test, False, None)
+    message = Message('test value', 'channel', 'user', 'ts', 'team')
+
+    assert command.pattern_matches(message) is not None
+    assert command.pattern_matches(message) == {'val': 'value'}
+
+
 def test_command_pattern_matches_returns_none() -> None:
     def test() -> None:
         pass
