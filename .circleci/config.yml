@@ -48,7 +48,7 @@ jobs:
           name: Run Tests
           command: |
             . venv/bin/activate
-             pytest tests --cov=phial --cov-report xml
+             pytest tests -v --cov=phial --cov-report xml
 
       - run:
           name: Upload coverage

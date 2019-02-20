@@ -6,7 +6,6 @@ if TYPE_CHECKING:
 
 
 def help_command(bot: 'Phial') -> str:
-    print(bot.config)
     help_text = cast(str, bot.config.get('baseHelpText', ""))
     if help_text:
         help_text += "\n"
@@ -16,7 +15,6 @@ def help_command(bot: 'Phial') -> str:
             # If no help text default to blank string
             command_doc = ""
         command_help_text = parse_help_text(command_doc)
-        # command_name = bot.command_names[command]
         help_text += "*{0}* - {1}\n".format(command.pattern_string,
                                             command_help_text)
     return help_text
