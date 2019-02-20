@@ -84,7 +84,7 @@ class Phial:
     def add_fallback(self, func: Callable) -> None:
         self.fallback_func = func
 
-    def fallback(self) -> Callable:
+    def fallback_command(self) -> Callable:
         def decorator(f: Callable) -> Callable:
             self.add_fallback(f)
             return f

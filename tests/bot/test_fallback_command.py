@@ -15,7 +15,7 @@ def test_add_fallback_command() -> None:
 def test_add_fallback_decorator() -> None:
     bot = Phial('token', {})
 
-    @bot.fallback()
+    @bot.fallback_command()
     def test() -> None:
         pass
 
