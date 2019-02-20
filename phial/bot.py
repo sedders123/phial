@@ -205,8 +205,9 @@ class Phial:
             return
 
         # If message should have a prefix but doesn't return early
-        if (self.config["prefix"] is not None and not
-                message.text.startswith(self.config["prefix"])):
+        if ("prefix" in self.config
+                and self.config["prefix"] is not None
+                and not message.text.startswith(self.config["prefix"])):
             return
 
         # If message has not been intercepted continue with standard message
@@ -223,7 +224,7 @@ class Phial:
                     _command_ctx_stack.pop()
 
         # If we are here then no commands have matched
-        self.logger.warn("Command {0} not found".format(message.text))
+        self.logger.warning("Command {0} not found".format(message.text))
         if self.fallback_func is not None:
             try:
                 _command_ctx_stack.push(message)
