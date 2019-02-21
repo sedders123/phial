@@ -12,9 +12,10 @@ class Schedule:
     It can be used to compute when the next instance of an event
     should occur.
     """
+
     def __init__(self) -> None:
         self._days = 0
-        self._at = None  # type: Optional[Time]
+        self._at: Optional[Time] = None
         self._hours = 0
         self._minutes = 0
         self._seconds = 0
@@ -81,27 +82,80 @@ class Schedule:
         return self
 
     def hour(self) -> 'Schedule':
+        """
+        Adds an hour to the relative time till the next event.
+        ::
+
+            schedule = Schedule().every().hour()
+        """
         return self.hours(1)
 
     def hours(self, value: int) -> 'Schedule':
+        """
+        Adds the specified number of hours to the relative time till the next
+        event.
+        ::
+
+            schedule = Schedule().every().hours(2)
+
+        :param value: The number of hours to wait between events
+        """
         self._hours = value
         return self
 
     def minute(self) -> 'Schedule':
+        """
+        Adds a minute to the relative time till the next event
+        ::
+
+            schedule = Schedule().every().minute()
+        """
         return self.minutes(1)
 
     def minutes(self, value: int) -> 'Schedule':
+        """
+        Adds the specified number of minutes to the relative time till the next
+        event.
+        ::
+
+            schedule = Schedule().every().minutes(2)
+
+        :param value: The number of minutes to wait between events
+        """
         self._minutes = value
         return self
 
     def second(self) -> 'Schedule':
+        """
+        Adds a second to the relative time till the next event
+        ::
+
+            schedule = Schedule().every().second()
+        """
         return self.seconds(1)
 
     def seconds(self, value: int) -> 'Schedule':
+        """
+        Adds the specified number of seconds to the relative time till the next
+        event.
+        ::
+
+            schedule = Schedule().every().seconds(2)
+
+        :param value: The number of seconds to wait between events
+        """
         self._seconds = value
         return self
 
     def get_next_run_time(self, last_run: datetime) -> datetime:
+        """
+        Calculates the next time to run, based on the last time the
+        event was run.
+
+        :param last_run: The last time the event happened
+
+        :returns: A :obj:`datetime` of when the event should next happen
+        """
         if self._at:
             next_run = last_run.replace(hour=self._at.hour,
                                         minute=self._at.minute,
@@ -118,6 +172,10 @@ class Schedule:
 
 
 class ScheduledJob:
+    """
+    A function with a schedule
+    """
+
     def __init__(self, schedule: Schedule, func: Callable) -> None:
         self.func = func
         self.schedule = schedule
@@ -125,21 +183,42 @@ class ScheduledJob:
         self.next_run = self.schedule.get_next_run_time(datetime.now())
 
     def should_run(self) -> bool:
+        """
+        Checks whether the function needs to be run based on the schedule.
+
+        :returns: A :obj:`bool` of whether or not to run
+        """
         return self.next_run <= datetime.now()
 
     def run(self) -> None:
+        """
+        Runs the function and calculates + stores the next run time
+        """
         self.func()
         self.next_run = self.schedule.get_next_run_time(datetime.now())
 
 
 class Scheduler:
+    """
+    A store for Scheduled Jobs
+    """
+
     def __init__(self) -> None:
         self.jobs: List[ScheduledJob] = []
 
     def add_job(self, job: ScheduledJob) -> None:
+        """
+        Adds a scheuled job to the scheduler
+
+        :param job: The job to be added to the scheduler
+        """
         self.jobs.append(job)
 
     def run_pending(self) -> None:
+        """
+        Runs any ScheduledJobs in the store, where :code:`job.should_run()`
+        returns true
+        """
         jobs_to_run: List[ScheduledJob] = [job for job in self.jobs
                                            if job.should_run()]
         for job in jobs_to_run:
