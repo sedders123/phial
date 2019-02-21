@@ -2,7 +2,23 @@ from typing import Callable, Optional, List, TypeVar  # noqa: F401
 from datetime import timedelta, datetime
 from collections import namedtuple
 
-Time = namedtuple("Time", ['hour', 'minute', 'second'])
+
+class _Time(namedtuple("Time", ['hour', 'minute', 'second'])):
+    """ Represents a time of day.
+
+    .. py:attribute:: hour
+
+        The hour of day.
+
+    .. py:attribute:: minute
+
+        The minute of the hour.
+
+    .. py:attribute:: second
+
+        The second of the minute.
+
+    """
 
 
 class Schedule:
@@ -33,7 +49,7 @@ class Schedule:
 
     def day(self) -> 'Schedule':
         """
-        Adds a day to the relative time till the next event
+        Adds a day to the relative time till the next event.
 
         ::
 
@@ -69,7 +85,6 @@ class Schedule:
         :param second: The second of day the next event should
                        happen, when combined with the hour and
                        minute.
-
                        Defaults to 0
         """
         if self._hours or self._minutes:
@@ -78,7 +93,7 @@ class Schedule:
             raise Exception("'at' can only be used on day(s)")
         if self._at:
             raise Exception("'at' can only be set once")
-        self._at = Time(hour, minute, second)
+        self._at = _Time(hour, minute, second)
         return self
 
     def hour(self) -> 'Schedule':
