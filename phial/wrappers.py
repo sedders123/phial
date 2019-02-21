@@ -4,6 +4,46 @@ from phial.types import PhialResponse
 
 
 class Response():
+    """
+    A response to be sent ot Slack.
+
+    When returned in a command function will send a message, or reaction to
+    Slack depending on contents.
+
+    :param channel: The Slack channel ID the response will be sent to
+    :param text: The response contents
+    :param original_ts: The timestamp of the original message. If populated
+                        will put the text response in a thread
+    :param reation: A valid slack emoji name. NOTE: will only work when
+                    :paramref:`original_ts` is populated
+    :param attachments: Any Slack Message Attachments (TODO: Link)
+    :param ephemeral: Whether to send the message as an ephemeral message
+    :param user: The user id to display the ephemeral message to
+
+    Examples:
+        The following would send a message to a slack channel when executed ::
+
+            @slackbot.command('ping')
+            def ping():
+                return Response(text="Pong", channel='channel_id')
+
+        The following would send a reply to a message in a thread ::
+
+            @slackbot.command('hello')
+            def hello():
+                return Response(text="hi",
+                                channel='channel_id',
+                                original_ts='original_ts')
+
+        The following would send a reaction to a message ::
+
+            @slackbot.command('react')
+            def react():
+                return Response(reaction="x",
+                                channel='channel_id',
+                                original_ts='original_ts')
+    """
+
     def __init__(self,
                  channel: str,
                  text: Optional[str] = None,
@@ -41,6 +81,19 @@ class Attachment():
 
 
 class Message():
+    """
+    A representation of a Slack message.
+
+    :param text: The message contents
+    :param channel: The Slack channel ID the message was sent from
+    :param user: The user who sent the message
+    :param timestamp: The message's timestamp
+    :param team: The Team ID of the Slack workspace the message was
+                 sent from
+    :param bot_id: If the message was sent by a bot
+                   the ID of that bot. Defaults to None.
+    """
+
     def __init__(self,
                  text: str,
                  channel: str,
