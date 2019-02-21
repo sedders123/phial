@@ -31,7 +31,7 @@ class Schedule:
 
     def __init__(self) -> None:
         self._days = 0
-        self._at: Optional[Time] = None
+        self._at: Optional[_Time] = None
         self._hours = 0
         self._minutes = 0
         self._seconds = 0
