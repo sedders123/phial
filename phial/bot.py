@@ -26,7 +26,8 @@ class Phial:
                  logger: Optional[logging.Logger] = None) -> None:
         self.slack_client = SlackClient(token)
         self.commands: List[Command] = []
-        self.config: Dict = config
+        self.config: Dict = dict(self.default_config)
+        self.config.update(config)
         self.middleware_functions: List[Callable
                                         [[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()

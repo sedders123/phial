@@ -82,7 +82,7 @@ def test_message_calls_command_correctly_when_no_prefix() -> None:
         middleware_calls[0] += 1
         return message
 
-    bot = Phial('token', {})
+    bot = Phial('token', {'prefix': ''})
     bot.add_command("test", command)
     bot.add_middleware(middleware)
     message = Message('test', 'channel', 'user', 'timestamp', 'team')
