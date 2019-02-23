@@ -6,7 +6,7 @@ def test_add_fallback_command() -> None:
         pass
 
     bot = Phial('token', {})
-    bot.add_fallback(test)
+    bot.add_fallback_command(test)
 
     assert bot.fallback_func is not None
     assert bot.fallback_func is test

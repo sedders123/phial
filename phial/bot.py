@@ -11,7 +11,13 @@ from phial.types import PhialResponse
 
 
 class Phial:
+    """
+    The Phial class acts as the main interface to Slack.
 
+    It handles registraion and execution of user defined commands,
+    as well as providing a wrapper around :obj:`slackclient.SlackClient`
+    to make sending messages to Slack simpler.
+    """
     #: Default configuration
     default_config = {
         'prefix': "!",
@@ -31,7 +37,7 @@ class Phial:
         self.middleware_functions: List[Callable
                                         [[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
-        self.fallback_func: Optional[Callable[[], PhialResponse]] = None
+        self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
         if logger is None:
             logger = logging.getLogger(__name__)
             if not logger.hasHandlers():
@@ -46,9 +52,52 @@ class Phial:
 
     def add_command(self,
                     pattern: str,
-                    func: Callable,
+                    func: Callable[..., PhialResponse],
                     case_sensitive: bool = False,
                     help_text_override: Optional[str] = None) -> None:
+        """
+        Registers a command with the bot.
+
+        This method can be used as a decorator via :meth:`command`
+
+        :param pattern: The pattern that a :obj:`Message`'s text must
+                        match for the command to be invoked.
+        :param func: The fucntion to be executed when the command is
+                     invoked
+        :param case_sensitive: Whether the :code:`pattern` should
+                               respect case sensitivity.
+
+                               Defaults to False
+        :param help_text_override: Text that should be used as a
+                                   description of the command using
+                                   the inbuilt help function.
+
+                                   If not overriden the command's
+                                   docstring will be used as the
+                                   help text.
+
+                                   Defaults to None
+
+        :raises ValueError: If command with the same pattern is already
+                            registered
+
+        .. rubric:: Example
+
+        ::
+
+            def hello():
+                return "world"
+            bot.add_command('hello', world)
+
+
+        Is the same as
+        ::
+
+            @bot.command('hello')
+            def hello():
+                return "world"
+
+        """
         pattern = "{0}{1}".format(self.config["prefix"] if "prefix"
                                   in self.config else "", pattern)
         # Validate command does not already exist
@@ -65,13 +114,63 @@ class Phial:
 
     def command(self,
                 pattern: str,
-                case_sensitive: bool = False) -> Callable:
+                case_sensitive: bool = False,
+                help_text_override: Optional[str] = None) -> Callable:
+        """
+        Registers a command with the bot.
+
+        This command is a decorator version of :meth:`add_command`
+
+        :param pattern: The pattern that a :obj:`Message`'s text must
+                        match for the command to be invoked.
+        :param case_sensitive: Whether the :code:`pattern` should
+                               respect case sensitivity.
+
+                               Defaults to False
+        :param help_text_override: Text that should be used as a
+                                   description of the command using
+                                   the inbuilt help function.
+
+                                   If not overriden the command's
+                                   docstring will be used as the
+                                   help text.
+
+                                   Defaults to None
+
+        .. rubric:: Example
+
+        ::
+
+                @bot.command('hello')
+                def hello():
+                    return "world"
+
+                @bot.command('caseSensitive', case_sensitive=True)
+                def case_sensitive():
+                    return "You typed caseSensitive"
+
+        """
         def decorator(f: Callable) -> Callable:
-            self.add_command(pattern, f, case_sensitive)
+            self.add_command(pattern, f, case_sensitive, help_text_override)
             return f
         return decorator
 
     def alias(self, pattern: str) -> Callable:
+        """
+        A decorator that is used to register an alias for a command.
+
+        :param pattern: The pattern that a :obj:`Message`'s text must
+                        match for the command to be invoked.
+
+        .. rubric:: Example
+
+        ::
+
+            @bot.command('hello')
+            @bot.alias('goodbye')
+            def hello():
+                return "world"
+        """
         pattern = "{0}{1}".format(self.config["prefix"] if "prefix"
                                   in self.config else "", pattern)
 
@@ -82,22 +181,104 @@ class Phial:
             return f
         return decorator
 
-    def add_fallback(self, func: Callable) -> None:
+    def add_fallback_command(self,
+                             func: Callable[[Message], PhialResponse]) -> None:
+        """
+        Registers a 'fallback' function to run when a user tries to execute a
+        command that doesn't exist.
+
+        This method can be used as a decorator via :meth:`fallback_command`
+
+        :param func: The function to be executed when the user tries
+                     to execute a command that doesn't exist
+
+        .. rubric:: Example
+
+        ::
+
+            def error_handler(message: Message) -> str:
+                return "Oops that command doesn't seem to exist"
+
+            bot.add_fallback_command(error_handler)
+
+        Is the same as
+        ::
+
+            @bot.fallback_command()
+            def error_handler(message: Message) -> str:
+                return "Oops that command doesn't seem to exist"
+
+        """
         self.fallback_func = func
 
     def fallback_command(self) -> Callable:
+        """
+        A decorator to add a fallback command
+
+        See :meth:`add_fallback_command` for more information on
+        fallback commands
+
+        .. rubric:: Example
+
+        ::
+
+            @bot.fallback_command()
+            def error_handler(message: Message) -> str:
+                return "Oops that command doesn't seem to exist"
+        """
         def decorator(f: Callable) -> Callable:
-            self.add_fallback(f)
+            self.add_fallback_command(f)
             return f
         return decorator
 
     def add_middleware(self,
                        func: Callable[[Message], Optional[Message]]) -> None:
+        """
+        Adds a middleware function to the bot.
+
+        Middleware functions get passed every message the bot recieves from
+        slack before the bot process the message itself. Returning :obj:`None`
+        from a middleware function will prevent the bot from processing it.
+
+        This method can be used as a decorator via :meth:`middleware`.
+
+        :param middleware_func: The function to be added to the middleware
+                                pipeline
+
+        .. rubric :: Example
+
+        ::
+
+            def intercept(messaage):
+                return message
+            bot.add_middleware(intercept)
+
+        Is the same as
+        ::
+
+            @bot.middleware()
+            def intercept(messaage):
+                return message
+
+        """
         self.middleware_functions.append(func)
         self.logger.debug("Middleware {0} added"
                           .format(getattr(func, '__name__', repr(func))))
 
     def middleware(self) -> Callable:
+        """
+        A decorator to add a middleware function to the bot.
+
+        See :meth:`add_middleware` for more information about middleware
+
+        .. rubric:: Example
+
+        ::
+
+            @bot.middleware()
+            def intercept(messaage):
+                return message
+        """
         def decorator(f: Callable) -> Callable:
             self.add_middleware(f)
             return f
@@ -106,18 +287,68 @@ class Phial:
     def add_scheduled(self,
                       schedule: Schedule,
                       func: Callable) -> None:
+        """
+        Adds a scheduled function to the bot.
+
+        This method can be used as a decorator via :meth:`scheduled`.
+
+        :param schedule: The schedule used to run the function
+        :param scheduled_func: The function to be run in accordance to the
+                               schedule
+
+        .. rubric:: Example
+
+        ::
+
+            def scheduled_beep():
+                bot.send_message(Response(text="Beep",
+                                          channel="channel-id">))
+            bot.add_scheduled(Schedule().every().day(), scheduled_beep)
+
+        Is the same as
+
+        ::
+
+            @bot.scheduled(Schedule().every().day())
+            def scheduled_beep():
+                bot.send_message(Response(text="Beep",
+                                          channel="channel-id">))
+        """
         job = ScheduledJob(schedule, func)
         self.scheduler.add_job(job)
         self.logger.debug("Schedule {0} added"
                           .format(getattr(func, '__name__', repr(func))))
 
     def scheduled(self, schedule: Schedule) -> Callable:
+        """
+        A decorator that is used to register a scheduled function.
+
+        See :meth:`add_scheduled` for more information on scheduled
+        jobs.
+
+        :param schedule: The schedule used to determine when the function
+                         should be run
+
+        .. rubric:: Example
+
+        ::
+
+            @bot.scheduled(Schedule().every().day())
+            def scheduled_beep():
+                bot.send_message(Response(text="Beep",
+                                          channel="channel-id">))
+        """
         def decorator(f: Callable) -> Callable:
             self.add_scheduled(schedule, f)
             return f
         return decorator
 
     def send_message(self, message: Response) -> None:
+        """
+        Sends a message to Slack
+
+        :param message: The message to be sent to Slack
+        """
         api_method = ('chat.postEphemeral' if message.ephemeral
                       else 'chat.postMessage')
 
@@ -140,7 +371,12 @@ class Phial:
                                        as_user=True)
 
     def send_reaction(self, response: Response) -> None:
+        """
+        Sends a reaction to a Slack Message
 
+        :param response: Response containing the reaction to be
+                         sent to Slack
+        """
         self.slack_client.api_call("reactions.add",
                                    channel=response.channel,
                                    timestamp=response.original_ts,
@@ -148,6 +384,11 @@ class Phial:
                                    as_user=True)
 
     def upload_attachment(self, attachment: Attachment) -> None:
+        """
+        Upload a file to Slack
+
+        :param attachment: The attachment to be uploaded to Slack
+        """
         self.slack_client.api_call('files.upload',
                                    channels=attachment.channel,
                                    filename=attachment.filename,
@@ -226,7 +467,7 @@ class Phial:
         if self.fallback_func is not None:
             try:
                 _command_ctx_stack.push(message)
-                response = self.fallback_func()
+                response = self.fallback_func(message)
                 self._send_response(response, message.channel)
             finally:
                 _command_ctx_stack.pop()

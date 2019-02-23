@@ -109,7 +109,7 @@ def test_message_falls_back_correctly() -> None:
     bot = Phial('token')
     bot.add_command("test", command)
     bot.add_middleware(middleware)
-    bot.add_fallback(fallback)
+    bot.add_fallback_command(fallback)
     message = Message('!test-fallback', 'channel', 'user', 'timestamp', 'team')
     bot._handle_message(message)
     assert middleware_calls[0] == 1
