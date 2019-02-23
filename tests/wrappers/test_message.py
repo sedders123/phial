@@ -1,7 +1,9 @@
+"""Test Message class."""
 from phial import Message
 
 
 def test_message_equality() -> None:
+    """Assert Message equality works."""
     message_one = Message('text',
                           'channel',
                           'user',
@@ -19,6 +21,7 @@ def test_message_equality() -> None:
 
 
 def test_message_equality_fails() -> None:
+    """Assert Message equality fails."""
     message_one = Message('text',
                           'channel',
                           'user',
@@ -36,6 +39,7 @@ def test_message_equality_fails() -> None:
 
 
 def test_response_repr() -> None:
+    """Assert Message repr works."""
     message = Message('text',
                       'channel',
                       'user',

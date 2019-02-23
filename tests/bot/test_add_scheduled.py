@@ -1,7 +1,9 @@
-from phial import Phial, Message, Schedule
+"""Test Add Scheduled."""
+from phial import Message, Phial, Schedule
 
 
 def test_add_scheduled_command() -> None:
+    """Test add_scheduled works correctly."""
     def test(message: Message) -> None:
         pass
 
@@ -13,6 +15,7 @@ def test_add_scheduled_command() -> None:
 
 
 def test_add_scheduled_decorator() -> None:
+    """Test scheduled decorator works correctly."""
     bot = Phial('token', {})
 
     @bot.scheduled(Schedule().seconds(30))

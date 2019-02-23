@@ -1,10 +1,11 @@
-from typing import Callable, Optional, List, TypeVar  # noqa: F401
-from datetime import timedelta, datetime
+"""The classes related to scheduling of regular jobs in phial."""
 from collections import namedtuple
+from datetime import datetime, timedelta
+from typing import Callable, List, Optional
 
 
 class _Time(namedtuple("Time", ['hour', 'minute', 'second'])):
-    """ Represents a time of day.
+    """Represents a time of day.
 
     .. py:attribute:: hour
 
@@ -38,6 +39,8 @@ class Schedule:
 
     def every(self) -> 'Schedule':
         """
+        Syntantic sugar to make schedule declaration more readable.
+
         Syntatic sugar to allow the declaration of schedules to be more
         like an English sentence.
 
@@ -59,6 +62,8 @@ class Schedule:
 
     def days(self, value: int) -> 'Schedule':
         """
+        Set the days till the next instance of the event.
+
         Adds the specified number of days to the relative time till the next
         event.
         ::
@@ -73,6 +78,7 @@ class Schedule:
     def at(self, hour: int, minute: int, second: int = 0) -> 'Schedule':
         """
         Specifies the time of day the next occurnce will happen.
+
         NOTE: 'at' can only be used with :meth:`day`.
         ::
 
@@ -99,6 +105,7 @@ class Schedule:
     def hour(self) -> 'Schedule':
         """
         Adds an hour to the relative time till the next event.
+
         ::
 
             schedule = Schedule().every().hour()
@@ -107,8 +114,11 @@ class Schedule:
 
     def hours(self, value: int) -> 'Schedule':
         """
+        Sets the hours till the next instance of the event.
+
         Adds the specified number of hours to the relative time till the next
         event.
+
         ::
 
             schedule = Schedule().every().hours(2)
@@ -120,7 +130,8 @@ class Schedule:
 
     def minute(self) -> 'Schedule':
         """
-        Adds a minute to the relative time till the next event
+        Adds a minute to the relative time till the next event.
+
         ::
 
             schedule = Schedule().every().minute()
@@ -129,8 +140,11 @@ class Schedule:
 
     def minutes(self, value: int) -> 'Schedule':
         """
+        Sets the minutes till the next instance of the event.
+
         Adds the specified number of minutes to the relative time till the next
         event.
+
         ::
 
             schedule = Schedule().every().minutes(2)
@@ -142,7 +156,8 @@ class Schedule:
 
     def second(self) -> 'Schedule':
         """
-        Adds a second to the relative time till the next event
+        Adds a second to the relative time till the next event.
+
         ::
 
             schedule = Schedule().every().second()
@@ -151,6 +166,8 @@ class Schedule:
 
     def seconds(self, value: int) -> 'Schedule':
         """
+        Sets the seconds till the next instance of the event.
+
         Adds the specified number of seconds to the relative time till the next
         event.
         ::
@@ -164,6 +181,8 @@ class Schedule:
 
     def get_next_run_time(self, last_run: datetime) -> datetime:
         """
+        Get the next time the job should run.
+
         Calculates the next time to run, based on the last time the
         event was run.
 
@@ -187,9 +206,7 @@ class Schedule:
 
 
 class ScheduledJob:
-    """
-    A function with a schedule
-    """
+    """A function with a schedule."""
 
     def __init__(self, schedule: Schedule, func: Callable) -> None:
         self.func = func
@@ -206,24 +223,20 @@ class ScheduledJob:
         return self.next_run <= datetime.now()
 
     def run(self) -> None:
-        """
-        Runs the function and calculates + stores the next run time
-        """
+        """Runs the function and calculates + stores the next run time."""
         self.func()
         self.next_run = self.schedule.get_next_run_time(datetime.now())
 
 
 class Scheduler:
-    """
-    A store for Scheduled Jobs
-    """
+    """A store for Scheduled Jobs."""
 
     def __init__(self) -> None:
         self.jobs: List[ScheduledJob] = []
 
     def add_job(self, job: ScheduledJob) -> None:
         """
-        Adds a scheuled job to the scheduler
+        Adds a scheuled job to the scheduler.
 
         :param job: The job to be added to the scheduler
         """
@@ -231,6 +244,8 @@ class Scheduler:
 
     def run_pending(self) -> None:
         """
+        Runs any pending scheduled jobs.
+
         Runs any ScheduledJobs in the store, where :code:`job.should_run()`
         returns true
         """

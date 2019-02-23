@@ -1,10 +1,13 @@
-from werkzeug.local import LocalStack, LocalProxy
+"""Provides the globaly scoped parts of phial."""
 from typing import cast
+
+from werkzeug.local import LocalProxy, LocalStack
+
 from phial.wrappers import Message
 
 
 def _find_command() -> Message:
-    '''Gets the command from the context stack'''
+    """Gets the command from the context stack."""
     top = _command_ctx_stack.top
     if top is None:
         raise RuntimeError('Not in a context with a command')

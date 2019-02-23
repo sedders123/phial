@@ -1,10 +1,14 @@
-import slackclient  # type: ignore
-from phial import Phial, Response
+"""Test send_reaction."""
 from typing import Any
+
+import slackclient  # type: ignore
+
+from phial import Phial, Response
 from tests.helpers import wildpatch
 
 
 def test_send_reaction(monkeypatch: Any) -> None:
+    """Test send_reaction."""
     def mock_api_call(*args: Any, **kwargs: Any) -> None:
         assert args[1] == "reactions.add"
         assert kwargs["channel"] == "channel"

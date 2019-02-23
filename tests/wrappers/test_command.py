@@ -1,7 +1,9 @@
+"""Test Command class."""
 from phial.wrappers import Command, Message
 
 
 def test_command_repr() -> None:
+    """Assert Command repr works."""
     def test() -> None:
         pass
 
@@ -10,17 +12,19 @@ def test_command_repr() -> None:
 
 
 def test_command_help_text() -> None:
+    """Assert help text found from docstring."""
     def test() -> None:
-        """Help text"""
+        """Help text."""
         pass
 
     command = Command('test', test, False, None)
-    assert command.help_text == "Help text"
+    assert command.help_text == "Help text."
 
 
 def test_command_help_text_override() -> None:
+    """Assert help text override works."""
     def test() -> None:
-        """Help text"""
+        """Help text."""
         pass
 
     command = Command('test', test, False, "Help text override")
@@ -28,14 +32,18 @@ def test_command_help_text_override() -> None:
 
 
 def test_command_build_patter_regex_no_substition_ignore_case() -> None:
+    """Assert case insensitive regex works correctly."""
     command_template = 'test'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
     match = command_pattern.match("test")
     assert match is not None
+    match = command_pattern.match("Test")
+    assert match is not None
 
 
 def test_command_build_patter_regex_single_substition_ignore_case() -> None:
+    """Assert case insensitive regex with param works correctly."""
     command_template = 'test <one>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
@@ -45,6 +53,7 @@ def test_command_build_patter_regex_single_substition_ignore_case() -> None:
 
 
 def test_command_build_patter_regex_multiple_substition_ignore_case() -> None:
+    """Assert case insensitive regex with multiple param works correctly."""
     command_template = 'test <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
@@ -55,6 +64,7 @@ def test_command_build_patter_regex_multiple_substition_ignore_case() -> None:
 
 
 def test_command_build_patter_regex_no_substition_case_sensitive() -> None:
+    """Assert case sensitive regex works correctly."""
     command_template = 'tEst'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    True)
@@ -63,6 +73,7 @@ def test_command_build_patter_regex_no_substition_case_sensitive() -> None:
 
 
 def test_build_patter_regex_single_substition_case_sensitive() -> None:
+    """Assert case sensitive regex with param works correctly."""
     command_template = 'tEst <one>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    True)
@@ -74,6 +85,7 @@ def test_build_patter_regex_single_substition_case_sensitive() -> None:
 
 
 def test_build_patter_regex_multiple_substition_case_sensitive() -> None:
+    """Assert case sensitive regex with multiple param works correctly."""
     command_template = 'tEst <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    True)
@@ -85,6 +97,7 @@ def test_build_patter_regex_multiple_substition_case_sensitive() -> None:
 
 
 def test_build_command_allows_quotation_marks() -> None:
+    """Assert regex allows partial quoting."""
     command_template = 'test <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
@@ -95,6 +108,7 @@ def test_build_command_allows_quotation_marks() -> None:
 
 
 def test_build_command_allows_all_params_with_quotation_marks() -> None:
+    """Assert regex allows full quoting."""
     command_template = 'test <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
@@ -105,6 +119,7 @@ def test_build_command_allows_all_params_with_quotation_marks() -> None:
 
 
 def test_build_command_allows_multiple_params_with_quotation_marks() -> None:
+    """Assert regex allows partial quoting surrounding unquoted."""
     command_template = 'test <one> <two> <three>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
@@ -116,6 +131,7 @@ def test_build_command_allows_multiple_params_with_quotation_marks() -> None:
 
 
 def test_command_pattern_matches() -> None:
+    """Assert pattern_matches matches correctly."""
     def test() -> None:
         pass
 
@@ -127,6 +143,7 @@ def test_command_pattern_matches() -> None:
 
 
 def test_command_pattern_matches_returns_values() -> None:
+    """Assert pattern_matches matches returns values correctly."""
     def test(val: str) -> None:
         pass
 
@@ -138,6 +155,7 @@ def test_command_pattern_matches_returns_values() -> None:
 
 
 def test_command_pattern_matches_returns_none() -> None:
+    """Assert pattern_matches does not incorrectly match."""
     def test() -> None:
         pass
 

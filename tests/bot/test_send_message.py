@@ -1,10 +1,14 @@
-import slackclient  # type: ignore
-from phial import Phial, Response
+"""Test send_message."""
 from typing import Any
+
+import slackclient  # type: ignore
+
+from phial import Phial, Response
 from tests.helpers import wildpatch
 
 
 def test_send_message(monkeypatch: Any) -> None:
+    """Test send_message works correctly."""
     def mock_api_call(*args: Any, **kwargs: Any) -> None:
         assert args[1] == "chat.postMessage"
         assert kwargs["channel"] == "channel"
@@ -23,6 +27,7 @@ def test_send_message(monkeypatch: Any) -> None:
 
 
 def test_send_full_message(monkeypatch: Any) -> None:
+    """Test send mesage works correctly when all properties populated."""
     def mock_api_call(*args: Any, **kwargs: Any) -> None:
         assert args[1] == "chat.postMessage"
         assert kwargs["channel"] == "channel"
@@ -47,6 +52,7 @@ def test_send_full_message(monkeypatch: Any) -> None:
 
 
 def test_send_ephemeral_message(monkeypatch: Any) -> None:
+    """Test sending ephmeral messages works."""
     def mock_api_call(*args: Any, **kwargs: Any) -> None:
         assert args[1] == "chat.postEphemeral"
         assert kwargs["channel"] == "channel"

@@ -1,3 +1,4 @@
+"""Shared types for phial."""
 from typing import TYPE_CHECKING, Union
 
 if TYPE_CHECKING:

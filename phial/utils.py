@@ -1,9 +1,12 @@
+"""Helper utilities for phial."""
 import re
+from typing import Dict, List, Optional
+
 from phial.wrappers import Message
-from typing import List, Dict, Optional
 
 
 def parse_help_text(help_text: str) -> str:
+    """Parse help text."""
     NEW_LINE_SEPERATOR = "<__NEW_LINE_SEPERATOR__>"
 
     # Strip excess whitespace
@@ -21,6 +24,7 @@ def parse_help_text(help_text: str) -> str:
 
 
 def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
+    """Parse Slack output."""
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
         for output in output_list:

@@ -1,10 +1,14 @@
-from phial import Phial, Response, Attachment
-from tests.helpers import wildpatch
-import pytest  # type: ignore
+"""Test send_response."""
 import io
+
+import pytest  # type: ignore
+
+from phial import Attachment, Phial, Response
+from tests.helpers import wildpatch
 
 
 def test_send_response_string() -> None:
+    """Test send_response works with a string."""
     def mock_send_message(instance: Phial, response: Response) -> None:
         assert response.text == "test"
         assert response.channel == "channel"
@@ -16,12 +20,14 @@ def test_send_response_string() -> None:
 
 
 def test_send_response_with_none() -> None:
+    """Test send_response works with None."""
     bot = Phial('token')
 
     bot._send_response(None, "channel")
 
 
 def test_send_response_fails_with_non_response_object() -> None:
+    """Test send_response fails with an invalid type."""
     bot = Phial('token')
 
     with pytest.raises(ValueError):
@@ -29,6 +35,7 @@ def test_send_response_fails_with_non_response_object() -> None:
 
 
 def test_send_response() -> None:
+    """Test send_response works with response."""
     expected_response = Response("channel", "message",
                                  original_ts='orig_time',
                                  ephemeral=False,
@@ -45,6 +52,7 @@ def test_send_response() -> None:
 
 
 def test_send_response_fails_with_text_and_reaction() -> None:
+    """Test send_response fails when a response has both text and reaction."""
     expected_response = Response("channel",
                                  "message",
                                  original_ts='orig_time',
@@ -60,6 +68,7 @@ def test_send_response_fails_with_text_and_reaction() -> None:
 
 
 def test_send_response_with_attachment() -> None:
+    """Test send_response works with an Attachment."""
     def mock_send_attachment(instance: Phial, response: Attachment) -> None:
         assert response.channel == "channel"
         assert response.filename == "file_name"
@@ -74,6 +83,7 @@ def test_send_response_with_attachment() -> None:
 
 
 def test_send_response_reaction() -> None:
+    """Test send_response works with an reaction."""
     expected_response = Response("channel",
                                  original_ts='orig_time',
                                  reaction="reaction")

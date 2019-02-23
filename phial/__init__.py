@@ -1,3 +1,4 @@
+"""phial Slack Bot."""
 from phial.bot import Phial
 from phial.globals import command
 from phial.scheduler import Schedule
