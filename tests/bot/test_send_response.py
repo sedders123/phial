@@ -73,14 +73,6 @@ def test_send_response_with_attachment() -> None:
     bot._send_response(attachment, "channel")
 
 
-def test_send_response_with_attachment_fails_with_no_content() -> None:
-    bot = Phial('token')
-
-    attachment = Attachment("channel", "file_name")
-    with pytest.raises(ValueError):
-        bot._send_response(attachment, "channel")
-
-
 def test_send_response_reaction() -> None:
     expected_response = Response("channel",
                                  original_ts='orig_time',

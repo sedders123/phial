@@ -13,7 +13,7 @@ phial\.bot module
     :show-inheritance:
 
 phial\.scheduler module
-----------------------
+-----------------------
 
 .. automodule:: phial.scheduler
     :members:

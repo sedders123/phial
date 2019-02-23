@@ -187,9 +187,6 @@ class Phial:
                 self.send_message(response)
 
         if isinstance(response, Attachment):
-            if not response.content:
-                raise ValueError('The content field of Attachment objects ' +
-                                 'must be set')
             self.upload_attachment(response)
 
     def _handle_message(self, message: Optional[Message]) -> None:

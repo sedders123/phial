@@ -1,11 +1,11 @@
 import re
-from typing import Dict, Pattern, IO, Optional, List, Callable
+from typing import Dict, Pattern, IO, Optional, List, Callable, Any
 from phial.types import PhialResponse
 
 
 class Response():
     """
-    A response to be sent ot Slack.
+    A response to be sent to Slack.
 
     When returned in a command function will send a message, or reaction to
     Slack depending on contents.
@@ -15,35 +15,37 @@ class Response():
     :param original_ts: The timestamp of the original message. If populated
                         will put the text response in a thread
     :param reation: A valid slack emoji name. NOTE: will only work when
-                    :paramref:`original_ts` is populated
-    :param attachments: Any Slack Message Attachments (TODO: Link)
+                    :code:`original_ts` is populated
+    :param attachments: Any Slack
+                        `Message Attachments <https://api.slack.com/docs/\
+                        message-attachments#attachment_structure>`_
     :param ephemeral: Whether to send the message as an ephemeral message
     :param user: The user id to display the ephemeral message to
 
-    Examples:
-        The following would send a message to a slack channel when executed ::
+    .. rubric:: Examples
 
-            @slackbot.command('ping')
-            def ping():
-                return Response(text="Pong", channel='channel_id')
+    The following would send a message to a slack channel when executed ::
 
-        The following would send a reply to a message in a thread ::
+        @slackbot.command('ping')
+        def ping():
+            return Response(text="Pong", channel='channel_id')
 
-            @slackbot.command('hello')
-            def hello():
-                return Response(text="hi",
-                                channel='channel_id',
-                                original_ts='original_ts')
+    The following would send a reply to a message in a thread ::
 
-        The following would send a reaction to a message ::
+        @slackbot.command('hello')
+        def hello():
+            return Response(text="hi",
+                            channel='channel_id',
+                            original_ts='original_ts')
 
-            @slackbot.command('react')
-            def react():
-                return Response(reaction="x",
-                                channel='channel_id',
-                                original_ts='original_ts')
+    The following would send a reaction to a message ::
+
+        @slackbot.command('react')
+        def react():
+            return Response(reaction="x",
+                            channel='channel_id',
+                            original_ts='original_ts')
     """
-
     def __init__(self,
                  channel: str,
                  text: Optional[str] = None,
@@ -51,7 +53,7 @@ class Response():
                  reaction: Optional[str] = None,
                  ephemeral: bool = False,
                  user: Optional[str] = None,
-                 attachments: Optional[Dict] = None) -> None:
+                 attachments: Optional[Dict[str, Any]] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
@@ -68,16 +70,27 @@ class Response():
 
 
 class Attachment():
-    def __init__(self,
-                 channel: str,
-                 filename: Optional[str] = None,
-                 content: Optional[IO] = None) -> None:
+    """
+    A file to be uploaded to Slack
+
+    :param channel: The Slack channel ID the file will be sent to
+    :param filename: The filename of the file
+    :param content: The file to send to Slack. Open file
+                    using open('<file>', 'rb')
+
+    .. rubric:: Example
+
+    ::
+
+        Attachment('channel', 'file_name', open('file', 'rb'))
+    """
+    def __init__(self, channel: str, filename: str, content: IO) -> None:
         self.channel = channel
         self.filename = filename
         self.content = content
 
     def __repr__(self) -> str:
-        return "<Attachment in {0}>".format(self.channel)
+        return "<Attachment {0} in {1}>".format(self.filename, self.channel)
 
 
 class Message():
@@ -119,6 +132,18 @@ class Message():
 
 
 class Command:
+    """
+    An action executable from Slack.
+
+    :param pattern: A string that a Slack Message must match to trigger
+                    execution
+    :param func: The function that will be triggered when the command is
+                  invoked
+    :param case_sensitive: Whether the :code:`pattern` should enforce case
+                           sensitivity
+    :param help_text_override: Overrides the function's docstring in the
+                               standard help command
+    """
     def __init__(self,
                  pattern: str,
                  func: Callable[..., PhialResponse],
@@ -149,8 +174,11 @@ class Command:
         return re.compile("^{}$".format(command_regex),
                           0 if case_sensitive else re.IGNORECASE)
 
-    def pattern_matches(self,
-                        message: Message) -> Optional[Dict]:
+    def pattern_matches(self, message: Message) -> Optional[Dict[str, str]]:
+        """
+        Checks whether the text of a :obj:`Message` matches the command's
+        pattern, or any of it's aliased patterns
+        """
         match = self.pattern.match(message.text)
         if match:
             return match.groupdict()
@@ -165,6 +193,9 @@ class Command:
 
     @property
     def help_text(self) -> Optional[str]:
+        """
+        A description of the command's function
+        """
         if self.help_text_override is not None:
             return self.help_text_override
         return self.func.__doc__
