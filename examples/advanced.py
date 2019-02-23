@@ -10,7 +10,7 @@ SCHEDULED_CHANNEL = "channel-id"
 @slackbot.command('cent(er|re)')
 def regex_in_command():
     '''Command that uses regex to define structure'''
-    base_command = command.message.text.split(" ")[0]
+    base_command = command.text.split(" ")[0]
     if slackbot.config['prefix']:
         base_command = base_command[1:]
     if base_command == "center":
@@ -26,7 +26,7 @@ def regex_in_command():
 @slackbot.command('colo[u]?r <arg>')
 def regex_in_command_with_arg(arg):
     '''Command that uses regex to define structure with an arg'''
-    base_command = command.message.text.split(" ")[0]
+    base_command = command.text.split(" ")[0]
     return Response(text="My favourite {0} is {1}"
                     .format(base_command, arg),
                     channel=command.channel)

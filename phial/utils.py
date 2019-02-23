@@ -26,12 +26,16 @@ def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
         for output in output_list:
             if(output and 'text' in output):
                 bot_id = None
+                team = None
+                if 'team' in output:
+                    team = output['team']
                 if 'bot_id' in output:
                     bot_id = output['bot_id']
+
                 return Message(output['text'],
                                output['channel'],
                                output['user'],
                                output['ts'],
-                               output['team'],
+                               team,
                                bot_id)
     return None

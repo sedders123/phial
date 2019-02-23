@@ -112,7 +112,7 @@ class Message():
                  channel: str,
                  user: str,
                  timestamp: str,
-                 team: str,
+                 team: Optional[str],
                  bot_id: Optional[str] = None) -> None:
         self.text = text
         self.channel = channel
