@@ -1,8 +1,7 @@
 from phial.bot import Phial
-from phial.globals import command, g
+from phial.globals import command
 from phial.scheduler import Schedule
-from phial.wrappers import (Response, Attachment, MessageAttachment,
-                            MessageAttachmentField)
+from phial.wrappers import Response, Attachment, Message
 
-__all__ = ['Phial', 'command', 'Response', 'Attachment', 'MessageAttachment',
-           'MessageAttachmentField', 'g', 'Schedule']
+__version__ = "0.7.1"
+__all__ = ['Phial', 'command', 'Response', 'Attachment', 'Schedule', 'Message']

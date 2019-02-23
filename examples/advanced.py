@@ -1,4 +1,4 @@
-from phial import Phial, command, Response, Schedule, MessageAttachment, MessageAttachmentField
+from phial import Phial, command, Response, Schedule
 from multiprocessing import Process
 from time import sleep
 import logging
@@ -10,7 +10,7 @@ SCHEDULED_CHANNEL = "channel-id"
 @slackbot.command('cent(er|re)')
 def regex_in_command():
     '''Command that uses regex to define structure'''
-    base_command = command.message.text.split(" ")[0]
+    base_command = command.text.split(" ")[0]
     if slackbot.config['prefix']:
         base_command = base_command[1:]
     if base_command == "center":
@@ -26,7 +26,7 @@ def regex_in_command():
 @slackbot.command('colo[u]?r <arg>')
 def regex_in_command_with_arg(arg):
     '''Command that uses regex to define structure with an arg'''
-    base_command = command.message.text.split(" ")[0]
+    base_command = command.text.split(" ")[0]
     return Response(text="My favourite {0} is {1}"
                     .format(base_command, arg),
                     channel=command.channel)
@@ -61,21 +61,31 @@ def shceduled_function():
     slackbot.send_message(Response(text="Hey! Hey Listen!",
                                    channel=SCHEDULED_CHANNEL))
 
+
 @slackbot.command('messageWithAttachment')
 def get_message_with_attachment():
     '''A command that posts a message with a Slack attachment'''
     attachments = [
-        MessageAttachment(
-            title="Here's a message, it has 2 attachment fields",
-            title_link="https://api.slack.com/docs/message-attachments",
-            text="This message has some text!",
-            fields=[
-                MessageAttachmentField(title="Here's the first attachment field", value="And here's it's body", short=True),
-                MessageAttachmentField(title="...And here's the second", value="And here's it's body", short=True)
+        {
+            'title': "Here's a message, it has 2 attachment fields",
+            'title_link': "https://api.slack.com/docs/message-attachments",
+            'text': "This message has some text!",
+            'fields': [
+                {
+                 'title': "Here's the first attachment field",
+                 'value': "And here's it's body",
+                 'short': True
+                },
+                {
+                 'title': "...And here's the second",
+                 'value': "And here's it's body",
+                 'short': True
+                }
             ]
-        )
+        }
     ]
     return Response(channel=command.channel, attachments=attachments)
+
 
 if __name__ == '__main__':
     FORMAT = '%(asctime)-15s %(message)s'

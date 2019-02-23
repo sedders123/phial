@@ -1,7 +1,7 @@
-from phial import Phial, command, Response, Attachment, g
+from phial import Phial, command, Response, Attachment
 import os
 
-slackbot = Phial('token-goes-here')
+slackbot = Phial('token-here')
 
 
 @slackbot.command('ping')
@@ -37,7 +37,7 @@ def react():
     '''Simple command that reacts to the original message'''
     return Response(reaction="x",
                     channel=command.channel,
-                    original_ts=command.message_ts)
+                    original_ts=command.timestamp)
 
 
 @slackbot.command('upload')
@@ -55,30 +55,7 @@ def reply():
     '''Simple command that replies to the original message in a thread'''
     return Response(text="this is a thread",
                     channel=command.channel,
-                    original_ts=command.message_ts)
-
-
-@slackbot.command('start')
-def start():
-    '''A command which uses an application global variable'''
-    g['variable'] = True
-    return "Started"
-
-
-@slackbot.command('stop')
-def stop():
-    '''A command which uses an application global variable'''
-    g['variable'] = False
-    return "Stopped"
-
-
-@slackbot.command('check')
-def check():
-    '''A command that reads an application global variable'''
-    if g['variable']:
-        return "Process Started"
-    else:
-        return "Process Stopped"
+                    original_ts=command.timestamp)
 
 
 @slackbot.command('caseSensitive', case_sensitive=True)

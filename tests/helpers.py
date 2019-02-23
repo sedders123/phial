@@ -1,26 +1,26 @@
-from contextlib import contextmanager
-from io import StringIO
-import sys
+from typing import Any
+import pytest # type: ignore # noqa
 
 
-@contextmanager
-def captured_output():
-    new_out, new_err = StringIO(), StringIO()
-    old_out, old_err = sys.stdout, sys.stderr
-    try:
-        sys.stdout, sys.stderr = new_out, new_err
-        yield sys.stdout, sys.stderr
-    finally:
-        sys.stdout, sys.stderr = old_out, old_err
+def wildpatch(target: Any,
+              name: str,
+              value: Any = None,
+              raising: bool = True) -> None:
+    import inspect
 
+    if value is None:
+        if not isinstance(target, str):
+            raise TypeError("use setattr(target, name, value) or "
+                            "setattr(target, value) with target being a dotted"
+                            " import string")
+        value = name
+        name, target = derive_importpath(target, raising) # type: ignore # noqa
 
-class MockTrueFunc():
-    def true_once(self):
-        yield True
-        yield False
+    oldval = getattr(target, name, None)
+    if raising and oldval is None:
+        raise AttributeError("%r has no attribute %r" % (target, name))
 
-    def __init__(self):
-        self.gen = self.true_once()
-
-    def __call__(self):
-        return next(self.gen)
+    # avoid class descriptors like staticmethod/classmethod
+    if inspect.isclass(target):
+        oldval = target.__dict__.get(name, None)
+    setattr(target, name, value)
