@@ -103,7 +103,7 @@ def test_message_falls_back_correctly() -> None:
         middleware_calls[0] += 1
         return message
 
-    def fallback() -> None:
+    def fallback(message: Message) -> None:
         fallback_calls[0] += 1
 
     bot = Phial('token')

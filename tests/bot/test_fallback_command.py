@@ -1,8 +1,8 @@
-from phial import Phial
+from phial import Phial, Message
 
 
 def test_add_fallback_command() -> None:
-    def test() -> None:
+    def test(message: Message) -> None:
         pass
 
     bot = Phial('token', {})
@@ -16,7 +16,7 @@ def test_add_fallback_decorator() -> None:
     bot = Phial('token', {})
 
     @bot.fallback_command()
-    def test() -> None:
+    def test(message: Message) -> None:
         pass
 
     assert bot.fallback_func is not None
