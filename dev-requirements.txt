@@ -1,5 +1,5 @@
 sphinx==1.8.4
-flake8==3.7.5
+flake8==3.7.6
 coveralls==1.6.0
 twine==1.13.0
 mypy==0.670
