@@ -424,7 +424,7 @@ class Phial:
                                  + 'Reaction, Text')
             if response.original_ts and response.reaction:
                 self.send_reaction(response)
-            elif response.text:
+            elif response.text or response.attachments:
                 self.send_message(response)
 
         if isinstance(response, Attachment):

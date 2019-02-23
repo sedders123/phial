@@ -1,7 +1,7 @@
 from phial import Phial, command, Response, Attachment
 import os
 
-slackbot = Phial('token-goes-here')
+slackbot = Phial('token-here')
 
 
 @slackbot.command('ping')
@@ -37,7 +37,7 @@ def react():
     '''Simple command that reacts to the original message'''
     return Response(reaction="x",
                     channel=command.channel,
-                    original_ts=command.message_ts)
+                    original_ts=command.timestamp)
 
 
 @slackbot.command('upload')
@@ -55,7 +55,7 @@ def reply():
     '''Simple command that replies to the original message in a thread'''
     return Response(text="this is a thread",
                     channel=command.channel,
-                    original_ts=command.message_ts)
+                    original_ts=command.timestamp)
 
 
 @slackbot.command('caseSensitive', case_sensitive=True)

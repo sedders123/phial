@@ -27,7 +27,7 @@ def test_command_help_text_override() -> None:
     assert command.help_text == "Help text override"
 
 
-def test_command_build_patter_regex_no_substition_ignore_case():
+def test_command_build_patter_regex_no_substition_ignore_case() -> None:
     command_template = 'test'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
@@ -35,24 +35,26 @@ def test_command_build_patter_regex_no_substition_ignore_case():
     assert match is not None
 
 
-def test_command_build_patter_regex_single_substition_ignore_case():
+def test_command_build_patter_regex_single_substition_ignore_case() -> None:
     command_template = 'test <one>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
-    match_dict = command_pattern.match("test one").groupdict()
-    assert match_dict['one'] is not None
+    match_dict = command_pattern.match("test one")
+    assert match_dict is not None
+    assert match_dict.groupdict()['one'] is not None
 
 
-def test_command_build_patter_regex_multiple_substition_ignore_case():
+def test_command_build_patter_regex_multiple_substition_ignore_case() -> None:
     command_template = 'test <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
-    match_dict = command_pattern.match("test one two").groupdict()
-    assert match_dict['one'] is not None
-    assert match_dict['two'] is not None
+    match_dict = command_pattern.match("test one two")
+    assert match_dict is not None
+    assert match_dict.groupdict()['one'] is not None
+    assert match_dict.groupdict()['two'] is not None
 
 
-def test_command_build_patter_regex_no_substition_case_sensitive():
+def test_command_build_patter_regex_no_substition_case_sensitive() -> None:
     command_template = 'tEst'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    True)
@@ -60,58 +62,57 @@ def test_command_build_patter_regex_no_substition_case_sensitive():
     assert command_pattern.match("Test") is None
 
 
-def test_command_build_patter_regex_single_substition_case_sensitive():
+def test_build_patter_regex_single_substition_case_sensitive() -> None:
     command_template = 'tEst <one>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    True)
 
-    match_dict = command_pattern.match("tEst one").groupdict()
-    assert match_dict['one'] is not None
+    match_dict = command_pattern.match("tEst one")
+    assert match_dict is not None
+    assert match_dict.groupdict()['one'] is not None
     assert command_pattern.match("Test one") is None
 
 
-def test_command_build_patter_regex_multiple_substition_case_sensitive():
+def test_build_patter_regex_multiple_substition_case_sensitive() -> None:
     command_template = 'tEst <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    True)
-    match_dict = command_pattern.match("tEst one two").groupdict()
-    assert match_dict['one'] is not None
-    assert match_dict['two'] is not None
+    match_dict = command_pattern.match("tEst one two")
+    assert match_dict is not None
+    assert match_dict.groupdict()['one'] is not None
+    assert match_dict.groupdict()['two'] is not None
     assert command_pattern.match("Test one") is None
 
 
-def test_build_command_allows_quotation_marks():
+def test_build_command_allows_quotation_marks() -> None:
     command_template = 'test <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
-    match_dict = command_pattern.match("test \"one two\" three") \
-        .groupdict()
-    print(match_dict)
-    assert match_dict['one'] == "one two"
-    assert match_dict['two'] == "three"
+    match_dict = command_pattern.match("test \"one two\" three")
+    assert match_dict is not None
+    assert match_dict.groupdict()['one'] == "one two"
+    assert match_dict.groupdict()['two'] == "three"
 
 
-def test_build_command_allows_all_params_with_quotation_marks():
+def test_build_command_allows_all_params_with_quotation_marks() -> None:
     command_template = 'test <one> <two>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
-    match_dict = command_pattern.match("test \"one two\" \"three\"") \
-        .groupdict()
-    print(match_dict)
-    assert match_dict['one'] == "one two"
-    assert match_dict['two'] == "three"
+    match_dict = command_pattern.match("test \"one two\" \"three\"")
+    assert match_dict is not None
+    assert match_dict.groupdict()['one'] == "one two"
+    assert match_dict.groupdict()['two'] == "three"
 
 
-def test_build_command_allows_multiple_params_with_quotation_marks():
+def test_build_command_allows_multiple_params_with_quotation_marks() -> None:
     command_template = 'test <one> <two> <three>'
     command_pattern = Command._build_pattern_regex(command_template,
                                                    False)
-    match_dict = command_pattern.match("test \"one two\" three \"four\"") \
-        .groupdict()
-    print(match_dict)
-    assert match_dict['one'] == "one two"
-    assert match_dict['two'] == "three"
-    assert match_dict['three'] == "four"
+    match_dict = command_pattern.match("test \"one two\" three \"four\"")
+    assert match_dict is not None
+    assert match_dict.groupdict()['one'] == "one two"
+    assert match_dict.groupdict()['two'] == "three"
+    assert match_dict.groupdict()['three'] == "four"
 
 
 def test_command_pattern_matches() -> None:
