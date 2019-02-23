@@ -1,11 +1,15 @@
-import slackclient  # type: ignore
-from phial import Phial, Attachment
-from typing import Any
-from tests.helpers import wildpatch
+"""Test upload_attachment."""
 import io
+from typing import Any
+
+import slackclient  # type: ignore
+
+from phial import Attachment, Phial
+from tests.helpers import wildpatch
 
 
 def test_send_attachment() -> None:
+    """Test send attachments calls correctly."""
     def mock_api_call(*args: Any, **kwargs: Any) -> None:
         assert args[1] == "files.upload"
         assert kwargs["channels"] == "channel"

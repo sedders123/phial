@@ -1,7 +1,9 @@
-from phial import Phial, Message
+"""Test handle_message."""
+from phial import Message, Phial
 
 
 def test_handle_message_handles_none_correctly() -> None:
+    """Test handle_message handle None correctly."""
     def command() -> None:
         raise Exception("Should not be called")
 
@@ -15,6 +17,7 @@ def test_handle_message_handles_none_correctly() -> None:
 
 
 def test_message_passed_to_middleware() -> None:
+    """Test handle_message passes to middleware."""
     def command() -> None:
         raise Exception("Should not be called")
 
@@ -32,6 +35,7 @@ def test_message_passed_to_middleware() -> None:
 
 
 def test_message_ignored_if_no_prefix() -> None:
+    """Test message is ignored if it has no prefix."""
     middleware_calls = [0]
     command_calls = [0]
 
@@ -52,6 +56,7 @@ def test_message_ignored_if_no_prefix() -> None:
 
 
 def test_message_calls_command_correctly() -> None:
+    """Test message invokes a command correctly."""
     middleware_calls = [0]
     command_calls = [0]
 
@@ -72,6 +77,7 @@ def test_message_calls_command_correctly() -> None:
 
 
 def test_message_calls_command_correctly_when_no_prefix() -> None:
+    """Test message invokes a command correctly with no prefix."""
     middleware_calls = [0]
     command_calls = [0]
 
@@ -92,6 +98,7 @@ def test_message_calls_command_correctly_when_no_prefix() -> None:
 
 
 def test_message_falls_back_correctly() -> None:
+    """Test message hits fallback command correctly."""
     middleware_calls = [0]
     command_calls = [0]
     fallback_calls = [0]

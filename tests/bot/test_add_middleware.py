@@ -1,7 +1,9 @@
-from phial import Phial, Message
+"""Test add_middleware."""
+from phial import Message, Phial
 
 
 def test_add_middleware_command() -> None:
+    """Test add_middleware commmand works correctly."""
     def test(message: Message) -> None:
         pass
 
@@ -13,6 +15,7 @@ def test_add_middleware_command() -> None:
 
 
 def test_add_middleware_decorator() -> None:
+    """Test add_middleware decorator works correctly."""
     bot = Phial('token', {})
 
     @bot.middleware()

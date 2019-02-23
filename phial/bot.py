@@ -1,13 +1,16 @@
-from slackclient import SlackClient  # type: ignore
-from typing import Dict, List, Callable, Optional
-import logging
+"""The core of phial."""
 import json
+import logging
+from typing import Callable, Dict, List, Optional
+
+from slackclient import SlackClient  # type: ignore
+
 from phial.commands import help_command
 from phial.globals import _command_ctx_stack
-from phial.scheduler import Scheduler, Schedule, ScheduledJob
-from phial.wrappers import Command, Response, Message, Attachment
-from phial.utils import parse_slack_output
+from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.types import PhialResponse
+from phial.utils import parse_slack_output
+from phial.wrappers import Attachment, Command, Message, Response
 
 
 class Phial:
@@ -18,12 +21,13 @@ class Phial:
     as well as providing a wrapper around :obj:`slackclient.SlackClient`
     to make sending messages to Slack simpler.
     """
+
     #: Default configuration
     default_config = {
         'prefix': "!",
         'registerHelpCommand': True,
         'baseHelpText': "All available commands:",
-        'autoReconnect': True
+        'autoReconnect': True,
     }
 
     def __init__(self,
@@ -184,6 +188,8 @@ class Phial:
     def add_fallback_command(self,
                              func: Callable[[Message], PhialResponse]) -> None:
         """
+        Add a fallback command.
+
         Registers a 'fallback' function to run when a user tries to execute a
         command that doesn't exist.
 
@@ -213,7 +219,7 @@ class Phial:
 
     def fallback_command(self) -> Callable:
         """
-        A decorator to add a fallback command
+        A decorator to add a fallback command.
 
         See :meth:`add_fallback_command` for more information on
         fallback commands
@@ -345,7 +351,7 @@ class Phial:
 
     def send_message(self, message: Response) -> None:
         """
-        Sends a message to Slack
+        Sends a message to Slack.
 
         :param message: The message to be sent to Slack
         """
@@ -372,7 +378,7 @@ class Phial:
 
     def send_reaction(self, response: Response) -> None:
         """
-        Sends a reaction to a Slack Message
+        Sends a reaction to a Slack Message.
 
         :param response: Response containing the reaction to be
                          sent to Slack
@@ -385,7 +391,7 @@ class Phial:
 
     def upload_attachment(self, attachment: Attachment) -> None:
         """
-        Upload a file to Slack
+        Upload a file to Slack.
 
         :param attachment: The attachment to be uploaded to Slack
         """
@@ -414,14 +420,14 @@ class Phial:
 
         elif not isinstance(response, Response) and not \
                 isinstance(response, Attachment):
-            raise ValueError('Only Response or Attachment objects can be ' +
+            raise ValueError('Only Response or Attachment objects can be '
                              'returned from command functions')
 
         if isinstance(response, Response):
             if response.original_ts and response.reaction and response.text:
                 raise ValueError('Response objects with an original timestamp '
-                                 + 'can only have one of the attributes: '
-                                 + 'Reaction, Text')
+                                 'can only have one of the attributes: '
+                                 'Reaction, Text')
             if response.original_ts and response.reaction:
                 self.send_reaction(response)
             elif response.text or response.attachments:
@@ -444,9 +450,8 @@ class Phial:
             return
 
         # If message should have a prefix but doesn't return early
-        if ("prefix" in self.config
-                and self.config["prefix"] is not None
-                and not message.text.startswith(self.config["prefix"])):
+        if "prefix" in self.config and self.config["prefix"] is not None \
+                and not message.text.startswith(self.config["prefix"]):
             return
 
         # If message has not been intercepted continue with standard message
@@ -473,6 +478,11 @@ class Phial:
                 _command_ctx_stack.pop()
 
     def run(self) -> None:
+        """
+        Starts the bot.
+
+        When called will start the bot listening to messages from Slack
+        """
         auto_reconnect = self.config['autoReconnect']
         if not self.slack_client.rtm_connect(auto_reconnect=auto_reconnect,
                                              with_team_state=False):

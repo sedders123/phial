@@ -1,3 +1,4 @@
+"""Helpers for unit tests."""
 from typing import Any
 import pytest # type: ignore # noqa
 
@@ -6,6 +7,7 @@ def wildpatch(target: Any,
               name: str,
               value: Any = None,
               raising: bool = True) -> None:
+    """Monkey patch target."""
     import inspect
 
     if value is None:

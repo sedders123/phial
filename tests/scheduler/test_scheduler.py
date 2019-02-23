@@ -1,13 +1,17 @@
+"""Test Scheduler class."""
 from unittest.mock import MagicMock
-from phial.scheduler import Scheduler, Schedule, ScheduledJob
+
+from phial.scheduler import Schedule, ScheduledJob, Scheduler
 
 
 def test_creates_correctly() -> None:
+    """Test Scheduler creates correctly."""
     scheduler = Scheduler()
     assert len(scheduler.jobs) == 0
 
 
 def test_adds_job_correctly() -> None:
+    """Test Scheduler adds job correctly."""
     test_func = MagicMock()
     schedule = Schedule().every().day().at(12, 00)
     job = ScheduledJob(schedule, test_func)
@@ -19,6 +23,7 @@ def test_adds_job_correctly() -> None:
 
 
 def test_runs_jobs_correctly() -> None:
+    """Test Scheduler runs jobs correctly."""
     test_func = MagicMock()
     schedule = Schedule().every().day().at(12, 00)
     job = ScheduledJob(schedule, test_func)

@@ -1,10 +1,13 @@
+"""Contains models for phial to use."""
+
 import re
-from typing import Dict, Pattern, IO, Optional, List, Callable, Any
+from typing import IO, Callable, Dict, List, Optional, Pattern, Union
+
 from phial.types import PhialResponse
 
 
 class Response():
-    """
+    r"""
     A response to be sent to Slack.
 
     When returned in a command function will send a message, or reaction to
@@ -46,6 +49,7 @@ class Response():
                             channel='channel_id',
                             original_ts='original_ts')
     """
+
     def __init__(self,
                  channel: str,
                  text: Optional[str] = None,
@@ -53,7 +57,10 @@ class Response():
                  reaction: Optional[str] = None,
                  ephemeral: bool = False,
                  user: Optional[str] = None,
-                 attachments: Optional[Dict[str, Any]] = None) -> None:
+                 attachments: Optional[Dict[str, Union[str,
+                                                       int,
+                                                       float,
+                                                       bool]]] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
@@ -71,7 +78,7 @@ class Response():
 
 class Attachment():
     """
-    A file to be uploaded to Slack
+    A file to be uploaded to Slack.
 
     :param channel: The Slack channel ID the file will be sent to
     :param filename: The filename of the file
@@ -84,6 +91,7 @@ class Attachment():
 
         Attachment('channel', 'file_name', open('file', 'rb'))
     """
+
     def __init__(self, channel: str, filename: str, content: IO) -> None:
         self.channel = channel
         self.filename = filename
@@ -144,6 +152,7 @@ class Command:
     :param help_text_override: Overrides the function's docstring in the
                                standard help command
     """
+
     def __init__(self,
                  pattern: str,
                  func: Callable[..., PhialResponse],
@@ -176,8 +185,10 @@ class Command:
 
     def pattern_matches(self, message: Message) -> Optional[Dict[str, str]]:
         """
+        Check if message should invoke the command.
+
         Checks whether the text of a :obj:`Message` matches the command's
-        pattern, or any of it's aliased patterns
+        pattern, or any of it's aliased patterns.
         """
         match = self.pattern.match(message.text)
         if match:
@@ -193,9 +204,7 @@ class Command:
 
     @property
     def help_text(self) -> Optional[str]:
-        """
-        A description of the command's function
-        """
+        """A description of the command's function."""
         if self.help_text_override is not None:
             return self.help_text_override
         return self.func.__doc__

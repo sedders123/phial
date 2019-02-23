@@ -1,7 +1,9 @@
+"""Test Response class."""
 from phial import Response
 
 
 def test_response_equality() -> None:
+    """Assert Response equality is working."""
     response_one = Response('channel',
                             'text',
                             'ts',
@@ -21,6 +23,7 @@ def test_response_equality() -> None:
 
 
 def test_response_equality_attachment() -> None:
+    """Assert Response equality is working with attachments."""
     response_one = Response('channel',
                             'text',
                             'ts',
@@ -40,6 +43,7 @@ def test_response_equality_attachment() -> None:
 
 
 def test_response_equality_attachment_fails() -> None:
+    """Assert Response equality fails with attachments."""
     response_one = Response('channel',
                             'text',
                             'ts',
@@ -59,6 +63,7 @@ def test_response_equality_attachment_fails() -> None:
 
 
 def test_response_repr() -> None:
+    """Assert Response repr is working."""
     response = Response('channel',
                         'text',
                         'ts',

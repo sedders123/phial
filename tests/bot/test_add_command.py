@@ -1,8 +1,11 @@
-from phial import Phial
+"""Test ad_command."""
 import pytest  # type: ignore
+
+from phial import Phial
 
 
 def test_add_command() -> None:
+    """Test add_command works correctly."""
     def test() -> None:
         pass
 
@@ -14,6 +17,7 @@ def test_add_command() -> None:
 
 
 def test_add_same_command_throws() -> None:
+    """Test add_command throws when adding command with same pattern."""
     def test() -> None:
         pass
 
@@ -25,6 +29,7 @@ def test_add_same_command_throws() -> None:
 
 
 def test_add_command_decorator() -> None:
+    """Test add_command decorator works correctly."""
     bot = Phial('token', {'registerHelpCommand': False})
 
     @bot.command("test")
@@ -36,6 +41,7 @@ def test_add_command_decorator() -> None:
 
 
 def test_alias_decorator() -> None:
+    """Test alias decorator works correctly."""
     bot = Phial('token', {'registerHelpCommand': False})
 
     @bot.command("test")

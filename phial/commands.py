@@ -1,4 +1,6 @@
+"""Standard commands provided by phial."""
 from typing import TYPE_CHECKING, cast
+
 from phial.utils import parse_help_text
 
 if TYPE_CHECKING:
@@ -6,6 +8,7 @@ if TYPE_CHECKING:
 
 
 def help_command(bot: 'Phial') -> str:
+    """List all available commands."""
     help_text = cast(str, bot.config.get('baseHelpText', ""))
     if help_text:
         help_text += "\n"
