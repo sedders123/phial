@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+phial has undergone a major internal rewrite and while the public API has largely stayed the same this version should not be seen as a drop in replacement.
+
+### Changed
+ - Set minimum Python version to 3.5 (this has been the case since 0.3.0).
+ - The global `command` variable is now of type `Message`.
+
+### Removed
+ - MessageAttachment and MessageAttachmentField classes. Message attachments can still be sent by using dictionaries that match the JSON that Slack expects.
+
 ## [0.7.1](https://github.com/sedders123/phial/releases/tag/0.7.1) - 2019-02-03
 ### Changed
  - Allow consumers of the pacakge to use phial's type hints
