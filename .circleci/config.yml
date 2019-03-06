@@ -103,11 +103,13 @@ jobs:
       - run:
           name: Create source distribution
           command: |
+            . venv/bin/activate
             python setup.py sdist
 
       - run:
           name: Create wheel
           command: |
+            . venv/bin/activate
             python setup.py bdist_wheel
 
       - run:
