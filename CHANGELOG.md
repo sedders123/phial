@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.8.1](https://github.com/sedders123/phial/releases/tag/0.8.0) - 2019-03-08
+
+### Changed
+
+- Project Metadata
+
 ## [0.8.0](https://github.com/sedders123/phial/releases/tag/0.8.0) - 2019-02-25
 
 phial has undergone a major internal rewrite and while the public API has largely stayed the same this version should not be seen as a drop in replacement.
