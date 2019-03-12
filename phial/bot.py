@@ -8,6 +8,7 @@ from slackclient import SlackClient  # type: ignore
 
 from phial.commands import help_command
 from phial.globals import _command_ctx_stack
+from phial.reloader import run_with_reloader
 from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.types import PhialResponse
 from phial.utils import parse_slack_output
@@ -502,7 +503,7 @@ class Phial:
             finally:
                 _command_ctx_stack.pop()
 
-    def run(self) -> NoReturn:
+    def run_main(self) -> None:
         """
         Starts the bot.
 
@@ -522,3 +523,11 @@ class Phial:
             except Exception as e:
                 self.logger.error(e)
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
+
+    def run(self) -> None:
+        """
+        Starts the bot.
+
+        When called will start the bot listening to messages from Slack
+        """
+        run_with_reloader(self.run_main)
