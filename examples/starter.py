@@ -19,10 +19,10 @@ def pong():
     return "Ping"
 
 
-@slackbot.command('hello <name>')
-def hello(name):
+@slackbot.command('hi <name>')
+def hi(name):
     '''Simple command with argument which replies to a message'''
-    return Response(text="Hi {0}".format(name), channel=command.channel)
+    return Response(text="Hello {0}".format(name), channel=command.channel)
 
 
 @slackbot.command('hello <name> <from_>')
