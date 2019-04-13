@@ -123,8 +123,8 @@ def _get_args_for_reloading() -> List[str]:
         if os.name == "nt":
             # Windows entry points have ".exe" extension and should be
             # called directly.
-            if not os.path.exists(py_script) and os.path.exists(py_script +
-                                                                ".exe"):
+            if not os.path.exists(py_script) and os.path. \
+                    exists(py_script + ".exe"):
                 py_script += ".exe"
 
             if (
