@@ -8,11 +8,12 @@ from slackclient import SlackClient  # type: ignore
 
 from phial.commands import help_command
 from phial.globals import _command_ctx_stack
-from phial.reloader import run_with_reloader
 from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.types import PhialResponse
 from phial.utils import parse_slack_output
 from phial.wrappers import Attachment, Command, Message, Response
+
+from ._reloader import run_with_reloader
 
 
 class Phial:
@@ -31,6 +32,7 @@ class Phial:
         'baseHelpText': "All available commands:",
         'autoReconnect': True,
         'loopDelay': 0.001,
+        'hotReload': True,
     }
 
     def __init__(self,
@@ -503,12 +505,7 @@ class Phial:
             finally:
                 _command_ctx_stack.pop()
 
-    def run_main(self) -> None:
-        """
-        Starts the bot.
-
-        When called will start the bot listening to messages from Slack
-        """
+    def _start(self) -> None:
         auto_reconnect = self.config['autoReconnect']
         if not self.slack_client.rtm_connect(auto_reconnect=auto_reconnect,
                                              with_team_state=False):
@@ -530,4 +527,7 @@ class Phial:
 
         When called will start the bot listening to messages from Slack
         """
-        run_with_reloader(self.run_main)
+        if self.config['hotReload']:
+            run_with_reloader(self._start)
+        else:
+            self._start()

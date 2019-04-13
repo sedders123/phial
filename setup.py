@@ -60,7 +60,7 @@ setup(
         'slackclient>=1.2.1,<2',
         'Werkzeug>=0.14.1',
         'typing>=3.6.6',
-        'watchdog>0.9.0',
+        'watchdog>=0.9.0',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -73,7 +73,7 @@ setup(
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
-        'Typing :: Typed'
+        'Typing :: Typed',
     ],
     cmdclass={
         'verify': VerifyVersionCommand,
