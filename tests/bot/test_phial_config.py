@@ -25,6 +25,7 @@ def test_config_override() -> None:
         'baseHelpText': "All commands:",
         'autoReconnect': False,
         'loopDelay': 0.5,
+        'hotReload': True,
     }
 
 
