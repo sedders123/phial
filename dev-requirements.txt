@@ -11,7 +11,7 @@ mypy==0.701
 pytest==4.4.1
 pytest-cov==2.6.1
 rope==0.14.0
-setuptools==41.0.0
+setuptools==41.0.1
 sphinx==1.8.5
 sphinx-autodoc-typehints==1.6.0
 twine==1.13.0
