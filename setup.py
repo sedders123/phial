@@ -55,7 +55,7 @@ setup(
     python_requires='>=3.5',
     keywords=['Phial', 'Slack', 'bot', 'Slackbot'],
     install_requires=[
-        'slackclient>=1.2.1',
+        'slackclient>=1.2.1,<2',
         'Werkzeug>=0.14.1',
         'typing>=3.6.6'
     ],
