@@ -6,7 +6,7 @@ flake8-docstrings==1.3.0
 flake8-isort==2.7.0
 flake8-mutable==1.2.0
 freezegun==0.3.11
-isort==4.3.17
+isort==4.3.18
 mypy==0.701
 pytest==4.4.1
 pytest-cov==2.6.1
