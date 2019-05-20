@@ -495,5 +495,4 @@ class Phial:
                 self.scheduler.run_pending()
             except Exception as e:
                 self.logger.exception("Error {0}".format(e))
-            sleep(self.config['loopDelay'])  # Help prevent high CPU usage
-                                             #  while doing nothing.
+            sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
