@@ -1,6 +1,7 @@
 """The core of phial."""
 import json
 import logging
+from time import sleep
 from typing import Callable, Dict, List, Optional
 
 from slackclient import SlackClient  # type: ignore
@@ -28,12 +29,12 @@ class Phial:
         'registerHelpCommand': True,
         'baseHelpText': "All available commands:",
         'autoReconnect': True,
+        'loopDelay': 0.001,
     }
 
     def __init__(self,
                  token: str,
-                 config: Dict = default_config,
-                 logger: Optional[logging.Logger] = None) -> None:
+                 config: Dict = default_config) -> None:
         self.slack_client = SlackClient(token)
         self.commands: List[Command] = []
         self.config: Dict = dict(self.default_config)
@@ -42,16 +43,14 @@ class Phial:
                                         [[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
         self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
-        if logger is None:
-            logger = logging.getLogger(__name__)
-            if not logger.hasHandlers():
-                handler = logging.StreamHandler()
-                formatter = logging.Formatter(fmt="%(asctime)s - %(message)s")
-                handler.setFormatter(formatter)
-                logger.addHandler(handler)
-                logger.propagate = False
-            logger.setLevel(logging.INFO)
-        self.logger = logger
+        self.logger = logging.getLogger(__name__)
+        if not self.logger.hasHandlers():
+            handler = logging.StreamHandler()
+            formatter = logging.Formatter(fmt="%(asctime)s - %(message)s")
+            handler.setFormatter(formatter)
+            self.logger.addHandler(handler)
+            self.logger.propagate = False
+            self.logger.setLevel(logging.INFO)
         self._register_standard_commands()
 
     def add_command(self,
@@ -496,3 +495,4 @@ class Phial:
                 self.scheduler.run_pending()
             except Exception as e:
                 self.logger.exception("Error {0}".format(e))
+            sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
