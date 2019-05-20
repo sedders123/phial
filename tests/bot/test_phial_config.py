@@ -15,6 +15,7 @@ def test_config_override() -> None:
         'registerHelpCommand': False,
         'baseHelpText': "All commands:",
         'autoReconnect': False,
+        'loopDelay': 0.5
     })
 
     assert bot.config == {
@@ -22,6 +23,7 @@ def test_config_override() -> None:
         'registerHelpCommand': False,
         'baseHelpText': "All commands:",
         'autoReconnect': False,
+        'loopDelay': 0.5
     }
 
 

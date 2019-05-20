@@ -496,4 +496,4 @@ class Phial:
             except Exception as e:
                 self.logger.exception("Error {0}".format(e))
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage
-                                             # while doing nothing.
+                                             #  while doing nothing.
