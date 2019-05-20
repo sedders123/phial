@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [Unreleased](https://github.com/sedders123/phial/releases/tag/) - TBD
+
+### Added
+ - Added 'loopDelay' config option. Specifes how to long to sleep for in the main loop, this helps to prevent super high CPU usage while doing nothing. Defaults to 0.001
+
+### Removed
+ - Removed the optional `logger` paramater when constructing Phial instance. Now uses `logging.getLogger(__name__)` all the time.
+
 ## [0.8.3](https://github.com/sedders123/phial/releases/tag/0.8.3) - 2019-05-02
 
 ### Changed
