@@ -2,7 +2,7 @@
 import json
 import logging
 from time import sleep
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, NoReturn, Optional
 
 from slackclient import SlackClient  # type: ignore
 
@@ -46,11 +46,12 @@ class Phial:
         self.logger = logging.getLogger(__name__)
         if not self.logger.hasHandlers():
             handler = logging.StreamHandler()
-            formatter = logging.Formatter(fmt="%(asctime)s - %(message)s")
+            formatter = logging.Formatter(
+                fmt="%(asctime)s [%(name)s] - %(message)s")
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
             self.logger.propagate = False
-            self.logger.setLevel(logging.INFO)
+            self.logger.setLevel(logging.DEBUG)
         self._register_standard_commands()
 
     def add_command(self,
@@ -442,6 +443,8 @@ class Phial:
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
+                self.logger.debug(f"Ran middleware: {func.__name__} on"
+                                  " {message}")
                 message = func(message)
 
         # If message has been intercepted or is a bot message return early
@@ -456,6 +459,7 @@ class Phial:
         # If message has not been intercepted continue with standard message
         # handling
         for command in self.commands:
+            command_name = command.func.__name__
             kwargs = command.pattern_matches(message)
             if kwargs is not None:
                 try:
@@ -464,6 +468,8 @@ class Phial:
                     self._send_response(response, message.channel)
                     return
                 finally:
+                    self.logger.debug(f"Ran command: {command_name} on"
+                                      " {message}")
                     _command_ctx_stack.pop()
 
         # If we are here then no commands have matched
@@ -476,7 +482,7 @@ class Phial:
             finally:
                 _command_ctx_stack.pop()
 
-    def run(self) -> None:
+    def run(self) -> NoReturn:
         """
         Starts the bot.
 
@@ -494,5 +500,5 @@ class Phial:
                 self._handle_message(message)
                 self.scheduler.run_pending()
             except Exception as e:
-                self.logger.exception("Error {0}".format(e))
+                self.logger.error(e, exec_info=True)
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
