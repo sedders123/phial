@@ -34,4 +34,4 @@ def test_runs_jobs_correctly() -> None:
     scheduler.add_job(job)
 
     scheduler.run_pending()
-    test_func.assert_called_once()
+    test_func.assert_called_once_with()  # TODO: Remove 'with' once Python 3.5 support is removed. # noqa: E501
