@@ -13,6 +13,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
  - Python 3.6.1 is now marked as incompatible due to an issue with the `NoReturn` type
 
+### Deprecated
+ - Deprecated Python 3.5 Support. This is intended to be the last phial release to support Python 3.5
+
 ### Removed
  - Removed the optional `logger` paramater when constructing Phial instance. Now uses `logging.getLogger(__name__)` all the time.
 
