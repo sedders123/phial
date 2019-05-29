@@ -15,4 +15,4 @@ def _find_command() -> Message:
 
 
 _command_ctx_stack = LocalStack()  # type: ignore
-command: Message = cast(Message, LocalProxy(_find_command))
+command = cast(Message, LocalProxy(_find_command))  # type: Message

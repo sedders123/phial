@@ -10,6 +10,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
  - Added 'loopDelay' config option. Specifes how to long to sleep for in the main loop, this helps to prevent super high CPU usage while doing nothing. Defaults to 0.001
 
+### Changed
+ - Python 3.6.1 is now marked as incompatible due to an issue with the `NoReturn` type
+
 ### Removed
  - Removed the optional `logger` paramater when constructing Phial instance. Now uses `logging.getLogger(__name__)` all the time.
 

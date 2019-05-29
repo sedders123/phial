@@ -32,7 +32,7 @@ class Schedule:
 
     def __init__(self) -> None:
         self._days = 0
-        self._at: Optional[_Time] = None
+        self._at = None  # type: Optional[_Time]
         self._hours = 0
         self._minutes = 0
         self._seconds = 0
@@ -232,7 +232,7 @@ class Scheduler:
     """A store for Scheduled Jobs."""
 
     def __init__(self) -> None:
-        self.jobs: List[ScheduledJob] = []
+        self.jobs = []  # type: List[ScheduledJob]
 
     def add_job(self, job: ScheduledJob) -> None:
         """
@@ -249,7 +249,7 @@ class Scheduler:
         Runs any ScheduledJobs in the store, where :code:`job.should_run()`
         returns true
         """
-        jobs_to_run: List[ScheduledJob] = [job for job in self.jobs
-                                           if job.should_run()]
+        jobs_to_run = [job for job in self.jobs
+                       if job.should_run()]  # type List[ScheduledJob]
         for job in jobs_to_run:
             job.run()

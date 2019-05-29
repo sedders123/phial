@@ -36,13 +36,13 @@ class Phial:
                  token: str,
                  config: Dict = default_config) -> None:
         self.slack_client = SlackClient(token)
-        self.commands: List[Command] = []
-        self.config: Dict = dict(self.default_config)
+        self.commands = []  # type: List[Command]
+        self.config = dict(self.default_config)  # type: Dict
         self.config.update(config)
         self.middleware_functions: List[Callable
                                         [[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
-        self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
+        self.fallback_func = None  # type: Optional[Callable[[Message], PhialResponse]] # noqa: E501
         self.logger = logging.getLogger(__name__)
         if not self.logger.hasHandlers():
             handler = logging.StreamHandler()

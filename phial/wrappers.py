@@ -169,7 +169,7 @@ class Command:
         return "<Command: {0}>".format(self.pattern_string)
 
     def _get_alias_patterns(self, func: Callable) -> List[Pattern]:
-        patterns: List[Pattern] = []
+        patterns = []  # type: List[Pattern]
         if hasattr(func, 'alias_patterns'):
             for pattern in func.alias_patterns:  # type: ignore
                 patterns.append(self._build_pattern_regex(pattern))
