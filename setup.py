@@ -52,7 +52,7 @@ setup(
     include_package_data=True,
     zip_safe=False,
     platforms='any',
-    python_requires='>=3.5',
+    python_requires='>=3.5, !3.6.1',
     keywords=['Phial', 'Slack', 'bot', 'Slackbot'],
     install_requires=[
         'slackclient>=1.2.1,<2',
