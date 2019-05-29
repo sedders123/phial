@@ -39,8 +39,7 @@ class Phial:
         self.commands = []  # type: List[Command]
         self.config = dict(self.default_config)  # type: Dict
         self.config.update(config)
-        self.middleware_functions: List[Callable
-                                        [[Message], Optional[Message]]] = []
+        self.middleware_functions = []  # type: List[Callable[[Message], Optional[Message]]] # noqa: E501
         self.scheduler = Scheduler()
         self.fallback_func = None  # type: Optional[Callable[[Message], PhialResponse]] # noqa: E501
         self.logger = logging.getLogger(__name__)
