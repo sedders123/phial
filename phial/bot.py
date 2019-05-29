@@ -442,8 +442,8 @@ class Phial:
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
-                self.logger.debug(f"Ran middleware: {func.__name__} on"
-                                  " {message}")
+                self.logger.debug("Ran middleware: {0} on"
+                                  " {1}".format(func.__name__, message))
                 message = func(message)
 
         # If message has been intercepted or is a bot message return early
@@ -467,8 +467,8 @@ class Phial:
                     self._send_response(response, message.channel)
                     return
                 finally:
-                    self.logger.debug(f"Ran command: {command_name} on"
-                                      " {message}")
+                    self.logger.debug("Ran command: {0} on"
+                                      " {1}".format(command_name, message))
                     _command_ctx_stack.pop()
 
         # If we are here then no commands have matched
