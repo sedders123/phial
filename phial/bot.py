@@ -2,7 +2,7 @@
 import json
 import logging
 from time import sleep
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Dict, List, NoReturn, Optional
 
 from slackclient import SlackClient  # type: ignore
 
@@ -36,17 +36,17 @@ class Phial:
                  token: str,
                  config: Dict = default_config) -> None:
         self.slack_client = SlackClient(token)
-        self.commands: List[Command] = []
-        self.config: Dict = dict(self.default_config)
+        self.commands = []  # type: List[Command]
+        self.config = dict(self.default_config)  # type: Dict
         self.config.update(config)
-        self.middleware_functions: List[Callable
-                                        [[Message], Optional[Message]]] = []
+        self.middleware_functions = []  # type: List[Callable[[Message], Optional[Message]]] # noqa: E501
         self.scheduler = Scheduler()
-        self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
+        self.fallback_func = None  # type: Optional[Callable[[Message], PhialResponse]] # noqa: E501
         self.logger = logging.getLogger(__name__)
         if not self.logger.hasHandlers():
             handler = logging.StreamHandler()
-            formatter = logging.Formatter(fmt="%(asctime)s - %(message)s")
+            formatter = logging.Formatter(
+                fmt="%(asctime)s [%(name)s] - %(message)s")
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
             self.logger.propagate = False
@@ -442,6 +442,8 @@ class Phial:
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
+                self.logger.debug("Ran middleware: {0} on"
+                                  " {1}".format(func.__name__, message))
                 message = func(message)
 
         # If message has been intercepted or is a bot message return early
@@ -456,6 +458,7 @@ class Phial:
         # If message has not been intercepted continue with standard message
         # handling
         for command in self.commands:
+            command_name = command.func.__name__
             kwargs = command.pattern_matches(message)
             if kwargs is not None:
                 try:
@@ -464,6 +467,8 @@ class Phial:
                     self._send_response(response, message.channel)
                     return
                 finally:
+                    self.logger.debug("Ran command: {0} on"
+                                      " {1}".format(command_name, message))
                     _command_ctx_stack.pop()
 
         # If we are here then no commands have matched
@@ -476,7 +481,7 @@ class Phial:
             finally:
                 _command_ctx_stack.pop()
 
-    def run(self) -> None:
+    def run(self) -> NoReturn:
         """
         Starts the bot.
 
@@ -494,5 +499,5 @@ class Phial:
                 self._handle_message(message)
                 self.scheduler.run_pending()
             except Exception as e:
-                self.logger.exception("Error {0}".format(e))
+                self.logger.error(e, exec_info=True)
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.

@@ -43,6 +43,6 @@ def test_parse_slack_output_bot() -> None:
 
 def test_parse_slack_output_returns_none_on_empty_input() -> None:
     """Check returns None when no messages passed in."""
-    sample_input: List[Dict[str, str]] = []
+    sample_input = []  # type: List[Dict[str, str]]
     output = parse_slack_output(sample_input)
     assert output is None

@@ -1,7 +1,7 @@
 from phial import Phial, command, Response, Attachment
 import os
 
-slackbot = Phial('token-here')
+slackbot = Phial(os.getenv("SLACK_TOKEN"))
 
 
 @slackbot.command('ping')
