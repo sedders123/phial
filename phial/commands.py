@@ -13,6 +13,8 @@ def help_command(bot: 'Phial') -> str:
     if help_text:
         help_text += "\n"
     for command in bot.commands:
+        if command.hide_from_help_command:
+            continue
         command_doc = command.help_text
         if not command_doc:
             # If no help text default to blank string
