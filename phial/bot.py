@@ -50,7 +50,7 @@ class Phial:
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
             self.logger.propagate = False
-            self.logger.setLevel(logging.DEBUG)
+            self.logger.setLevel(logging.INFO)
         self._register_standard_commands()
 
     def add_command(self,
