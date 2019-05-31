@@ -151,7 +151,7 @@ class Command:
                            sensitivity
     :param help_text_override: Overrides the function's docstring in the
                                standard help command
-    :param hide_from_help_command: Prevents function from being displayed in
+    :param hide_from_help_command: Prevents function from being displayed by
                                    the standard help command
     """
 
