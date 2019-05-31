@@ -5,8 +5,9 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
+      - run: echo "$CIRCLE_JOB" > _circle_job
       - restore_cache:
-          key: v1-deps-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
+          key: v1-deps-{{ checksum "_circle_job" }}-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
       - run:
           name: Create Virtual Env
           command: |
@@ -22,7 +23,7 @@ jobs:
             . venv/bin/activate
             pip install -e .
       - save_cache:
-          key: v1-deps-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
+          key: v1-deps-{{ checksum "_circle_job" }}-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
           paths:
             - "venv"
       - run:
@@ -44,7 +45,7 @@ jobs:
           name: Upload coverage
           command: |
             . venv/bin/activate
-            if [ -z $COVERALLS_REPO_TOKEN ]; then echo "No Coveralls Token"; else coveralls; fi
+            if [ -z $COVERALLS_REPO_TOKEN ] || [ "$CIRCLE_JOB" != "build" ]; then echo "No Coveralls Token"; else coveralls; fi
 
   test-3.6:
     <<: *template
@@ -61,9 +62,9 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
-
+      - run: echo "build" > build_job
       - restore_cache:
-          key: v1-deps-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
+          key: v1-deps-{{checksum "build_job"}}--{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
 
       - run:
           name: Create Virtual Env
@@ -83,7 +84,7 @@ jobs:
             pip install -e .
 
       - save_cache:
-          key: v1-deps-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
+          key: v1-deps-{{checksum "build_job"}}-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
           paths:
             - "venv"
 

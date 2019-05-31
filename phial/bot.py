@@ -43,7 +43,7 @@ class Phial:
         self.scheduler = Scheduler()
         self.fallback_func = None  # type: Optional[Callable[[Message], PhialResponse]] # noqa: E501
         self.logger = logging.getLogger(__name__)
-        if not self.logger.hasHandlers():
+        if not self.logger.hasHandlers():  # pragma: nocover
             handler = logging.StreamHandler()
             formatter = logging.Formatter(
                 fmt="%(asctime)s [%(name)s] - %(message)s")
@@ -57,7 +57,8 @@ class Phial:
                     pattern: str,
                     func: Callable[..., PhialResponse],
                     case_sensitive: bool = False,
-                    help_text_override: Optional[str] = None) -> None:
+                    help_text_override: Optional[str] = None,
+                    hide_from_help_command: Optional[bool] = False) -> None:
         """
         Registers a command with the bot.
 
@@ -80,6 +81,12 @@ class Phial:
                                    help text.
 
                                    Defaults to None
+        :param hide_from_help_command: A flag to specify whether or not
+                                       the inbuilt help command should
+                                       hide this command from the list
+                                       it generates.
+
+                                       Defaults to False
 
         :raises ValueError: If command with the same pattern is already
                             registered
@@ -110,7 +117,11 @@ class Phial:
                                  .format(pattern.split("<")[0]))
 
         # Create and add command
-        command = Command(pattern, func, case_sensitive, help_text_override)
+        command = Command(pattern,
+                          func,
+                          case_sensitive,
+                          help_text_override=help_text_override,
+                          hide_from_help_command=hide_from_help_command)
         self.commands.append(command)
         self.logger.debug("Command {0} added"
                           .format(pattern))
@@ -118,7 +129,8 @@ class Phial:
     def command(self,
                 pattern: str,
                 case_sensitive: bool = False,
-                help_text_override: Optional[str] = None) -> Callable:
+                help_text_override: Optional[str] = None,
+                hide_from_help_command: Optional[bool] = False) -> Callable:
         """
         Registers a command with the bot.
 
@@ -139,6 +151,12 @@ class Phial:
                                    help text.
 
                                    Defaults to None
+        :param hide_from_help_command: A flag to specify whether or not
+                                       the inbuilt help command should
+                                       hide this command from the list
+                                       it generates.
+
+                                       Defaults to False
 
         .. rubric:: Example
 
@@ -154,7 +172,10 @@ class Phial:
 
         """
         def decorator(f: Callable) -> Callable:
-            self.add_command(pattern, f, case_sensitive, help_text_override)
+            self.add_command(pattern, f,
+                             case_sensitive,
+                             help_text_override=help_text_override,
+                             hide_from_help_command=hide_from_help_command)
             return f
         return decorator
 

@@ -151,19 +151,23 @@ class Command:
                            sensitivity
     :param help_text_override: Overrides the function's docstring in the
                                standard help command
+    :param hide_from_help_command: Prevents function from being displayed by
+                                   the standard help command
     """
 
     def __init__(self,
                  pattern: str,
                  func: Callable[..., PhialResponse],
                  case_sensitive: bool = False,
-                 help_text_override: Optional[str] = None):
+                 help_text_override: Optional[str] = None,
+                 hide_from_help_command: Optional[bool] = False):
         self.pattern_string = pattern
         self.pattern = self._build_pattern_regex(pattern, case_sensitive)
         self.alias_patterns = self._get_alias_patterns(func)
         self.func = func
         self.case_sensitive = case_sensitive
         self.help_text_override = help_text_override
+        self.hide_from_help_command = hide_from_help_command
 
     def __repr__(self) -> str:
         return "<Command: {0}>".format(self.pattern_string)
