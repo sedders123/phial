@@ -67,7 +67,7 @@ def case_sensitive():
 @slackbot.command('messageWithAttachment')
 def get_message_with_attachment():
     '''
-        A command that posts a message with a Slack attachment
+        A command that posts a message with a Slack attachment.
         Read more: https://api.slack.com/docs/message-attachments
     '''
     attachments = [{
@@ -76,6 +76,14 @@ def get_message_with_attachment():
         "footer": "Teeny tiny footer text"
     }]
     return Response(channel=command.channel, attachments=attachments)
+
+
+@slackbot.command('hidden', hide_from_help_command=True)
+def hidden():
+    '''
+        A command that is hidden from the default help command
+    '''
+    return "Suprise"
 
 
 @slackbot.fallback_command()
