@@ -5,8 +5,9 @@ jobs:
       - image: circleci/python:3.7
     steps:
       - checkout
+      run: echo "$CIRCLE_JOB" > _circle_job
       - restore_cache:
-          key: v1-deps-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
+          key: v1-deps-{{ checksum "_circle_job" }}-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
       - run:
           name: Create Virtual Env
           command: |
@@ -22,7 +23,7 @@ jobs:
             . venv/bin/activate
             pip install -e .
       - save_cache:
-          key: v1-deps-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
+          key: v1-deps-{{ checksum "_circle_job" }}-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
           paths:
             - "venv"
       - run:
@@ -63,7 +64,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: v1-deps-{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
+          key: v1-deps-build--{{ checksum "dev-requirements.txt" }}-{{ checksum "setup.py" }}
 
       - run:
           name: Create Virtual Env
