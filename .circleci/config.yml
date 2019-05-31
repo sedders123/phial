@@ -45,7 +45,7 @@ jobs:
           name: Upload coverage
           command: |
             . venv/bin/activate
-            if [ -z $COVERALLS_REPO_TOKEN ] && [ "$CIRCLE_JOB" == "build"]; then echo "No Coveralls Token"; else coveralls; fi
+            if [ -z $COVERALLS_REPO_TOKEN ] || [ "$CIRCLE_JOB" != "build"]; then echo "No Coveralls Token"; else coveralls; fi
 
   test-3.6:
     <<: *template
