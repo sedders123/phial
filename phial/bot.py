@@ -520,5 +520,5 @@ class Phial:
                 self._handle_message(message)
                 self.scheduler.run_pending()
             except Exception as e:
-                self.logger.error(e, exec_info=True)
+                self.logger.error(e)
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
