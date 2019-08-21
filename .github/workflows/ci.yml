@@ -12,10 +12,6 @@ jobs:
 
 
     steps:
-    - name: Dump matrix context
-      env:
-        MATRIX_CONTEXT: ${{ toJson(matrix) }}
-      run: echo "$MATRIX_CONTEXT"
     - uses: actions/checkout@v1
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v1
@@ -34,9 +30,4 @@ jobs:
         mypy phial --strict-optional --disallow-untyped-defs --disallow-incomplete-defs --disallow-untyped-decorators --no-implicit-optional --disallow-subclassing-any
     - name: Test with pytest
       run: |
-        pytest tests -v --cov=phial --cov-report xml
-    - name: Upload coverage to CodeCov
-      uses: codecov/codecov-action@v1.0.0
-      if: runner.os == 'Linux'
-      with:
-        token: ${{secrets.CODECOV_TOKEN}}
+        pytest tests -v
