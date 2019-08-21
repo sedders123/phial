@@ -2,8 +2,9 @@ name: Upload PyPI Package
 
 on:
   push:
-    tags:
-      - \*.\*
+    branches:
+      - refs/tags/*
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
