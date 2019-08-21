@@ -3,7 +3,7 @@ name: Upload PyPI Package
 on:
   push:
     tags:
-      - \*
+      - \*.\*
 jobs:
   deploy:
     runs-on: ubuntu-latest
