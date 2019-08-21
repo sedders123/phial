@@ -37,6 +37,6 @@ jobs:
         pytest tests -v --cov=phial --cov-report xml
     - name: Upload coverage to CodeCov
       uses: codecov/codecov-action@v1.0.0
-      if: runner.os == "Linux"
+      if: runner.os == 'Linux'
       with:
         token: ${{secrets.CODECOV_TOKEN}}
