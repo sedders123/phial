@@ -142,6 +142,20 @@ def test_command_pattern_matches() -> None:
     assert command.pattern_matches(message) == {}
 
 
+def test_command_pattern_matches_aliases() -> None:
+    """Assert pattern_matches matches aliases correctly."""
+    def test() -> None:
+        pass
+
+    command = Command('test', test, False, None)
+    command.alias_patterns = [Command._build_pattern_regex("test <one>",
+                                                           False)]
+    message = Message('test one', 'channel', 'user', 'ts', 'team')
+
+    assert command.pattern_matches(message) is not None
+    assert command.pattern_matches(message) == {"one": "one"}
+
+
 def test_command_pattern_matches_returns_values() -> None:
     """Assert pattern_matches matches returns values correctly."""
     def test(val: str) -> None:

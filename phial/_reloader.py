@@ -102,7 +102,7 @@ def _find_observable_paths(extra_files:
     return _find_common_roots(rv)
 
 
-def _get_args_for_reloading() -> List[str]:
+def _get_args_for_reloading() -> List[str]:  # pragma: no cover
     """
     Returns the executable.
 
@@ -123,13 +123,13 @@ def _get_args_for_reloading() -> List[str]:
         if os.name == "nt":
             # Windows entry points have ".exe" extension and should be
             # called directly.
-            if not os.path.exists(py_script) and os.path. \
-                    exists(py_script + ".exe"):
+            if not os.path.exists(py_script) and os.path.exists(py_script +
+                                                                ".exe"):
                 py_script += ".exe"
 
             if (
-                os.path.splitext(rv[0])[1] == ".exe"and os.
-                path.splitext(py_script)[1] == ".exe"
+                os.path.splitext(rv[0])[1] == ".exe"
+                and os.path.splitext(py_script)[1] == ".exe"
             ):
                 rv.pop(0)
 
@@ -189,7 +189,7 @@ class ReloaderLoop(object):
         """Run."""
         pass
 
-    def restart_with_reloader(self) -> int:
+    def restart_with_reloader(self) -> int:  # pragma: no cover
         """
         Restart the reloader.
 
@@ -222,7 +222,7 @@ class StatReloaderLoop(ReloaderLoop):
 
     name = "stat"
 
-    def run(self) -> None:
+    def run(self) -> None:  # pragma: no cover
         """Run."""
         mtimes: Dict[str, float] = {}
         while 1:
@@ -292,7 +292,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
         self.should_reload = True
         self.log_reload(filename)
 
-    def run(self) -> None:
+    def run(self) -> None:  # pragma: no cover
         """Run."""
         watches: Dict[str, Any] = {}
         observer = self.observer_class()
@@ -306,7 +306,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
                     if path not in watches:
                         try:
                             watches[path] = observer.schedule(
-                                self.event_handler, path, recursive=True,
+                                self.event_handler, path, recursive=True
                             )
                         except OSError:
                             # Clear this path from list of watches We don't
@@ -337,7 +337,7 @@ else:
     reloader_loops["auto"] = reloader_loops["watchdog"]
 
 
-def ensure_echo_on() -> None:
+def ensure_echo_on() -> None:  # pragma: no cover
     """
     Ensure that echo mode is enabled.
 
@@ -357,10 +357,12 @@ def ensure_echo_on() -> None:
         termios.tcsetattr(sys.stdin, termios.TCSANOW, attributes)
 
 
-def run_with_reloader(main_func: Callable,
-                      extra_files: Optional[List[str]] = None,
-                      interval: int = 1,
-                      reloader_type: str = "auto") -> None:
+def run_with_reloader(
+    main_func: Callable,
+    extra_files: Optional[List[str]] = None,
+    interval: int = 1,
+    reloader_type: str = "auto",
+) -> None:  # pragma: no cover
     """Run the given function in an independent python interpreter."""
     import signal
 

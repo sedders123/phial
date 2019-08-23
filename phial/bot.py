@@ -32,7 +32,7 @@ class Phial:
         'baseHelpText': "All available commands:",
         'autoReconnect': True,
         'loopDelay': 0.001,
-        'hotReload': True,
+        'hotReload': False,
     }
 
     def __init__(self,
@@ -505,7 +505,7 @@ class Phial:
             finally:
                 _command_ctx_stack.pop()
 
-    def _start(self) -> None:
+    def _start(self) -> None:  # pragma: no cover
         auto_reconnect = self.config['autoReconnect']
         if not self.slack_client.rtm_connect(auto_reconnect=auto_reconnect,
                                              with_team_state=False):
@@ -521,7 +521,7 @@ class Phial:
                 self.logger.error(e)
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
 
-    def run(self) -> None:
+    def run(self) -> None:  # pragma: no cover
         """
         Starts the bot.
 
