@@ -7,7 +7,6 @@ from phial._reloader import (
     _find_observable_paths,
     _get_args_for_reloading,
     _iter_module_files,
-    ensure_echo_on,
     iteritems,
 )
 
