@@ -178,7 +178,7 @@ def _find_common_roots(paths: Any) -> Set[str]:
 class ReloaderLoop(object):
     """Reloader loop."""
 
-    name: Optional[str] = None
+    name = None  # type: Optional[str]
 
     def __init__(self, extra_files: Optional[List[str]] = None,
                  interval: int = 1):
@@ -224,7 +224,7 @@ class StatReloaderLoop(ReloaderLoop):
 
     def run(self) -> None:  # pragma: no cover
         """Run."""
-        mtimes: Dict[str, float] = {}
+        mtimes = {}  # type:  Dict[str, float]
         while 1:
             for filename in chain(_iter_module_files(), self.extra_files):
                 try:
@@ -249,7 +249,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
         from watchdog.observers import Observer  # type: ignore
         from watchdog.events import FileSystemEventHandler  # type: ignore
 
-        self.observable_paths: Set[str] = set()
+        self.observable_paths = set()  # type: Set[str]
 
         def _check_modification(filename: str) -> None:
             if filename in self.extra_files:
@@ -294,7 +294,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
 
     def run(self) -> None:  # pragma: no cover
         """Run."""
-        watches: Dict[str, Any] = {}
+        watches = {}  # type: Dict[str, Any]
         observer = self.observer_class()
         observer.start()
 
