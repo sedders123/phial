@@ -62,23 +62,23 @@ def _iter_module_files() -> Generator[str, None, None]:
     already loaded modules as well as all files reachable through a package.
     """
     for module in list(sys.modules.values()):
-        if module is None:
+        if module is None:  # pragma: no cover
             continue
         filename = getattr(module, "__file__", None)
         if filename:
             if os.path.isdir(filename) and os.path.exists(
                 os.path.join(filename, "__init__.py"),
-            ):
+            ):  # pragma: no cover
                 filename = os.path.join(filename, "__init__.py")
 
             old = None
             while not os.path.isfile(filename):
                 old = filename
                 filename = os.path.dirname(filename)
-                if filename == old:
+                if filename == old:  # pragma: no cover
                     break
             else:
-                if filename[-4:] in (".pyc", ".pyo"):
+                if filename[-4:] in (".pyc", ".pyo"):  # pragma: no cover
                     filename = filename[:-1]
                 yield filename
 
@@ -251,7 +251,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
 
         self.observable_paths = set()  # type: Set[str]
 
-        def _check_modification(filename: str) -> None:
+        def _check_modification(filename: str) -> None:  # pragma: no cover
             if filename in self.extra_files:
                 self.trigger_reload(filename)
             dirname = os.path.dirname(filename)
@@ -260,17 +260,17 @@ class WatchdogReloaderLoop(ReloaderLoop):
                     self.trigger_reload(filename)
 
         class _CustomHandler(FileSystemEventHandler):  # type: ignore
-            def on_created(self, event):  # type: ignore
+            def on_created(self, event):  # type: ignore # pragma: no cover
                 _check_modification(event.src_path)
 
-            def on_modified(self, event):  # type: ignore
+            def on_modified(self, event):  # type: ignore # pragma: no cover
                 _check_modification(event.src_path)
 
-            def on_moved(self, event):  # type: ignore
+            def on_moved(self, event):  # type: ignore # pragma: no cover
                 _check_modification(event.src_path)
                 _check_modification(event.dest_path)
 
-            def on_deleted(self, event):  # type: ignore
+            def on_deleted(self, event):  # type: ignore # pragma: no cover
                 _check_modification(event.src_path)
 
         reloader_name = Observer.__name__.lower()
@@ -331,7 +331,7 @@ reloader_loops = {"stat": StatReloaderLoop, "watchdog": WatchdogReloaderLoop}
 
 try:
     __import__("watchdog.observers")
-except ImportError:
+except ImportError:  # pragma: no cover
     reloader_loops["auto"] = reloader_loops["stat"]
 else:
     reloader_loops["auto"] = reloader_loops["watchdog"]
