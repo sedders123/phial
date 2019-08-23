@@ -156,7 +156,7 @@ def _get_args_for_reloading() -> List[str]:  # pragma: no cover
 def _find_common_roots(paths: Any) -> Set[str]:
     """Out of some paths it finds the common roots that need monitoring."""
     paths = [x.split(os.path.sep) for x in paths]
-    root: Dict[str, Dict] = {}
+    root = {}  # type: Dict[str, Dict]
     for chunks in sorted(paths, key=len, reverse=True):
         node = root
         for chunk in chunks:
