@@ -2,7 +2,7 @@
 import json
 import logging
 from time import sleep
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, Optional
 
 from slackclient import SlackClient  # type: ignore
 
