@@ -506,6 +506,11 @@ class Phial:
                 _command_ctx_stack.pop()
 
     def _start(self) -> None:  # pragma: no cover
+        """
+        Starts the bot.
+
+        When called will start the bot listening to messages from Slack
+        """
         auto_reconnect = self.config['autoReconnect']
         if not self.slack_client.rtm_connect(auto_reconnect=auto_reconnect,
                                              with_team_state=False):
@@ -522,11 +527,7 @@ class Phial:
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
 
     def run(self) -> None:  # pragma: no cover
-        """
-        Starts the bot.
-
-        When called will start the bot listening to messages from Slack
-        """
+        """Run the bot."""
         if self.config['hotReload']:
             run_with_reloader(self._start)
         else:

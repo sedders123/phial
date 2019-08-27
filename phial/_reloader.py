@@ -31,6 +31,7 @@
 # CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 # THE POSSIBILITY OF SUCH DAMAGE.
+import logging
 import os
 import subprocess
 import sys
@@ -47,6 +48,8 @@ from typing import (
     Set,
     Tuple,
 )
+
+LOGGER = logging.getLogger("phial.bot")
 
 
 def iteritems(d: Any, *args: Any, **kwargs: Any) -> Any:
@@ -197,7 +200,6 @@ class ReloaderLoop(object):
         but running the reloader thread.
         """
         while 1:
-            # _log("info", " * Restarting with %s" % self.name)
             args = _get_args_for_reloading()
             new_environ = os.environ.copy()
 
@@ -214,7 +216,7 @@ class ReloaderLoop(object):
     def log_reload(self, filename: str) -> None:
         """Log a reload has occured."""
         filename = os.path.abspath(filename)
-        # _log("info", " * Detected change in %r, reloading" % filename)
+        LOGGER.info("* Detected change in {0}, reloading".format(filename))
 
 
 class StatReloaderLoop(ReloaderLoop):
