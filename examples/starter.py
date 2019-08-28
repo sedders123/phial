@@ -1,7 +1,7 @@
 from phial import Phial, command, Response, Attachment
 import os
 
-slackbot = Phial(os.getenv("SLACK_TOKEN"))
+slackbot = Phial(os.getenv("SLACK_TOKEN"), {'hotReload': True})
 
 
 @slackbot.command('ping')

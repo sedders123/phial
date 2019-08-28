@@ -5,10 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## Unreleased - TBC
+
+### Added
+ - Hot reload functionality. If phial detects a file has changed it will reload the file and restart the bot. Enable this using the `hotReload` key in the phial config (Valid values `True` and `False`. Defaults to `False`)
+
 ## [0.9.1](https://github.com/sedders123/phial/releases/tag/0.9.1) - 2019-06-19
 
 ### Fixed
- - Error when phial logged an error 
+ - Error when phial logged an error
 
 
 ## [0.9.0](https://github.com/sedders123/phial/releases/tag/0.9.0) - 2019-05-31

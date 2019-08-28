@@ -3,13 +3,13 @@ from typing import TYPE_CHECKING, cast
 
 from phial.utils import parse_help_text
 
-if TYPE_CHECKING:
-    from phial import Phial  # noqa
+if TYPE_CHECKING:  # pragma: no cover
+    from phial import Phial
 
 
-def help_command(bot: 'Phial') -> str:
+def help_command(bot: "Phial") -> str:
     """List all available commands."""
-    help_text = cast(str, bot.config.get('baseHelpText', ""))
+    help_text = cast(str, bot.config.get("baseHelpText", ""))
     if help_text:
         help_text += "\n"
     for command in bot.commands:

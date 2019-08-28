@@ -2,7 +2,7 @@
 import json
 import logging
 from time import sleep
-from typing import Callable, Dict, List, NoReturn, Optional
+from typing import Callable, Dict, List, Optional
 
 from slackclient import SlackClient  # type: ignore
 
@@ -12,6 +12,8 @@ from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.types import PhialResponse
 from phial.utils import parse_slack_output
 from phial.wrappers import Attachment, Command, Message, Response
+
+from ._reloader import run_with_reloader
 
 
 class Phial:
@@ -30,6 +32,7 @@ class Phial:
         'baseHelpText': "All available commands:",
         'autoReconnect': True,
         'loopDelay': 0.001,
+        'hotReload': False,
     }
 
     def __init__(self,
@@ -502,7 +505,7 @@ class Phial:
             finally:
                 _command_ctx_stack.pop()
 
-    def run(self) -> NoReturn:
+    def _start(self) -> None:  # pragma: no cover
         """
         Starts the bot.
 
@@ -522,3 +525,10 @@ class Phial:
             except Exception as e:
                 self.logger.error(e)
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
+
+    def run(self) -> None:  # pragma: no cover
+        """Run the bot."""
+        if self.config['hotReload']:
+            run_with_reloader(self._start)
+        else:
+            self._start()
