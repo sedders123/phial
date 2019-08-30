@@ -1,7 +1,7 @@
 phial
 =====
 
-|Documentation Status| |CircleCI| |Coverage Status| |PyPi|
+|Documentation Status| |Github Actions| |Coverage Status| |PyPi|
 
     A simple framework for building slack bots
 
@@ -84,9 +84,9 @@ Erlenmeyer Flask by Iconic from the Noun Project - `CC BY
 
 .. |Documentation Status| image:: https://readthedocs.org/projects/phial/badge/?version=develop
    :target: http://phial.readthedocs.io/en/develop/
-.. |CircleCI| image:: https://circleci.com/gh/sedders123/phial.svg?style=svg
-   :target: https://circleci.com/gh/sedders123/phial
-.. |Coverage Status| image:: https://coveralls.io/repos/github/sedders123/phial/badge.svg?branch=develop
-   :target: https://coveralls.io/github/sedders123/phial?branch=develop
+.. |Github Actions| image:: https://github.com/sedders123/phial/workflows/CI/badge.svg
+   :target: https://github.com/sedders123/phial/actions
+.. |Coverage Status| image:: https://codecov.io/gh/sedders123/phial/branch/develop/graph/badge.svg
+   :target: https://codecov.io/gh/sedders123/phial/
 .. |PyPi| image:: https://badge.fury.io/py/phial-slack.svg
     :target: https://badge.fury.io/py/phial-slack
