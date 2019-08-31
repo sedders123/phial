@@ -1,8 +1,26 @@
 """Helper utilities for phial."""
 import re
-from typing import Dict, List, Optional
+from inspect import Signature, signature
+from typing import Any, Callable, Dict, List, Optional
 
 from phial.wrappers import Message
+
+
+def validate_kwargs(func: Callable, kwargs: Dict[str, str]) -> Dict[str, Any]:
+    """Validate kwargs match a functions signature."""
+    func_params = signature(func).parameters
+    validated_kwargs = {}  # type: Dict[str, Any]
+    for key in func_params.values():
+        value = kwargs[key.name]
+        if key.name not in kwargs:
+            raise Exception("Mismatch of params")  # TODO: Better message
+        if key.annotation is not Signature.empty:
+            try:
+                value = key.annotation(value)
+            except ValueError:
+                raise Exception("Invalid type")  # TODO: Better message
+        validated_kwargs[key.name] = value
+    return validated_kwargs
 
 
 def parse_help_text(help_text: str) -> str:

@@ -10,7 +10,7 @@ from phial.commands import help_command
 from phial.globals import _command_ctx_stack
 from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.types import PhialResponse
-from phial.utils import parse_slack_output
+from phial.utils import parse_slack_output, validate_kwargs
 from phial.wrappers import Attachment, Command, Message, Response
 
 from ._reloader import run_with_reloader
@@ -485,6 +485,8 @@ class Phial:
             command_name = command.func.__name__
             kwargs = command.pattern_matches(message)
             if kwargs is not None:
+                # TODO: Catch validate errors + return to slack if appropriate
+                validate_kwargs(command.func, kwargs)
                 try:
                     _command_ctx_stack.push(message)
                     response = command.func(**kwargs)
