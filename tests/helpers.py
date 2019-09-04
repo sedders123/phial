@@ -1,6 +1,6 @@
 """Helpers for unit tests."""
 from typing import Any
-import pytest # type: ignore # noqa
+import pytest  # noqa
 
 
 def wildpatch(target: Any,

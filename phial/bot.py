@@ -7,6 +7,7 @@ from typing import Callable, Dict, List, Optional
 from slackclient import SlackClient  # type: ignore
 
 from phial.commands import help_command
+from phial.errors import ArgumentTypeValidationError
 from phial.globals import _command_ctx_stack
 from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.types import PhialResponse
@@ -485,12 +486,14 @@ class Phial:
             command_name = command.func.__name__
             kwargs = command.pattern_matches(message)
             if kwargs is not None:
-                # TODO: Catch validate errors + return to slack if appropriate
-                validate_kwargs(command.func, kwargs)
                 try:
+                    kwargs = validate_kwargs(command.func, kwargs)
                     _command_ctx_stack.push(message)
                     response = command.func(**kwargs)
                     self._send_response(response, message.channel)
+                    return
+                except ArgumentTypeValidationError as e:
+                    self._send_response(str(e), message.channel)
                     return
                 finally:
                     self.logger.debug("Ran command: {0} on"
