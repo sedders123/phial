@@ -7,7 +7,7 @@ class ArgumentValidationError(Exception):
     pass
 
 
-class ArgumentTypeValidationError(Exception):
+class ArgumentTypeValidationError(ArgumentValidationError):
     """Exception indicating argument type validation has failed."""
 
     pass

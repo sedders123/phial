@@ -1,5 +1,8 @@
 """Test handle_message."""
+import pytest
+
 from phial import Message, Phial
+from phial.errors import ArgumentValidationError
 
 
 def test_handle_message_handles_none_correctly() -> None:
@@ -122,3 +125,18 @@ def test_message_falls_back_correctly() -> None:
     assert middleware_calls[0] == 1
     assert command_calls[0] == 0
     assert fallback_calls[0] == 1
+
+
+def test_type_validation_works_correctly() -> None:
+    """Test type validation works correctly."""
+    command_calls = [0]
+
+    def command(name: str) -> None:
+        command_calls[0] += 1
+
+    bot = Phial('token')
+    bot.add_command("test", command)
+    message = Message('!test', 'channel', 'user', 'timestamp', 'team')
+    with pytest.raises(ArgumentValidationError):
+        bot._handle_message(message)
+    assert command_calls[0] == 0

@@ -1,6 +1,7 @@
 """Test validate_kwargs."""
 import pytest
 
+from phial.errors import ArgumentValidationError
 from phial.utils import validate_kwargs
 
 
@@ -35,6 +36,13 @@ def test_args_type_validation_errors_correctly() -> None:
     """Test args type validation errors correctly."""
     def test(age: int) -> None:
         pass
-    with pytest.raises(Exception) as e:
+    with pytest.raises(ArgumentValidationError) as e:
         validate_kwargs(test, {"age": "string"})
     assert e is not None
+
+
+def test_validation_ignores_defaulted_kwargs_correctly() -> None:
+    """Test validation ignores defaulted kwargs correctly."""
+    def test(name: str, age: int = 5) -> None:
+        pass
+    validate_kwargs(test, {"name": "string"})
