@@ -1,7 +1,7 @@
 from phial import Phial, command, Response, Attachment
 import os
 
-slackbot = Phial(os.getenv("SLACK_TOKEN"), {'hotReload': True})
+slackbot = Phial(os.getenv("SLACK_API_TOKEN"), {'hotReload': True})
 
 
 @slackbot.command('ping')
@@ -20,9 +20,15 @@ def pong():
 
 
 @slackbot.command('hi <name>')
-def hi(name):
+def hi(name: str):
     '''Simple command with argument which replies to a message'''
     return Response(text="Hello {0}".format(name), channel=command.channel)
+
+@slackbot.command('add <x> <y>')
+@slackbot.alias('add <x>')
+def add(x: int, y: int = 5):
+    '''Add two numbers.'''
+    return str(x + y)
 
 
 @slackbot.command('hello <name> <from_>')

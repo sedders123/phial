@@ -27,7 +27,7 @@ jobs:
         flake8 phial/ tests/
     - name: Lint with mypy
       run: |
-        mypy phial --strict-optional --disallow-untyped-defs --disallow-incomplete-defs --disallow-untyped-decorators --no-implicit-optional --disallow-subclassing-any
+        mypy phial tests --strict-optional --disallow-untyped-defs --disallow-incomplete-defs --disallow-untyped-decorators --no-implicit-optional --disallow-subclassing-any
     - name: Test with pytest
       run: |
         pytest tests -v

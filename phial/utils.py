@@ -1,8 +1,33 @@
 """Helper utilities for phial."""
 import re
-from typing import Dict, List, Optional
+from inspect import Parameter, Signature, signature
+from typing import Any, Callable, Dict, List, Optional
 
+from phial.errors import ArgumentTypeValidationError, ArgumentValidationError
 from phial.wrappers import Message
+
+
+def validate_kwargs(func: Callable, kwargs: Dict[str, str]) -> Dict[str, Any]:
+    """Validate kwargs match a functions signature."""
+    func_params = signature(func).parameters
+    validated_kwargs = {}  # type: Dict[str, Any]
+    for key in func_params.values():
+        if key.default is not Parameter.empty:
+            validated_kwargs[key.name] = key.default
+            continue
+        if key.name not in kwargs:
+            raise ArgumentValidationError("Parameter {0} not provided to {1}"
+                                          .format(key.name, func.__name__))
+        value = kwargs[key.name]
+        if key.annotation is not Signature.empty:
+            try:
+                value = key.annotation(value)
+            except ValueError:
+                raise ArgumentTypeValidationError("{0} could not be converted to {1}"
+                                                  .format(value,
+                                                          key.annotation.__name__))
+        validated_kwargs[key.name] = value
+    return validated_kwargs
 
 
 def parse_help_text(help_text: str) -> str:
