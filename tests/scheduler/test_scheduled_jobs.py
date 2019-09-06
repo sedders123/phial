@@ -31,3 +31,15 @@ def test_job_run_correctly() -> None:
 
     job.run()
     test_func.assert_called_once_with()  # TODO: Remove 'with' once Python 3.5 support is removed. # noqa: E501
+
+
+def test_job_reschedules_after_failure() -> None:
+    """Tests ScheduledJobs reschedule after failure."""
+    def test() -> None:
+        raise Exception
+
+    schedule = Schedule().every().day().at(12, 00)
+    job = ScheduledJob(schedule, test)
+
+    job.run()
+    assert job.next_run is not None
