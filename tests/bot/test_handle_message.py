@@ -127,8 +127,8 @@ def test_message_falls_back_correctly() -> None:
     assert fallback_calls[0] == 1
 
 
-def test_type_validation_works_correctly() -> None:
-    """Test type validation works correctly."""
+def test_argument_validation_works_correctly() -> None:
+    """Test argument validation works correctly."""
     command_calls = [0]
 
     def command(name: str) -> None:
@@ -139,4 +139,18 @@ def test_type_validation_works_correctly() -> None:
     message = Message('!test', 'channel', 'user', 'timestamp', 'team')
     with pytest.raises(ArgumentValidationError):
         bot._handle_message(message)
+    assert command_calls[0] == 0
+
+
+def test_type_validation_works_correctly() -> None:
+    """Test type validation works correctly."""
+    command_calls = [0]
+
+    def command(age: int) -> None:
+        command_calls[0] += 1
+
+    bot = Phial('token')
+    bot.add_command("test <age>", command)
+    message = Message('!test string', 'channel', 'user', 'timestamp', 'team')
+    bot._handle_message(message)
     assert command_calls[0] == 0
