@@ -49,7 +49,7 @@ from typing import (
     Tuple,
 )
 
-LOGGER = logging.getLogger("phial.bot")
+LOGGER = logging.getLogger("phial.bot.reloader")
 
 
 def iteritems(d: Any, *args: Any, **kwargs: Any) -> Any:
