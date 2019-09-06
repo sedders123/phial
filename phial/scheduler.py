@@ -1,7 +1,10 @@
 """The classes related to scheduling of regular jobs in phial."""
+import logging
 from collections import namedtuple
 from datetime import datetime, timedelta
 from typing import Callable, List, Optional
+
+LOGGER = logging.getLogger("phial.bot.scheduler")
 
 
 class _Time(namedtuple("Time", ['hour', 'minute', 'second'])):
@@ -224,7 +227,10 @@ class ScheduledJob:
 
     def run(self) -> None:
         """Runs the function and calculates + stores the next run time."""
-        self.func()
+        try:
+            self.func()
+        except Exception as e:
+            LOGGER.error(e)
         self.next_run = self.schedule.get_next_run_time(datetime.now())
 
 

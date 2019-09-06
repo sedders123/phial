@@ -2,8 +2,9 @@ from phial import Phial, command, Response, Schedule
 from multiprocessing import Process
 from time import sleep
 import logging
+import os
 
-slackbot = Phial(os.getenv("SLACK_TOKEN"))
+slackbot = Phial(os.getenv("SLACK_API_TOKEN"))
 SCHEDULED_CHANNEL = "channel-id"
 
 

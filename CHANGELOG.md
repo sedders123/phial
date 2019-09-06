@@ -11,6 +11,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
  - Hot reload functionality. If phial detects a file has changed it will reload the file and restart the bot. Enable this using the `hotReload` key in the phial config (Valid values `True` and `False`. Defaults to `False`)
  - Type hint validation. If you use inline type hints to specify the type of a command's parameter phial will now validate the users input and convert it to the specified type. for use in your command function.
 
+### Changed
+ - Scheduled jobs now will reschedule if the job's function errors.
+
 ## [0.9.1](https://github.com/sedders123/phial/releases/tag/0.9.1) - 2019-06-19
 
 ### Fixed
