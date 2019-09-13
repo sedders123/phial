@@ -533,7 +533,7 @@ class Phial:
             try:
                 message = parse_slack_output(self.slack_client.rtm_read())
                 thread_pool.submit(self._handle_message, message)
-                if not run_pending_tasks or run_pending_tasks.done():
+                if run_pending_tasks is None or run_pending_tasks.done():
                     run_pending_tasks = thread_pool.submit(self.scheduler.run_pending)
             except Exception as e:
                 self.logger.error(e)
