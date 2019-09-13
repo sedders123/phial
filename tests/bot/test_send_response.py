@@ -1,7 +1,7 @@
 """Test send_response."""
 import io
 
-import pytest  # type: ignore
+import pytest
 
 from phial import Attachment, Phial, Response
 from tests.helpers import wildpatch

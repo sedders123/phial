@@ -2,12 +2,12 @@
 from datetime import datetime, timedelta
 from unittest.mock import MagicMock
 
-from freezegun import freeze_time  # type: ignore
+from freezegun import freeze_time
 
 from phial.scheduler import Schedule, ScheduledJob
 
 
-@freeze_time('2018-01-01 13:00:00')  # type: ignore
+@freeze_time('2018-01-01 13:00:00')
 def test_job_create_correctly() -> None:
     """Test ScheduledJob creates correctly."""
     def job_func() -> None:
@@ -30,7 +30,7 @@ def test_job_run_correctly() -> None:
     job = ScheduledJob(schedule, test_func)
 
     job.run()
-    test_func.assert_called_once_with()  # TODO: Remove 'with' once Python 3.5 support is removed. # noqa: E501
+    test_func.assert_called_once()
 
 
 def test_job_reschedules_after_failure() -> None:

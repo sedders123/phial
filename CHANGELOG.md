@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Changed
  - Scheduled jobs now will reschedule if the job's function errors.
 
+### Removed
+ - Python 3.5 support
+
 ## [0.9.1](https://github.com/sedders123/phial/releases/tag/0.9.1) - 2019-06-19
 
 ### Fixed

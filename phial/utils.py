@@ -10,7 +10,7 @@ from phial.wrappers import Message
 def validate_kwargs(func: Callable, kwargs: Dict[str, str]) -> Dict[str, Any]:
     """Validate kwargs match a functions signature."""
     func_params = signature(func).parameters
-    validated_kwargs = {}  # type: Dict[str, Any]
+    validated_kwargs: Dict[str, Any] = {}
     for key in func_params.values():
         if key.default is not Parameter.empty:
             validated_kwargs[key.name] = key.default
