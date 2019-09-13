@@ -1,9 +1,8 @@
 name: Upload PyPI Package
 
 on:
-  push:
-    branches:
-      - refs/tags/*
+  release:
+    types: [published]
 
 jobs:
   deploy:
