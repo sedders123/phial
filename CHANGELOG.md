@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## Unreleased
+## [0.10.0](https://github.com/sedders123/phial/releases/tag/0.10.0) - 2019-09-13
 
 ### Added
  - Concurrent commands and jobs. Command and jobs now run concurrently by default. You can modify the maximum number of concurrent events using the `maxThreads` property on the config object, by default its value is 4. To opt out of this feature you can set the value of the config key to `1` and the old syncrhonous behaviour will remain.
