@@ -42,12 +42,12 @@ class Phial:
                  token: str,
                  config: Dict = default_config) -> None:
         self.slack_client = SlackClient(token)
-        self.commands = []  # type: List[Command]
-        self.config = dict(self.default_config)  # type: Dict
+        self.commands: List[Command] = []
+        self.config: Dict = dict(self.default_config)
         self.config.update(config)
-        self.middleware_functions = []  # type: List[Callable[[Message], Optional[Message]]] # noqa: E501
+        self.middleware_functions: List[Callable[[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
-        self.fallback_func = None  # type: Optional[Callable[[Message], PhialResponse]] # noqa: E501
+        self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
         self.logger = logging.getLogger(__name__)
         if not self.logger.hasHandlers():  # pragma: nocover
             handler = logging.StreamHandler()
@@ -527,7 +527,7 @@ class Phial:
 
         thread_pool_size = self.config['maxThreads']
         thread_pool = ThreadPoolExecutor(thread_pool_size)
-        run_pending_tasks = None  # type: Optional[Future]
+        run_pending_tasks: Optional[Future] = None
 
         while True:
             try:

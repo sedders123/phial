@@ -69,7 +69,6 @@ setup(
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Programming Language :: Python :: 3 :: Only',
-        'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
@@ -81,6 +80,6 @@ setup(
     project_urls={
         'CI: Circle': 'https://circleci.com/gh/sedders123/phial',
         'GitHub: Issues': 'https://github.com/sedders123/phial/issues',
-        'Documentation': 'https://phial.readthedocs.io/en/develop/'
+        'Documentation': 'https://phial.dev',
     },
 )

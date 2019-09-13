@@ -1,7 +1,7 @@
 """Test Schedule class."""
 from datetime import datetime, timedelta
 
-import pytest  # type: ignore
+import pytest
 from freezegun import freeze_time  # type: ignore
 
 from phial.scheduler import Schedule

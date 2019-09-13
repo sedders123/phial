@@ -1,5 +1,5 @@
 """Test ad_command."""
-import pytest  # type: ignore
+import pytest
 
 from phial import Phial
 

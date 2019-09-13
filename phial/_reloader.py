@@ -159,7 +159,7 @@ def _get_args_for_reloading() -> List[str]:  # pragma: no cover
 def _find_common_roots(paths: Any) -> Set[str]:
     """Out of some paths it finds the common roots that need monitoring."""
     paths = [x.split(os.path.sep) for x in paths]
-    root = {}  # type: Dict[str, Dict]
+    root: Dict[str, Dict] = {}
     for chunks in sorted(paths, key=len, reverse=True):
         node = root
         for chunk in chunks:
@@ -181,7 +181,7 @@ def _find_common_roots(paths: Any) -> Set[str]:
 class ReloaderLoop(object):
     """Reloader loop."""
 
-    name = None  # type: Optional[str]
+    name: Optional[str] = None
 
     def __init__(self, extra_files: Optional[List[str]] = None,
                  interval: int = 1):
@@ -226,7 +226,7 @@ class StatReloaderLoop(ReloaderLoop):
 
     def run(self) -> None:  # pragma: no cover
         """Run."""
-        mtimes = {}  # type:  Dict[str, float]
+        mtimes: Dict[str, float] = {}
         while 1:
             for filename in chain(_iter_module_files(), self.extra_files):
                 try:
@@ -251,7 +251,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
         from watchdog.observers import Observer  # type: ignore
         from watchdog.events import FileSystemEventHandler  # type: ignore
 
-        self.observable_paths = set()  # type: Set[str]
+        self.observable_paths: Set[str] = set()
 
         def _check_modification(filename: str) -> None:  # pragma: no cover
             if filename in self.extra_files:
@@ -296,7 +296,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
 
     def run(self) -> None:  # pragma: no cover
         """Run."""
-        watches = {}  # type: Dict[str, Any]
+        watches: Dict[str, Any] = {}
         observer = self.observer_class()
         observer.start()
 
