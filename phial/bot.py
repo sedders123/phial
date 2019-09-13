@@ -1,6 +1,7 @@
 """The core of phial."""
 import json
 import logging
+from concurrent.futures import Future, ThreadPoolExecutor
 from time import sleep
 from typing import Callable, Dict, List, Optional
 
@@ -34,6 +35,7 @@ class Phial:
         'autoReconnect': True,
         'loopDelay': 0.001,
         'hotReload': False,
+        'maxThreads': 4,
     }
 
     def __init__(self,
@@ -522,11 +524,17 @@ class Phial:
             raise ValueError("Connection failed. Invalid Token or bot ID")
 
         self.logger.info("Phial connected and running!")
+
+        thread_pool_size = self.config['maxThreads']
+        thread_pool = ThreadPoolExecutor(thread_pool_size)
+        run_pending_tasks = None  # type: Optional[Future]
+
         while True:
             try:
                 message = parse_slack_output(self.slack_client.rtm_read())
-                self._handle_message(message)
-                self.scheduler.run_pending()
+                thread_pool.submit(self._handle_message, message)
+                if not run_pending_tasks or run_pending_tasks.done():
+                    run_pending_tasks = thread_pool.submit(self.scheduler.run_pending)
             except Exception as e:
                 self.logger.error(e)
             sleep(self.config['loopDelay'])  # Help prevent high CPU usage.

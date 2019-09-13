@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ## Unreleased
 
 ### Added
+ - Concurrent commands and jobs. Command and jobs now run concurrently by default. You can modify the maximum number of concurrent events using the `maxThreads` property on the config object, by default its value is 4. To opt out of this feature you can set the value of the config key to `1` and the old syncrhonous behaviour will remain.
  - Hot reload functionality. If phial detects a file has changed it will reload the file and restart the bot. Enable this using the `hotReload` key in the phial config (Valid values `True` and `False`. Defaults to `False`)
  - Type hint validation. If you use inline type hints to specify the type of a command's parameter phial will now validate the users input and convert it to the specified type. for use in your command function.
 

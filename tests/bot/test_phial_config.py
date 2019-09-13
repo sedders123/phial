@@ -17,6 +17,7 @@ def test_config_override() -> None:
         'autoReconnect': False,
         'loopDelay': 0.5,
         'hotReload': True,
+        'maxThreads': 1,
     })
 
     assert bot.config == {
@@ -26,6 +27,7 @@ def test_config_override() -> None:
         'autoReconnect': False,
         'loopDelay': 0.5,
         'hotReload': True,
+        'maxThreads': 1,
     }
 
 

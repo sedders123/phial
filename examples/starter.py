@@ -1,5 +1,6 @@
 from phial import Phial, command, Response, Attachment
 import os
+from time import sleep
 
 slackbot = Phial(os.getenv("SLACK_API_TOKEN"), {'hotReload': True})
 
@@ -82,6 +83,11 @@ def get_message_with_attachment():
         "footer": "Teeny tiny footer text"
     }]
     return Response(channel=command.channel, attachments=attachments)
+
+@slackbot.command("long")
+def long():
+    sleep(5)
+    return "Well that took a while"
 
 
 @slackbot.command('hidden', hide_from_help_command=True)
