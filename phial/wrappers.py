@@ -3,7 +3,8 @@
 import re
 from typing import IO, Callable, Dict, List, Optional, Pattern, Union
 
-from phial.types import PhialResponse
+#: A union of all response types phial can use
+PhialResponse = Union[None, str, 'Response', 'Attachment']
 
 
 class Response():
