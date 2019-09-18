@@ -5,9 +5,11 @@ from phial.utils import parse_help_text
 
 if TYPE_CHECKING:  # pragma: no cover
     from phial import Phial
+else:
+    Phial = None
 
 
-def help_command(bot: "Phial") -> str:
+def help_command(bot: Phial) -> str:
     """List all available commands."""
     help_text = cast(str, bot.config.get("baseHelpText", ""))
     if help_text:
