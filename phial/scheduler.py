@@ -7,7 +7,7 @@ from typing import Callable, List, Optional
 LOGGER = logging.getLogger("phial.bot.scheduler")
 
 
-class _Time(namedtuple("Time", ['hour', 'minute', 'second'])):
+class _Time(namedtuple("Time", ["hour", "minute", "second"])):
     """Represents a time of day.
 
     .. py:attribute:: hour
@@ -40,7 +40,7 @@ class Schedule:
         self._minutes = 0
         self._seconds = 0
 
-    def every(self) -> 'Schedule':
+    def every(self) -> "Schedule":
         """
         Syntantic sugar to make schedule declaration more readable.
 
@@ -53,7 +53,7 @@ class Schedule:
         """
         return self
 
-    def day(self) -> 'Schedule':
+    def day(self) -> "Schedule":
         """
         Adds a day to the relative time till the next event.
 
@@ -63,7 +63,7 @@ class Schedule:
         """
         return self.days(1)
 
-    def days(self, value: int) -> 'Schedule':
+    def days(self, value: int) -> "Schedule":
         """
         Set the days till the next instance of the event.
 
@@ -78,7 +78,7 @@ class Schedule:
         self._days = value
         return self
 
-    def at(self, hour: int, minute: int, second: int = 0) -> 'Schedule':
+    def at(self, hour: int, minute: int, second: int = 0) -> "Schedule":
         """
         Specifies the time of day the next occurnce will happen.
 
@@ -105,7 +105,7 @@ class Schedule:
         self._at = _Time(hour, minute, second)
         return self
 
-    def hour(self) -> 'Schedule':
+    def hour(self) -> "Schedule":
         """
         Adds an hour to the relative time till the next event.
 
@@ -115,7 +115,7 @@ class Schedule:
         """
         return self.hours(1)
 
-    def hours(self, value: int) -> 'Schedule':
+    def hours(self, value: int) -> "Schedule":
         """
         Sets the hours till the next instance of the event.
 
@@ -131,7 +131,7 @@ class Schedule:
         self._hours = value
         return self
 
-    def minute(self) -> 'Schedule':
+    def minute(self) -> "Schedule":
         """
         Adds a minute to the relative time till the next event.
 
@@ -141,7 +141,7 @@ class Schedule:
         """
         return self.minutes(1)
 
-    def minutes(self, value: int) -> 'Schedule':
+    def minutes(self, value: int) -> "Schedule":
         """
         Sets the minutes till the next instance of the event.
 
@@ -157,7 +157,7 @@ class Schedule:
         self._minutes = value
         return self
 
-    def second(self) -> 'Schedule':
+    def second(self) -> "Schedule":
         """
         Adds a second to the relative time till the next event.
 
@@ -167,7 +167,7 @@ class Schedule:
         """
         return self.seconds(1)
 
-    def seconds(self, value: int) -> 'Schedule':
+    def seconds(self, value: int) -> "Schedule":
         """
         Sets the seconds till the next instance of the event.
 
@@ -194,18 +194,22 @@ class Schedule:
         :returns: A :obj:`datetime` of when the event should next happen
         """
         if self._at:
-            next_run = last_run.replace(hour=self._at.hour,
-                                        minute=self._at.minute,
-                                        second=self._at.second,
-                                        microsecond=0)
+            next_run = last_run.replace(
+                hour=self._at.hour,
+                minute=self._at.minute,
+                second=self._at.second,
+                microsecond=0,
+            )
             if next_run <= datetime.now():
                 next_run += timedelta(days=self._days)
             return next_run
 
-        return last_run + timedelta(days=self._days,
-                                    hours=self._hours,
-                                    minutes=self._minutes,
-                                    seconds=self._seconds)
+        return last_run + timedelta(
+            days=self._days,
+            hours=self._hours,
+            minutes=self._minutes,
+            seconds=self._seconds,
+        )
 
 
 class ScheduledJob:
@@ -255,7 +259,6 @@ class Scheduler:
         Runs any ScheduledJobs in the store, where :code:`job.should_run()`
         returns true
         """
-        jobs_to_run: List[ScheduledJob] = [job for job in self.jobs
-                                           if job.should_run()]
+        jobs_to_run: List[ScheduledJob] = [job for job in self.jobs if job.should_run()]
         for job in jobs_to_run:
             job.run()

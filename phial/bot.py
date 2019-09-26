@@ -12,7 +12,7 @@ from phial.errors import ArgumentTypeValidationError
 from phial.globals import _command_ctx_stack
 from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.utils import parse_slack_output, validate_kwargs
-from phial.wrappers import (
+from phial.wrappers import (  # fmt: off
     Attachment,
     Command,
     Message,
@@ -34,18 +34,16 @@ class Phial:
 
     #: Default configuration
     default_config = {
-        'prefix': "!",
-        'registerHelpCommand': True,
-        'baseHelpText': "All available commands:",
-        'autoReconnect': True,
-        'loopDelay': 0.001,
-        'hotReload': False,
-        'maxThreads': 4,
+        "prefix": "!",
+        "registerHelpCommand": True,
+        "baseHelpText": "All available commands:",
+        "autoReconnect": True,
+        "loopDelay": 0.001,
+        "hotReload": False,
+        "maxThreads": 4,
     }
 
-    def __init__(self,
-                 token: str,
-                 config: Dict = default_config) -> None:
+    def __init__(self, token: str, config: Dict = default_config) -> None:
         self.slack_client = SlackClient(token)
         self.commands: List[Command] = []
         self.config: Dict = dict(self.default_config)
@@ -56,20 +54,21 @@ class Phial:
         self.logger = logging.getLogger(__name__)
         if not self.logger.hasHandlers():  # pragma: nocover
             handler = logging.StreamHandler()
-            formatter = logging.Formatter(
-                fmt="%(asctime)s [%(name)s] - %(message)s")
+            formatter = logging.Formatter(fmt="%(asctime)s [%(name)s] - %(message)s")
             handler.setFormatter(formatter)
             self.logger.addHandler(handler)
             self.logger.propagate = False
             self.logger.setLevel(logging.INFO)
         self._register_standard_commands()
 
-    def add_command(self,
-                    pattern: str,
-                    func: Callable[..., PhialResponse],
-                    case_sensitive: bool = False,
-                    help_text_override: Optional[str] = None,
-                    hide_from_help_command: Optional[bool] = False) -> None:
+    def add_command(
+        self,
+        pattern: str,
+        func: Callable[..., PhialResponse],
+        case_sensitive: bool = False,
+        help_text_override: Optional[str] = None,
+        hide_from_help_command: Optional[bool] = False,
+    ) -> None:
         """
         Registers a command with the bot.
 
@@ -119,29 +118,34 @@ class Phial:
                 return "world"
 
         """
-        pattern = "{0}{1}".format(self.config["prefix"] if "prefix"
-                                  in self.config else "", pattern)
+        pattern = "{0}{1}".format(
+            self.config["prefix"] if "prefix" in self.config else "", pattern
+        )
         # Validate command does not already exist
         for existing_command in self.commands:
             if pattern == existing_command.pattern_string:
-                raise ValueError('Command {0} already exists'
-                                 .format(pattern.split("<")[0]))
+                raise ValueError(
+                    "Command {0} already exists".format(pattern.split("<")[0])
+                )
 
         # Create and add command
-        command = Command(pattern,
-                          func,
-                          case_sensitive,
-                          help_text_override=help_text_override,
-                          hide_from_help_command=hide_from_help_command)
+        command = Command(
+            pattern,
+            func,
+            case_sensitive,
+            help_text_override=help_text_override,
+            hide_from_help_command=hide_from_help_command,
+        )
         self.commands.append(command)
-        self.logger.debug("Command {0} added"
-                          .format(pattern))
+        self.logger.debug("Command {0} added".format(pattern))
 
-    def command(self,
-                pattern: str,
-                case_sensitive: bool = False,
-                help_text_override: Optional[str] = None,
-                hide_from_help_command: Optional[bool] = False) -> Callable:
+    def command(
+        self,
+        pattern: str,
+        case_sensitive: bool = False,
+        help_text_override: Optional[str] = None,
+        hide_from_help_command: Optional[bool] = False,
+    ) -> Callable:
         """
         Registers a command with the bot.
 
@@ -182,12 +186,17 @@ class Phial:
                     return "You typed caseSensitive"
 
         """
+
         def decorator(f: Callable) -> Callable:
-            self.add_command(pattern, f,
-                             case_sensitive,
-                             help_text_override=help_text_override,
-                             hide_from_help_command=hide_from_help_command)
+            self.add_command(
+                pattern,
+                f,
+                case_sensitive,
+                help_text_override=help_text_override,
+                hide_from_help_command=hide_from_help_command,
+            )
             return f
+
         return decorator
 
     def alias(self, pattern: str) -> Callable:
@@ -206,18 +215,19 @@ class Phial:
             def hello():
                 return "world"
         """
-        pattern = "{0}{1}".format(self.config["prefix"] if "prefix"
-                                  in self.config else "", pattern)
+        pattern = "{0}{1}".format(
+            self.config["prefix"] if "prefix" in self.config else "", pattern
+        )
 
         def decorator(f: Callable) -> Callable:
-            if not hasattr(f, 'alias_patterns'):
+            if not hasattr(f, "alias_patterns"):
                 f.alias_patterns = []  # type: ignore
             f.alias_patterns.append(pattern)  # type: ignore
             return f
+
         return decorator
 
-    def add_fallback_command(self,
-                             func: Callable[[Message], PhialResponse]) -> None:
+    def add_fallback_command(self, func: Callable[[Message], PhialResponse]) -> None:
         """
         Add a fallback command.
 
@@ -263,13 +273,14 @@ class Phial:
             def error_handler(message: Message) -> str:
                 return "Oops that command doesn't seem to exist"
         """
+
         def decorator(f: Callable) -> Callable:
             self.add_fallback_command(f)
             return f
+
         return decorator
 
-    def add_middleware(self,
-                       func: Callable[[Message], Optional[Message]]) -> None:
+    def add_middleware(self, func: Callable[[Message], Optional[Message]]) -> None:
         """
         Adds a middleware function to the bot.
 
@@ -299,8 +310,9 @@ class Phial:
 
         """
         self.middleware_functions.append(func)
-        self.logger.debug("Middleware {0} added"
-                          .format(getattr(func, '__name__', repr(func))))
+        self.logger.debug(
+            "Middleware {0} added".format(getattr(func, "__name__", repr(func)))
+        )
 
     def middleware(self) -> Callable:
         """
@@ -316,14 +328,14 @@ class Phial:
             def intercept(messaage):
                 return message
         """
+
         def decorator(f: Callable) -> Callable:
             self.add_middleware(f)
             return f
+
         return decorator
 
-    def add_scheduled(self,
-                      schedule: Schedule,
-                      func: Callable) -> None:
+    def add_scheduled(self, schedule: Schedule, func: Callable) -> None:
         """
         Adds a scheduled function to the bot.
 
@@ -353,8 +365,9 @@ class Phial:
         """
         job = ScheduledJob(schedule, func)
         self.scheduler.add_job(job)
-        self.logger.debug("Schedule {0} added"
-                          .format(getattr(func, '__name__', repr(func))))
+        self.logger.debug(
+            "Schedule {0} added".format(getattr(func, "__name__", repr(func)))
+        )
 
     def scheduled(self, schedule: Schedule) -> Callable:
         """
@@ -375,9 +388,11 @@ class Phial:
                 bot.send_message(Response(text="Beep",
                                           channel="channel-id">))
         """
+
         def decorator(f: Callable) -> Callable:
             self.add_scheduled(schedule, f)
             return f
+
         return decorator
 
     def send_message(self, message: Response) -> None:
@@ -386,26 +401,27 @@ class Phial:
 
         :param message: The message to be sent to Slack
         """
-        api_method = ('chat.postEphemeral' if message.ephemeral
-                      else 'chat.postMessage')
+        api_method = "chat.postEphemeral" if message.ephemeral else "chat.postMessage"
 
         if message.original_ts:
-            self.slack_client.api_call(api_method,
-                                       channel=message.channel,
-                                       text=message.text,
-                                       thread_ts=message.original_ts,
-                                       attachments=json.dumps(
-                                           message.attachments),
-                                       user=message.user,
-                                       as_user=True)
+            self.slack_client.api_call(
+                api_method,
+                channel=message.channel,
+                text=message.text,
+                thread_ts=message.original_ts,
+                attachments=json.dumps(message.attachments),
+                user=message.user,
+                as_user=True,
+            )
         else:
-            self.slack_client.api_call(api_method,
-                                       channel=message.channel,
-                                       text=message.text,
-                                       attachments=json.dumps(
-                                           message.attachments),
-                                       user=message.user,
-                                       as_user=True)
+            self.slack_client.api_call(
+                api_method,
+                channel=message.channel,
+                text=message.text,
+                attachments=json.dumps(message.attachments),
+                user=message.user,
+                as_user=True,
+            )
 
     def send_reaction(self, response: Response) -> None:
         """
@@ -414,11 +430,13 @@ class Phial:
         :param response: Response containing the reaction to be
                          sent to Slack
         """
-        self.slack_client.api_call("reactions.add",
-                                   channel=response.channel,
-                                   timestamp=response.original_ts,
-                                   name=response.reaction,
-                                   as_user=True)
+        self.slack_client.api_call(
+            "reactions.add",
+            channel=response.channel,
+            timestamp=response.original_ts,
+            name=response.reaction,
+            as_user=True,
+        )
 
     def upload_attachment(self, attachment: Attachment) -> None:
         """
@@ -426,39 +444,45 @@ class Phial:
 
         :param attachment: The attachment to be uploaded to Slack
         """
-        self.slack_client.api_call('files.upload',
-                                   channels=attachment.channel,
-                                   filename=attachment.filename,
-                                   file=attachment.content)
+        self.slack_client.api_call(
+            "files.upload",
+            channels=attachment.channel,
+            filename=attachment.filename,
+            file=attachment.content,
+        )
 
     def _register_standard_commands(self) -> None:
-        if ("registerHelpCommand" in self.config and self.
-                config['registerHelpCommand']):
+        if "registerHelpCommand" in self.config and self.config["registerHelpCommand"]:
             # The command function has to be a lambda as we wish to delay
             # execution until all commands have been registered.
-            self.add_command("help", lambda: help_command(self),
-                             help_text_override="List all available commmands")
+            self.add_command(
+                "help",
+                lambda: help_command(self),
+                help_text_override="List all available commmands",
+            )
 
-    def _send_response(self,
-                       response: PhialResponse,
-                       original_channel: str) -> None:
+    def _send_response(self, response: PhialResponse, original_channel: str) -> None:
         if response is None:
             return  # Do nothing if command function returns nothing
 
         if isinstance(response, str):
-            self.send_message(Response(text=response,
-                                       channel=original_channel))
+            self.send_message(Response(text=response, channel=original_channel))
 
-        elif not isinstance(response, Response) and not \
-                isinstance(response, Attachment):
-            raise ValueError('Only Response or Attachment objects can be '
-                             'returned from command functions')
+        elif not isinstance(response, Response) and not isinstance(
+            response, Attachment
+        ):
+            raise ValueError(
+                "Only Response or Attachment objects can be "
+                "returned from command functions"
+            )
 
         if isinstance(response, Response):
             if response.original_ts and response.reaction and response.text:
-                raise ValueError('Response objects with an original timestamp '
-                                 'can only have one of the attributes: '
-                                 'Reaction, Text')
+                raise ValueError(
+                    "Response objects with an original timestamp "
+                    "can only have one of the attributes: "
+                    "Reaction, Text"
+                )
             if response.original_ts and response.reaction:
                 self.send_reaction(response)
             elif response.text or response.attachments:
@@ -474,8 +498,9 @@ class Phial:
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
-                self.logger.debug("Ran middleware: {0} on"
-                                  " {1}".format(func.__name__, message))
+                self.logger.debug(
+                    "Ran middleware: {0} on" " {1}".format(func.__name__, message)
+                )
                 message = func(message)
 
         # If message has been intercepted or is a bot message return early
@@ -483,8 +508,11 @@ class Phial:
             return
 
         # If message should have a prefix but doesn't return early
-        if "prefix" in self.config and self.config["prefix"] is not None \
-                and not message.text.startswith(self.config["prefix"]):
+        if (
+            "prefix" in self.config
+            and self.config["prefix"] is not None
+            and not message.text.startswith(self.config["prefix"])
+        ):
             return
 
         # If message has not been intercepted continue with standard message
@@ -503,8 +531,9 @@ class Phial:
                     self._send_response(str(e), message.channel)
                     return
                 finally:
-                    self.logger.debug("Ran command: {0} on"
-                                      " {1}".format(command_name, message))
+                    self.logger.debug(
+                        "Ran command: {0} on" " {1}".format(command_name, message)
+                    )
                     _command_ctx_stack.pop()
 
         # If we are here then no commands have matched
@@ -523,14 +552,15 @@ class Phial:
 
         When called will start the bot listening to messages from Slack
         """
-        auto_reconnect = self.config['autoReconnect']
-        if not self.slack_client.rtm_connect(auto_reconnect=auto_reconnect,
-                                             with_team_state=False):
+        auto_reconnect = self.config["autoReconnect"]
+        if not self.slack_client.rtm_connect(
+            auto_reconnect=auto_reconnect, with_team_state=False
+        ):
             raise ValueError("Connection failed. Invalid Token or bot ID")
 
         self.logger.info("Phial connected and running!")
 
-        thread_pool_size = self.config['maxThreads']
+        thread_pool_size = self.config["maxThreads"]
         thread_pool = ThreadPoolExecutor(thread_pool_size)
         run_pending_tasks: Optional[Future] = None
 
@@ -542,11 +572,11 @@ class Phial:
                     run_pending_tasks = thread_pool.submit(self.scheduler.run_pending)
             except Exception as e:
                 self.logger.error(e)
-            sleep(self.config['loopDelay'])  # Help prevent high CPU usage.
+            sleep(self.config["loopDelay"])  # Help prevent high CPU usage.
 
     def run(self) -> None:  # pragma: no cover
         """Run the bot."""
-        if self.config['hotReload']:
+        if self.config["hotReload"]:
             run_with_reloader(self._start)
         else:
             self._start()
