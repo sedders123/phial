@@ -24,10 +24,10 @@ jobs:
         pip install -e .
     - name: Lint with flake8
       run: |
-        flake8 phial/ tests/
+        flake8 phial/ tests/ examples/
     - name: Lint with mypy
       run: |
-        mypy phial tests --strict-optional --disallow-untyped-defs --disallow-incomplete-defs --disallow-untyped-decorators --no-implicit-optional --disallow-subclassing-any
+        mypy phial tests stubs examples --strict-optional --disallow-untyped-defs --disallow-incomplete-defs --disallow-untyped-decorators --no-implicit-optional --disallow-subclassing-any
     - name: Test with pytest
       run: |
         pytest tests -v
