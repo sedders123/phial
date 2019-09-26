@@ -72,25 +72,28 @@ def shceduled_function() -> None:
 @slackbot.command("messageWithAttachment")
 def get_message_with_attachment() -> Response:
     """A command that posts a message with a Slack attachment."""
-    return Response(channel=command.channel, attachments=[
-        {
-            "title": "Here's a message, it has 2 attachment fields",
-            "title_link": "https://api.slack.com/docs/message-attachments",
-            "text": "This message has some text!",
-            "fields": [
-                {
-                    "title": "Here's the first attachment field",
-                    "value": "And here's it's body",
-                    "short": True,
-                },
-                {
-                    "title": "...And here's the second",
-                    "value": "And here's it's body",
-                    "short": True,
-                },
-            ],
-        },
-    ])
+    return Response(
+        channel=command.channel,
+        attachments=[
+            {
+                "title": "Here's a message, it has 2 attachment fields",
+                "title_link": "https://api.slack.com/docs/message-attachments",
+                "text": "This message has some text!",
+                "fields": [
+                    {
+                        "title": "Here's the first attachment field",
+                        "value": "And here's it's body",
+                        "short": True,
+                    },
+                    {
+                        "title": "...And here's the second",
+                        "value": "And here's it's body",
+                        "short": True,
+                    },
+                ],
+            }
+        ],
+    )
 
 
 if __name__ == "__main__":

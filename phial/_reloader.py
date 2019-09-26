@@ -37,17 +37,7 @@ import subprocess
 import sys
 import threading
 from itertools import chain
-from typing import (
-    Any,
-    Callable,
-    Dict,
-    Generator,
-    Iterable,
-    List,
-    Optional,
-    Set,
-    Tuple,
-)
+from typing import Any, Callable, Dict, Generator, Iterable, List, Optional, Set, Tuple
 
 LOGGER = logging.getLogger("phial.bot.reloader")
 
@@ -70,7 +60,7 @@ def _iter_module_files() -> Generator[str, None, None]:
         filename = getattr(module, "__file__", None)
         if filename:
             if os.path.isdir(filename) and os.path.exists(
-                os.path.join(filename, "__init__.py"),
+                os.path.join(filename, "__init__.py")
             ):  # pragma: no cover
                 filename = os.path.join(filename, "__init__.py")
 
@@ -86,11 +76,12 @@ def _iter_module_files() -> Generator[str, None, None]:
                 yield filename
 
 
-def _find_observable_paths(extra_files:
-                           Optional[Iterable[str]] = None) -> Set[str]:
+def _find_observable_paths(extra_files: Optional[Iterable[str]] = None) -> Set[str]:
     """Finds all paths that should be observed."""
-    rv = {os.path.dirname(os.path.abspath(x)) if os.path.isfile(x) else
-          os.path.abspath(x) for x in sys.path}
+    rv = {
+        os.path.dirname(os.path.abspath(x)) if os.path.isfile(x) else os.path.abspath(x)
+        for x in sys.path
+    }
 
     for filename in extra_files or ():
         rv.add(os.path.dirname(os.path.abspath(filename)))
@@ -126,8 +117,7 @@ def _get_args_for_reloading() -> List[str]:  # pragma: no cover
         if os.name == "nt":
             # Windows entry points have ".exe" extension and should be
             # called directly.
-            if not os.path.exists(py_script) and os.path.exists(py_script
-                                                                + ".exe"):
+            if not os.path.exists(py_script) and os.path.exists(py_script + ".exe"):
                 py_script += ".exe"
 
             if (
@@ -183,8 +173,7 @@ class ReloaderLoop(object):
 
     name: Optional[str] = None
 
-    def __init__(self, extra_files: Optional[List[str]] = None,
-                 interval: int = 1):
+    def __init__(self, extra_files: Optional[List[str]] = None, interval: int = 1):
         self.extra_files = {os.path.abspath(x) for x in extra_files or ()}
         self.interval = interval
 
@@ -308,7 +297,7 @@ class WatchdogReloaderLoop(ReloaderLoop):
                     if path not in watches:
                         try:
                             watches[path] = observer.schedule(
-                                self.event_handler, path, recursive=True,
+                                self.event_handler, path, recursive=True
                             )
                         except OSError:
                             # Clear this path from list of watches We don't

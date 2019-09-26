@@ -41,7 +41,7 @@ def add(x: int, y: int = 5) -> str:
 def hello(name: str, from_: str) -> Response:
     """Simple command with two arguments which replies to a message."""
     return Response(
-        text="Hi {0}, from {1}".format(name, from_), channel=command.channel,
+        text="Hi {0}, from {1}".format(name, from_), channel=command.channel
     )
 
 
@@ -49,7 +49,7 @@ def hello(name: str, from_: str) -> Response:
 def react() -> Response:
     """Simple command that reacts to the original message."""
     return Response(
-        reaction="x", channel=command.channel, original_ts=command.timestamp,
+        reaction="x", channel=command.channel, original_ts=command.timestamp
     )
 
 
@@ -59,7 +59,7 @@ def upload() -> Attachment:
     project_dir = os.path.dirname(__file__)
     file_path = os.path.join(project_dir, "phial.png")
     return Attachment(
-        channel=command.channel, filename="example.txt", content=open(file_path, "rb"),
+        channel=command.channel, filename="example.txt", content=open(file_path, "rb")
     )
 
 
@@ -67,7 +67,7 @@ def upload() -> Attachment:
 def reply() -> Response:
     """Simple command that replies to the original message in a thread."""
     return Response(
-        text="this is a thread", channel=command.channel, original_ts=command.timestamp,
+        text="this is a thread", channel=command.channel, original_ts=command.timestamp
     )
 
 
@@ -84,13 +84,16 @@ def get_message_with_attachment() -> Response:
 
     Read more: https://api.slack.com/docs/message-attachments
     """
-    return Response(channel=command.channel, attachments=[
-        {
-            "title": "Here's the title of the attachment",
-            "text": "...and here's the text",
-            "footer": "Teeny tiny footer text",
-        },
-    ])
+    return Response(
+        channel=command.channel,
+        attachments=[
+            {
+                "title": "Here's the title of the attachment",
+                "text": "...and here's the text",
+                "footer": "Teeny tiny footer text",
+            }
+        ],
+    )
 
 
 @slackbot.command("long")

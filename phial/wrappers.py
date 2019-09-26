@@ -4,10 +4,10 @@ import re
 from typing import IO, Callable, Dict, List, Optional, Pattern, Union
 
 #: A union of all response types phial can use
-PhialResponse = Union[None, str, 'Response', 'Attachment']
+PhialResponse = Union[None, str, "Response", "Attachment"]
 
 
-class Response():
+class Response:
     r"""
     A response to be sent to Slack.
 
@@ -51,18 +51,18 @@ class Response():
                             original_ts='original_ts')
     """
 
-    def __init__(self,
-                 channel: str,
-                 text: Optional[str] = None,
-                 original_ts: Optional[str] = None,
-                 reaction: Optional[str] = None,
-                 ephemeral: bool = False,
-                 user: Optional[str] = None,
-                 attachments: Optional[List[Dict[str, Union[str,
-                                                            int,
-                                                            float,
-                                                            bool,
-                                                            List]]]] = None) -> None:
+    def __init__(
+        self,
+        channel: str,
+        text: Optional[str] = None,
+        original_ts: Optional[str] = None,
+        reaction: Optional[str] = None,
+        ephemeral: bool = False,
+        user: Optional[str] = None,
+        attachments: Optional[
+            List[Dict[str, Union[str, int, float, bool, List]]]
+        ] = None,
+    ) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
@@ -78,7 +78,7 @@ class Response():
         return self.__dict__ == other.__dict__
 
 
-class Attachment():
+class Attachment:
     """
     A file to be uploaded to Slack.
 
@@ -103,7 +103,7 @@ class Attachment():
         return "<Attachment {0} in {1}>".format(self.filename, self.channel)
 
 
-class Message():
+class Message:
     """
     A representation of a Slack message.
 
@@ -117,13 +117,15 @@ class Message():
                    the ID of that bot. Defaults to None.
     """
 
-    def __init__(self,
-                 text: str,
-                 channel: str,
-                 user: str,
-                 timestamp: str,
-                 team: Optional[str],
-                 bot_id: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        text: str,
+        channel: str,
+        user: str,
+        timestamp: str,
+        team: Optional[str],
+        bot_id: Optional[str] = None,
+    ) -> None:
         self.text = text
         self.channel = channel
         self.user = user
@@ -132,10 +134,9 @@ class Message():
         self.bot_id = bot_id
 
     def __repr__(self) -> str:
-        return "<Message: {0} in {1}:{2} at {3}>".format(self.text,
-                                                         self.channel,
-                                                         self.team,
-                                                         self.timestamp)
+        return "<Message: {0} in {1}:{2} at {3}>".format(
+            self.text, self.channel, self.team, self.timestamp
+        )
 
     def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
@@ -157,12 +158,14 @@ class Command:
                                    the standard help command
     """
 
-    def __init__(self,
-                 pattern: str,
-                 func: Callable[..., PhialResponse],
-                 case_sensitive: bool = False,
-                 help_text_override: Optional[str] = None,
-                 hide_from_help_command: Optional[bool] = False):
+    def __init__(
+        self,
+        pattern: str,
+        func: Callable[..., PhialResponse],
+        case_sensitive: bool = False,
+        help_text_override: Optional[str] = None,
+        hide_from_help_command: Optional[bool] = False,
+    ):
         self.pattern_string = pattern
         self.pattern = self._build_pattern_regex(pattern, case_sensitive)
         self.alias_patterns = self._get_alias_patterns(func)
@@ -176,18 +179,20 @@ class Command:
 
     def _get_alias_patterns(self, func: Callable) -> List[Pattern]:
         patterns: List[Pattern] = []
-        if hasattr(func, 'alias_patterns'):
+        if hasattr(func, "alias_patterns"):
             for pattern in func.alias_patterns:  # type: ignore
                 patterns.append(self._build_pattern_regex(pattern))
         return patterns
 
     @staticmethod
-    def _build_pattern_regex(pattern: str,
-                             case_sensitive: bool = False) -> Pattern[str]:
-        command = re.sub(r'(<\w+>)', r'(\"?\1\"?)', pattern)
-        command_regex = re.sub(r'(<\w+>)', r'(?P\1[^"]*)', command)
-        return re.compile("^{}$".format(command_regex),
-                          0 if case_sensitive else re.IGNORECASE)
+    def _build_pattern_regex(
+        pattern: str, case_sensitive: bool = False
+    ) -> Pattern[str]:
+        command = re.sub(r"(<\w+>)", r"(\"?\1\"?)", pattern)
+        command_regex = re.sub(r"(<\w+>)", r'(?P\1[^"]*)', command)
+        return re.compile(
+            "^{}$".format(command_regex), 0 if case_sensitive else re.IGNORECASE
+        )
 
     def pattern_matches(self, message: Message) -> Optional[Dict[str, str]]:
         """

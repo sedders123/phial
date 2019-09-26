@@ -16,16 +16,19 @@ def validate_kwargs(func: Callable, kwargs: Dict[str, str]) -> Dict[str, Any]:
             validated_kwargs[key.name] = key.default
             continue
         if key.name not in kwargs:
-            raise ArgumentValidationError("Parameter {0} not provided to {1}"
-                                          .format(key.name, func.__name__))
+            raise ArgumentValidationError(
+                "Parameter {0} not provided to {1}".format(key.name, func.__name__)
+            )
         value = kwargs[key.name]
         if key.annotation is not Signature.empty:
             try:
                 value = key.annotation(value)
             except ValueError:
-                raise ArgumentTypeValidationError("{0} could not be converted to {1}"
-                                                  .format(value,
-                                                          key.annotation.__name__))
+                raise ArgumentTypeValidationError(
+                    "{0} could not be converted to {1}".format(
+                        value, key.annotation.__name__
+                    )
+                )
         validated_kwargs[key.name] = value
     return validated_kwargs
 
@@ -43,28 +46,30 @@ def parse_help_text(help_text: str) -> str:
     help_text = help_text.replace(NEW_LINE_SEPERATOR, "")
 
     # Remove extra spaces
-    help_text = re.sub(r'(^[ \t]+|[ \t]+)', ' ', help_text, flags=re.M)
+    help_text = re.sub(r"(^[ \t]+|[ \t]+)", " ", help_text, flags=re.M)
 
     return help_text
 
 
-def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional['Message']:
+def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional["Message"]:
     """Parse Slack output."""
     output_list = slack_rtm_output
     if output_list and len(output_list) > 0:
         for output in output_list:
-            if(output and 'text' in output):
+            if output and "text" in output:
                 bot_id = None
                 team = None
-                if 'team' in output:
-                    team = output['team']
-                if 'bot_id' in output:
-                    bot_id = output['bot_id']
+                if "team" in output:
+                    team = output["team"]
+                if "bot_id" in output:
+                    bot_id = output["bot_id"]
 
-                return Message(output['text'],
-                               output['channel'],
-                               output['user'],
-                               output['ts'],
-                               team,
-                               bot_id)
+                return Message(
+                    output["text"],
+                    output["channel"],
+                    output["user"],
+                    output["ts"],
+                    team,
+                    bot_id,
+                )
     return None

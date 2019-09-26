@@ -79,29 +79,25 @@ def test_seconds() -> None:
     assert next_run == expected_datetime
 
 
-@freeze_time('2018-01-01 10:00:00')
+@freeze_time("2018-01-01 10:00:00")
 def test_at_before_time() -> None:
     """Test at will run on the first day if time not already passed."""
     schedule = Schedule().every().day().at(12, 00)
     now = datetime.now()
     next_run = schedule.get_next_run_time(now)
-    expected_datetime = (now).replace(hour=12,
-                                      minute=0,
-                                      second=0,
-                                      microsecond=0)
+    expected_datetime = (now).replace(hour=12, minute=0, second=0, microsecond=0)
     assert next_run == expected_datetime
 
 
-@freeze_time('2018-01-01 13:00:00')
+@freeze_time("2018-01-01 13:00:00")
 def test_at_after_time() -> None:
     """Test at will run on the next day if time already passed."""
     schedule = Schedule().every().day().at(12, 00)
     now = datetime.now()
     next_run = schedule.get_next_run_time(now)
-    expected_datetime = (now + timedelta(days=1)).replace(hour=12,
-                                                          minute=0,
-                                                          second=0,
-                                                          microsecond=0)
+    expected_datetime = (now + timedelta(days=1)).replace(
+        hour=12, minute=0, second=0, microsecond=0
+    )
     assert next_run == expected_datetime
 
 

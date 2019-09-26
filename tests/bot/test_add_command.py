@@ -6,10 +6,11 @@ from phial import Phial
 
 def test_add_command() -> None:
     """Test add_command works correctly."""
+
     def test() -> None:
         pass
 
-    bot = Phial('token', {'registerHelpCommand': False})
+    bot = Phial("token", {"registerHelpCommand": False})
     bot.add_command("test", test)
 
     assert len(bot.commands) == 1
@@ -18,10 +19,11 @@ def test_add_command() -> None:
 
 def test_add_same_command_throws() -> None:
     """Test add_command throws when adding command with same pattern."""
+
     def test() -> None:
         pass
 
-    bot = Phial('token', {'registerHelpCommand': False})
+    bot = Phial("token", {"registerHelpCommand": False})
     bot.add_command("test", test)
 
     with pytest.raises(ValueError):
@@ -30,7 +32,7 @@ def test_add_same_command_throws() -> None:
 
 def test_add_command_decorator() -> None:
     """Test add_command decorator works correctly."""
-    bot = Phial('token', {'registerHelpCommand': False})
+    bot = Phial("token", {"registerHelpCommand": False})
 
     @bot.command("test")
     def test() -> None:
@@ -42,7 +44,7 @@ def test_add_command_decorator() -> None:
 
 def test_alias_decorator() -> None:
     """Test alias decorator works correctly."""
-    bot = Phial('token', {'registerHelpCommand': False})
+    bot = Phial("token", {"registerHelpCommand": False})
 
     @bot.command("test")
     @bot.alias("test2")

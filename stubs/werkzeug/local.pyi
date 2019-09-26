@@ -1,21 +1,13 @@
 """Partial type stubs for Werkzeug."""
 from typing import Callable, Generic, TypeVar
 
-T = TypeVar('T')
-
+T = TypeVar("T")
 
 class LocalStack(Generic[T]):
-
     @property
-    def top(self) -> T:
-        ...
-
-    def push(self, item: T) -> None:
-        ...
-
-    def pop(self) -> None:
-        ...
-
+    def top(self) -> T: ...
+    def push(self, item: T) -> None: ...
+    def pop(self) -> None: ...
 
 def LocalProxy(func: Callable[..., T]) -> T:
     """
