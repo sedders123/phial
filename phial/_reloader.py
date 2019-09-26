@@ -37,7 +37,17 @@ import subprocess
 import sys
 import threading
 from itertools import chain
-from typing import Any, Callable, Dict, Generator, Iterable, List, Optional, Set, Tuple
+from typing import (  # fmt: off
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterable,
+    List,
+    Optional,
+    Set,
+    Tuple,
+)
 
 LOGGER = logging.getLogger("phial.bot.reloader")
 
