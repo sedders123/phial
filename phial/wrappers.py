@@ -58,10 +58,11 @@ class Response():
                  reaction: Optional[str] = None,
                  ephemeral: bool = False,
                  user: Optional[str] = None,
-                 attachments: Optional[Dict[str, Union[str,
-                                                       int,
-                                                       float,
-                                                       bool]]] = None) -> None:
+                 attachments: Optional[List[Dict[str, Union[str,
+                                                            int,
+                                                            float,
+                                                            bool,
+                                                            List]]]] = None) -> None:
         self.channel = channel
         self.text = text
         self.original_ts = original_ts
