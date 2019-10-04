@@ -55,4 +55,17 @@ def test_validation_ignores_defaulted_kwargs_correctly() -> None:
     def test(name: str, age: int = 5) -> None:
         pass
 
-    validate_kwargs(test, {"name": "string"})
+    args = validate_kwargs(test, {"name": "string"})
+    assert args["name"] == "string"
+    assert args["age"] == 5
+
+
+def test_validation_allows_override_of_kwargs_correctly() -> None:
+    """Test validation ignores defaulted kwargs correctly."""
+
+    def test(name: str, age: int = 5) -> None:
+        pass
+
+    args = validate_kwargs(test, {"name": "string", "age": "2"})
+    assert args["name"] == "string"
+    assert args["age"] == 2

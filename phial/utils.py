@@ -12,14 +12,16 @@ def validate_kwargs(func: Callable, kwargs: Dict[str, str]) -> Dict[str, Any]:
     func_params = signature(func).parameters
     validated_kwargs: Dict[str, Any] = {}
     for key in func_params.values():
+        value = None
         if key.default is not Parameter.empty:
-            validated_kwargs[key.name] = key.default
-            continue
-        if key.name not in kwargs:
+            value = key.default
+        if value is None and key.name not in kwargs:
             raise ArgumentValidationError(
                 "Parameter {0} not provided to {1}".format(key.name, func.__name__)
             )
-        value = kwargs[key.name]
+        elif key.name in kwargs:
+            value = kwargs[key.name]
+
         if key.annotation is not Signature.empty:
             try:
                 value = key.annotation(value)
