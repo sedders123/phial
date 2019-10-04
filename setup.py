@@ -31,7 +31,7 @@ class VerifyVersionCommand(install):  # type: ignore
     description = "Verify that the git tag matches our version"
 
     def run(self) -> None:
-        tag = os.getenv("CIRCLE_TAG")
+        tag = os.getenv("GITHUB_REF")
 
         if tag != VERSION:
             info = "Git tag: {0} != phial version: {1}".format(tag, VERSION)
