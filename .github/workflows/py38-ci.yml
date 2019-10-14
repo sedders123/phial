@@ -1,0 +1,29 @@
+name: CI - Python 3.8 Beta
+
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: Set up Python 3.8
+      run : |
+        sudo add-apt-repository ppa:deadsnakes/nightly
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends python3.8-dev python3.8-distutils
+    - name: Install dependencies
+      run: |
+        python3.8 -m pip install --upgrade pip setuptools wheel
+        python3.8 -m pip install -r dev-requirements.txt --user
+        python3.8 -m pip install -e . --user
+    - name: Lint with flake8
+      run: |
+        python3.8 -m flake8 phial/ tests/ examples/
+    - name: Lint with mypy
+      run: |
+        python3.8 -m mypy phial tests stubs examples --strict-optional --disallow-untyped-defs --disallow-incomplete-defs --disallow-untyped-decorators --no-implicit-optional --disallow-subclassing-any
+    - name: Test with pytest
+      run: |
+        python3.8 -m pytest tests -v
