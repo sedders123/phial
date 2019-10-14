@@ -12,10 +12,10 @@ jobs:
       run : |
         sudo add-apt-repository ppa:deadsnakes/nightly
         sudo apt-get update
-        sudo apt-get install -y --no-install-recommends python3.8-dev python3.8-distutils python3.8-setuptools
+        sudo apt-get install -y --no-install-recommends python3.8-dev python3.8-distutils
     - name: Install dependencies
       run: |
-        python3.8 -m pip install --upgrade pip
+        python3.8 -m pip install --upgrade pip setuptools wheel
         pip3 install -r dev-requirements.txt
         pip3 install -e .
     - name: Lint with flake8
