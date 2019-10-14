@@ -16,8 +16,8 @@ jobs:
     - name: Install dependencies
       run: |
         python3.8 -m pip install --upgrade pip setuptools wheel
-        python3.8 -m pip install -r dev-requirements.txt
-        python3.8 -m pip install -e .
+        python3.8 -m pip install -r dev-requirements.txt --user
+        python3.8 -m pip install -e . --user
     - name: Lint with flake8
       run: |
         python3.8 -m flake8 phial/ tests/ examples/
