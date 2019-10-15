@@ -10,23 +10,23 @@ slackbot = Phial(os.getenv("SLACK_API_TOKEN", "NONE"), {"hotReload": True})
 
 @slackbot.command("ping")
 def ping() -> str:
-    """Simple command which replies with a message."""
+    """A command which replies with a message."""
     return "Pong"
 
 
 @slackbot.command("pong")
 def pong() -> str:
     """
-    Simple command which replies with a message.
+    A command which replies with a message.
 
-    Has a mutiline docstring.
+    It has a mutiline docstring.
     """
     return "Ping"
 
 
 @slackbot.command("hi <name>")
 def hi(name: str) -> Response:
-    """Simple command with argument which replies to a message."""
+    """A command with an argument which replies to a message."""
     return Response(text="Hello {0}".format(name), channel=command.channel)
 
 
@@ -39,7 +39,7 @@ def add(x: int, y: int = 5) -> str:
 
 @slackbot.command("hello <name> <from_>")
 def hello(name: str, from_: str) -> Response:
-    """Simple command with two arguments which replies to a message."""
+    """A command with two arguments which replies to a message."""
     return Response(
         text="Hi {0}, from {1}".format(name, from_), channel=command.channel
     )
@@ -47,7 +47,7 @@ def hello(name: str, from_: str) -> Response:
 
 @slackbot.command("react")
 def react() -> Response:
-    """Simple command that reacts to the original message."""
+    """A command that reacts to the original message."""
     return Response(
         reaction="x", channel=command.channel, original_ts=command.timestamp
     )
@@ -55,7 +55,7 @@ def react() -> Response:
 
 @slackbot.command("upload")
 def upload() -> Attachment:
-    """Simple command that uploads a set file."""
+    """A command that uploads a set file."""
     project_dir = os.path.dirname(__file__)
     file_path = os.path.join(project_dir, "phial.png")
     return Attachment(
@@ -65,7 +65,7 @@ def upload() -> Attachment:
 
 @slackbot.command("reply")
 def reply() -> Response:
-    """Simple command that replies to the original message in a thread."""
+    """A command that replies to the original message in a thread."""
     return Response(
         text="this is a thread", channel=command.channel, original_ts=command.timestamp
     )
@@ -73,7 +73,7 @@ def reply() -> Response:
 
 @slackbot.command("caseSensitive", case_sensitive=True)
 def case_sensitive() -> str:
-    """Simple command which replies with a message."""
+    """A command which replies with a message."""
     return "You typed caseSensitive"
 
 
