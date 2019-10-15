@@ -31,7 +31,7 @@ Python:
 
     @bot.command('greet <name>')
     def greet(name):
-        '''Basic command with an argument which replies to a message'''
+        '''A command with an argument which replies to a message'''
         return "Hello {0}".format(name)
 
     bot.run()
