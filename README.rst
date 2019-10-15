@@ -3,7 +3,7 @@ phial
 
 |Documentation Status| |Github Actions| |Coverage Status| |PyPi|
 
-    A simple framework for building slack bots
+    A lightweight framework for building slack bots
 
 Phial is a slack bot framework, modelled loosely on
 `flask <https://github.com/pallets/flask/>`__.
@@ -31,7 +31,7 @@ Python:
 
     @bot.command('greet <name>')
     def greet(name):
-        '''Simple command with argument which replies to a message'''
+        '''Basic command with an argument which replies to a message'''
         return "Hello {0}".format(name)
 
     bot.run()
@@ -51,7 +51,7 @@ can be changed in the config.
 
 Features:
 
--  Simple command definition
+-  Decorator based command definition
 -  Send messages to slack
 -  Reply to messages in a thread
 -  Reply to messages with a reaction
