@@ -1,5 +1,5 @@
 Getting started with phial
-=============
+===========================
 
 ## What can phial do?
 
