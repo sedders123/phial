@@ -16,6 +16,6 @@ pytest-cov==2.8.1
 rope==0.14.0
 setuptools==41.6.0
 sphinx==2.2.1
-sphinx-autodoc-typehints==1.10.0
+sphinx-autodoc-typehints==1.10.1
 twine==2.0.0
 wheel==0.33.6
