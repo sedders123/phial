@@ -13,7 +13,7 @@ mypy==0.761
 pydocstyle==5.0.2
 pytest==5.3.2
 pytest-cov==2.8.1
-rope==0.14.0
+rope==0.16.0
 setuptools==44.0.0
 sphinx==2.3.1
 sphinx-autodoc-typehints==1.10.3
