@@ -1,5 +1,5 @@
 black==19.10b0
-doc8==0.8.0
+doc8==0.8.1
 coveralls==2.0.0
 flake8==3.8.2
 flake8-commas==2.0.0
