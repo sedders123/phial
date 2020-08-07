@@ -247,8 +247,8 @@ class WatchdogReloaderLoop(ReloaderLoop):
 
     def __init__(self, *args: Any, **kwargs: Any):
         ReloaderLoop.__init__(self, *args, **kwargs)
-        from watchdog.observers import Observer  # type: ignore
         from watchdog.events import FileSystemEventHandler  # type: ignore
+        from watchdog.observers import Observer  # type: ignore
 
         self.observable_paths: Set[str] = set()
 
