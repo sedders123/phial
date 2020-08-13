@@ -14,7 +14,7 @@ pydocstyle==5.0.2
 pytest==6.0.1
 pytest-cov==2.10.0
 rope==0.17.0
-setuptools==49.3.2
+setuptools==49.4.0
 sphinx==3.2.0
 sphinx-autodoc-typehints==1.11.0
 twine==3.2.0
