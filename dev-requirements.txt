@@ -3,7 +3,7 @@ doc8==0.8.1
 coveralls==2.1.2
 flake8==3.8.4
 flake8-commas==2.0.0
-flake8-comprehensions==3.2.3
+flake8-comprehensions==3.3.0
 flake8-docstrings==1.5.0
 flake8-isort==4.0.0
 flake8-mutable==1.2.0
