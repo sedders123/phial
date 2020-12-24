@@ -17,5 +17,5 @@ rope==0.18.0
 setuptools==51.1.0.post20201221
 sphinx==3.4.0
 sphinx-autodoc-typehints==1.11.1
-twine==3.2.0
+twine==3.3.0
 wheel==0.36.2
