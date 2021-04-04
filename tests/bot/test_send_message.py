@@ -49,7 +49,7 @@ def test_send_full_message(monkeypatch: Any) -> None:
         reaction="reaction",
         ephemeral=False,
         user="user",
-        attachments={"foo": "bar"},
+        attachments=[{"foo": "bar"}],
     )
     bot = Phial("token")
 
@@ -77,7 +77,7 @@ def test_send_ephemeral_message(monkeypatch: Any) -> None:
         reaction="reaction",
         ephemeral=True,
         user="user",
-        attachments={"foo": "bar"},
+        attachments=[{"foo": "bar"}],
     )
     bot = Phial("token")
 

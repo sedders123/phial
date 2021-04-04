@@ -353,8 +353,8 @@ def ensure_echo_on() -> None:  # pragma: no cover
     except ImportError:
         return
     attributes = termios.tcgetattr(sys.stdin)
-    if not attributes[3] & termios.ECHO:  # type: ignore
-        attributes[3] |= termios.ECHO  # type: ignore
+    if not attributes[3] & termios.ECHO:
+        attributes[3] |= termios.ECHO
         termios.tcsetattr(sys.stdin, termios.TCSANOW, attributes)
 
 
