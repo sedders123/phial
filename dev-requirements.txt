@@ -9,7 +9,7 @@ flake8-isort==4.0.0
 flake8-mutable==1.2.0
 freezegun==1.1.0
 isort==5.8.0
-mypy==0.790
+mypy==0.812
 pydocstyle==6.0.0
 pytest==6.2.3
 pytest-cov==2.11.1

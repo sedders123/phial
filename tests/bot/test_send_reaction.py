@@ -29,7 +29,7 @@ def test_send_reaction(monkeypatch: Any) -> None:
         reaction="reaction",
         ephemeral=False,
         user="user",
-        attachments={"foo": "bar"},
+        attachments=[{"foo": "bar"}],
     )
     bot = Phial("token")
 

@@ -43,7 +43,7 @@ def test_send_response() -> None:
         original_ts="orig_time",
         ephemeral=False,
         user="user",
-        attachments={"foo": "bar"},
+        attachments=[{"foo": "bar"}],
     )
 
     def mock_send_message(instance: Phial, response: Response) -> None:
