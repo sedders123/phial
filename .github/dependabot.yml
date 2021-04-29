@@ -1,0 +1,21 @@
+version: 2
+updates:
+- package-ecosystem: pip
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
+  reviewers:
+  - sedders123
+  ignore:
+  - dependency-name: mypy
+    versions:
+    - "0.800"
+  - dependency-name: watchdog
+    versions:
+    - 1.0.0
+- package-ecosystem: github-actions
+  directory: "/"
+  schedule:
+    interval: daily
+  open-pull-requests-limit: 10
