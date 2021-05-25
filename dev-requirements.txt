@@ -1,6 +1,6 @@
 black==21.5b1
 doc8==0.8.1
-coveralls==3.0.1
+coveralls==3.1.0
 flake8==3.9.2
 flake8-commas==2.0.0
 flake8-comprehensions==3.5.0
