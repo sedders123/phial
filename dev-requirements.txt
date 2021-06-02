@@ -12,7 +12,7 @@ isort==5.8.0
 mypy==0.812
 pydocstyle==6.1.1
 pytest==6.2.4
-pytest-cov==2.12.0
+pytest-cov==2.12.1
 rope==0.19.0
 setuptools==57.0.0
 sphinx==4.0.2
