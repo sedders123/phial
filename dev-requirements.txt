@@ -1,4 +1,4 @@
-black==21.9b0
+black==22.1.0
 doc8==0.9.1
 coveralls==3.2.0
 flake8==3.9.2
