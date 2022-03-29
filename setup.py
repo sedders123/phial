@@ -56,7 +56,7 @@ setup(
     keywords=["Phial", "Slack", "bot", "Slackbot"],
     install_requires=[
         "slackclient>=1.2.1,<2",
-        "Werkzeug>=0.14.1,<1.1",
+        "Werkzeug>=0.14.1,<2.2",
         "typing>=3.6.6",
         "watchdog>=0.9.0,<2.1",
     ],
