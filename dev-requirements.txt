@@ -18,4 +18,4 @@ setuptools==61.2.0
 sphinx==4.5.0
 sphinx-autodoc-typehints==1.17.0
 twine==4.0.0
-wheel==0.37.1
+wheel==0.38.1
