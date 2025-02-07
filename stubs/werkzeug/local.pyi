@@ -1,4 +1,5 @@
 """Partial type stubs for Werkzeug."""
+
 from typing import Callable, Generic, TypeVar
 
 T = TypeVar("T")

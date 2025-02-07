@@ -1,4 +1,5 @@
 """Test validate_kwargs."""
+
 import pytest
 
 from phial.errors import ArgumentValidationError

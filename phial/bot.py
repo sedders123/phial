@@ -6,10 +6,10 @@ from concurrent.futures import Future, ThreadPoolExecutor
 from time import sleep
 from typing import Callable, Optional, cast
 
-from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
 from slack_sdk.socket_mode.response import SocketModeResponse
+from slack_sdk.web import WebClient
 
 from phial.commands import help_command
 from phial.errors import ArgumentTypeValidationError

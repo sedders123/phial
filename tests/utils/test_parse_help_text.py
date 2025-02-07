@@ -1,4 +1,5 @@
 """Test parse_help_text."""
+
 from phial.utils import parse_help_text
 
 

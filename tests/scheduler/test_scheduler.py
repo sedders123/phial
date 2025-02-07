@@ -1,4 +1,5 @@
 """Test Scheduler class."""
+
 from unittest.mock import MagicMock
 
 from phial.scheduler import Schedule, ScheduledJob, Scheduler

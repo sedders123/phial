@@ -1,4 +1,5 @@
 """Test globals."""
+
 import pytest
 
 from phial.globals import _command_ctx_stack, _find_command

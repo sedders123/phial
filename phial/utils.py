@@ -1,8 +1,9 @@
 """Helper utilities for phial."""
 
 import re
+from collections.abc import Callable
 from inspect import Parameter, Signature, signature
-from typing import Any, Callable, Optional
+from typing import Any, Optional
 
 from phial.errors import ArgumentTypeValidationError, ArgumentValidationError
 from phial.wrappers import Message
@@ -18,9 +19,9 @@ def validate_kwargs(func: Callable, kwargs: dict[str, str]) -> dict[str, Any]:
             value = key.default
         if value is None and key.name not in kwargs:
             raise ArgumentValidationError(
-                "Parameter {0} not provided to {1}".format(key.name, func.__name__)
+                f"Parameter {key.name} not provided to {func.__name__}",
             )
-        elif key.name in kwargs:
+        if key.name in kwargs:
             value = kwargs[key.name]
 
         if key.annotation is not Signature.empty:
@@ -28,9 +29,7 @@ def validate_kwargs(func: Callable, kwargs: dict[str, str]) -> dict[str, Any]:
                 value = key.annotation(value)
             except ValueError:
                 raise ArgumentTypeValidationError(
-                    "{0} could not be converted to {1}".format(
-                        value, key.annotation.__name__
-                    )
+                    f"{value} could not be converted to {key.annotation.__name__}",
                 )
         validated_kwargs[key.name] = value
     return validated_kwargs
@@ -49,7 +48,7 @@ def parse_help_text(help_text: str) -> str:
     help_text = help_text.replace(NEW_LINE_SEPERATOR, "")
 
     # Remove extra spaces
-    help_text = re.sub(r"(^[ \t]+|[ \t]+)", " ", help_text, flags=re.M)
+    help_text = re.sub(r"(^[ \t]+|[ \t]+)", " ", help_text, flags=re.MULTILINE)
 
     return help_text
 
