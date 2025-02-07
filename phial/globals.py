@@ -1,4 +1,4 @@
-"""Provides the globaly scoped parts of phial."""
+"""Provides the globally scoped parts of phial."""
 
 from typing import cast
 

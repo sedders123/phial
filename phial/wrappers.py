@@ -15,7 +15,7 @@ class Response:
     :param text: The response contents
     :param original_ts: The timestamp of the original message. If populated
                         will put the text response in a thread
-    :param reation: A valid slack emoji name. NOTE: will only work when
+    :param reaction: A valid slack emoji name. NOTE: will only work when
                     :code:`original_ts` is populated
     :param attachments: Any Slack
                         `Message Attachments <https://api.slack.com/docs/\

@@ -30,7 +30,7 @@ class Phial:
     The Phial class acts as the main interface to Slack.
 
     It handles registration and execution of user defined commands,
-    as well as providing a wrapper around :obj:`slackclient.SlackClient`
+    as well as providing a wrapper around :obj:`slack_sdk.SocketModeClient`
     to make sending messages to Slack simpler.
     """
 
@@ -41,7 +41,6 @@ class Phial:
         "baseHelpText": "All available commands:",
         "autoReconnect": True,
         "loopDelay": 0.001,
-        "hotReload": False,
         "maxThreads": 4,
     }
 
@@ -84,7 +83,7 @@ class Phial:
 
         :param pattern: The pattern that a :obj:`Message`'s text must
                         match for the command to be invoked.
-        :param func: The fucntion to be executed when the command is
+        :param func: The function to be executed when the command is
                      invoked
         :param case_sensitive: Whether the :code:`pattern` should
                                respect case sensitivity.
@@ -94,7 +93,7 @@ class Phial:
                                    description of the command using
                                    the inbuilt help function.
 
-                                   If not overriden the command's
+                                   If not overridden the command's
                                    docstring will be used as the
                                    help text.
 
@@ -169,7 +168,7 @@ class Phial:
                                    description of the command using
                                    the inbuilt help function.
 
-                                   If not overriden the command's
+                                   If not overridden the command's
                                    docstring will be used as the
                                    help text.
 
@@ -292,7 +291,7 @@ class Phial:
         """
         Adds a middleware function to the bot.
 
-        Middleware functions get passed every message the bot recieves from
+        Middleware functions get passed every message the bot receives from
         slack before the bot process the message itself. Returning :obj:`None`
         from a middleware function will prevent the bot from processing it.
 
@@ -305,7 +304,7 @@ class Phial:
 
         ::
 
-            def intercept(messaage):
+            def intercept(message):
                 return message
             bot.add_middleware(intercept)
 
@@ -313,7 +312,7 @@ class Phial:
         ::
 
             @bot.middleware()
-            def intercept(messaage):
+            def intercept(message):
                 return message
 
         """
@@ -333,7 +332,7 @@ class Phial:
         ::
 
             @bot.middleware()
-            def intercept(messaage):
+            def intercept(message):
                 return message
         """
 
@@ -467,7 +466,7 @@ class Phial:
             self.add_command(
                 "help",
                 lambda: help_command(self),
-                help_text_override="List all available commmands",
+                help_text_override="List all available commands",
             )
 
     def _send_response(self, response: PhialResponse, original_channel: str) -> None:

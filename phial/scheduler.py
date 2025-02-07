@@ -43,9 +43,9 @@ class Schedule:
 
     def every(self) -> "Schedule":
         """
-        Syntantic sugar to make schedule declaration more readable.
+        Syntactic sugar to make schedule declaration more readable.
 
-        Syntatic sugar to allow the declaration of schedules to be more
+        Syntactic sugar to allow the declaration of schedules to be more
         like an English sentence.
 
         ::
@@ -81,7 +81,7 @@ class Schedule:
 
     def at(self, hour: int, minute: int, second: int = 0) -> "Schedule":
         """
-        Specifies the time of day the next occurnce will happen.
+        Specifies the time of day the next occurrence will happen.
 
         NOTE: 'at' can only be used with :meth:`day`.
         ::
@@ -247,7 +247,7 @@ class Scheduler:
 
     def add_job(self, job: ScheduledJob) -> None:
         """
-        Adds a scheuled job to the scheduler.
+        Adds a scheduled job to the scheduler.
 
         :param job: The job to be added to the scheduler
         """
