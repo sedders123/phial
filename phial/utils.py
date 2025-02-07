@@ -13,25 +13,30 @@ def validate_kwargs(func: Callable, kwargs: dict[str, str]) -> dict[str, Any]:
     """Validate kwargs match a functions signature."""
     func_params = signature(func).parameters
     validated_kwargs: dict[str, Any] = {}
+    # If a function is wrapped additional parameters could be injected
+    # which the user should not have to provide.
+    # We won't validate params for wrapped functions
+    is_func_wrapped = hasattr(func, "__wrapped__")
     for key in func_params.values():
         value = None
         if key.default is not Parameter.empty:
             value = key.default
-        if value is None and key.name not in kwargs:
+        if value is None and key.name not in kwargs and not is_func_wrapped:
             raise ArgumentValidationError(
                 f"Parameter {key.name} not provided to {func.__name__}",
             )
         if key.name in kwargs:
             value = kwargs[key.name]
 
-        if key.annotation is not Signature.empty:
+        if key.annotation is not Signature.empty and value:
             try:
                 value = key.annotation(value)
             except ValueError:
                 raise ArgumentTypeValidationError(
                     f"{value} could not be converted to {key.annotation.__name__}",
                 )
-        validated_kwargs[key.name] = value
+        if value:
+            validated_kwargs[key.name] = value
     return validated_kwargs
 
 

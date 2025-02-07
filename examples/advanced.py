@@ -4,6 +4,8 @@ import logging
 import os
 from multiprocessing import Process
 from time import sleep
+from functools import wraps
+from typing import Any, Callable
 
 from phial import Message, Phial, Response, Schedule, command
 
@@ -11,6 +13,21 @@ slackbot = Phial(
     os.getenv("SLACK_APP_TOKEN", "NONE"), os.getenv("SLACK_BOT_TOKEN", "NONE")
 )
 SCHEDULED_CHANNEL = "channel-id"
+
+
+def foo_injector(func: Callable) -> Callable:
+    @wraps(func)
+    def decorator(*args: Any, **kwargs: Any) -> Any:
+        return func(*args, foo="bar", **kwargs)
+
+    return decorator
+
+
+@slackbot.command("foo")
+@foo_injector
+def foo(foo: str) -> str:
+    """A command which replies with a message."""
+    return foo
 
 
 @slackbot.command("cent(er|re)")
