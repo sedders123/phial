@@ -6,21 +6,21 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: 3.7
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r dev-requirements.txt
-        pip install -e .
-    - name: Test with pytest
-      run: |
-        pytest tests -v --cov=phial --cov-report xml
-    - name: Upload coverage to CodeCov
-      uses: codecov/codecov-action@v2.1.0
-      with:
-        token: ${{secrets.CODECOV_TOKEN}}
-        file: ./coverage.xml
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+      - name: Install dependencies
+        run: |
+          python -m pip install uv
+          uv sync
+          pip install -e .
+      - name: Test with pytest
+        run: |
+          pytest tests -v --cov=phial --cov-report xml
+      - name: Upload coverage to CodeCov
+        uses: codecov/codecov-action@v2.1.0
+        with:
+          token: ${{secrets.CODECOV_TOKEN}}
+          file: ./coverage.xml
