@@ -1,5 +1,5 @@
 [project]
-name = "phial"
+name = "phial-slack"
 dynamic = ["version"]
 authors = [{ name = "James Seden Smith", email = "sedders123@gmail.com" }]
 maintainers = [{ name = "James Seden Smith", email = "sedders123@gmail.com" }]
