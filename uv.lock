@@ -296,7 +296,7 @@ wheels = [
 ]
 
 [[package]]
-name = "phial"
+name = "phial-slack"
 source = { editable = "." }
 dependencies = [
     { name = "slack-sdk" },
