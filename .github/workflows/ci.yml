@@ -21,13 +21,13 @@ jobs:
           pip install -e .
       - name: Lint with ruff
         run: |
-          ruff check phial/ tests/ examples/
+          uv run ruff check phial/ tests/ examples/
       - name: Lint with mypy
         run: |
-          mypy phial tests stubs examples
+          uv run mypy phial tests stubs examples
       - name: Test with pytest
         run: |
-          pytest tests -v
+          uv run pytest tests -v
       - name: Build docs
         run: |
-          python -msphinx -M html "docs/source" "build/"
+          uv run python -msphinx -M html "docs/source" "build/"
