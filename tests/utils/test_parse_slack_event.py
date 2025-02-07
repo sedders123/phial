@@ -1,21 +1,23 @@
 """Test parse_slack_output."""
+
 from typing import Dict, List
 
-from phial.utils import parse_slack_output
+from phial.utils import parse_slack_event
 
 
-def test_parse_slack_output() -> None:
+def test_parse_slack_event() -> None:
     """Test returns Message correctly."""
-    sample_input = [
-        {
+    sample_input = {
+        "event": {
             "text": "test",
             "channel": "channel",
             "user": "user",
             "ts": "ts",
             "team": "team",
-        }
-    ]
-    output = parse_slack_output(sample_input)
+        },
+    }
+
+    output = parse_slack_event(sample_input)
     assert output is not None
     assert output.channel == "channel"
     assert output.team == "team"
@@ -25,19 +27,20 @@ def test_parse_slack_output() -> None:
     assert output.bot_id is None
 
 
-def test_parse_slack_output_bot() -> None:
+def test_parse_slack_event_bot() -> None:
     """Test returns bot Message correctly."""
-    sample_input = [
-        {
+    sample_input = {
+        "event": {
             "text": "test",
             "channel": "channel",
             "user": "user",
             "ts": "ts",
             "team": "team",
             "bot_id": "bot",
-        }
-    ]
-    output = parse_slack_output(sample_input)
+        },
+    }
+
+    output = parse_slack_event(sample_input)
     assert output is not None
     assert output.channel == "channel"
     assert output.team == "team"
@@ -49,6 +52,6 @@ def test_parse_slack_output_bot() -> None:
 
 def test_parse_slack_output_returns_none_on_empty_input() -> None:
     """Check returns None when no messages passed in."""
-    sample_input: List[Dict[str, str]] = []
-    output = parse_slack_output(sample_input)
+    sample_input = {}
+    output = parse_slack_event(sample_input)
     assert output is None
