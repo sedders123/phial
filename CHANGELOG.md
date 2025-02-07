@@ -5,10 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.11.1](https://github.com/sedders123/phial/releases/tag/0.11.1) - 2025-02-07
+
+### Fixed
+
+- Commands that are wrapped with a functools.wrap decorator no longer fail parameter validation
+
 ## [0.11.0](https://github.com/sedders123/phial/releases/tag/0.11.0) - 2025-02-07
 
+### Changed
+
 - Upgrade to use slack_sdk and Socket Mode. This is a breaking change and will require you to update your code to use the new API.
-- Remove hot reload functionality. This may be re-added in a future release.
+
+### Removed
+
+- Removed hot reload functionality. This may be re-added in a future release.
 
 ## [0.10.1](https://github.com/sedders123/phial/releases/tag/0.10.1) - 2019-10-04
 
