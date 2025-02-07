@@ -1,4 +1,5 @@
 """Test Response class."""
+
 from phial import Response
 
 

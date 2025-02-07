@@ -1,17 +1,21 @@
 """The core of phial."""
+
 import json
 import logging
 from concurrent.futures import Future, ThreadPoolExecutor
 from time import sleep
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Optional, cast
 
-from slackclient import SlackClient  # type: ignore
+from slack_sdk.socket_mode import SocketModeClient
+from slack_sdk.socket_mode.request import SocketModeRequest
+from slack_sdk.socket_mode.response import SocketModeResponse
+from slack_sdk.web import WebClient
 
 from phial.commands import help_command
 from phial.errors import ArgumentTypeValidationError
 from phial.globals import _command_ctx_stack
 from phial.scheduler import Schedule, ScheduledJob, Scheduler
-from phial.utils import parse_slack_output, validate_kwargs
+from phial.utils import parse_slack_event, validate_kwargs
 from phial.wrappers import (  # fmt: off
     Attachment,
     Command,
@@ -20,14 +24,12 @@ from phial.wrappers import (  # fmt: off
     Response,
 )
 
-from ._reloader import run_with_reloader
-
 
 class Phial:
     """
     The Phial class acts as the main interface to Slack.
 
-    It handles registraion and execution of user defined commands,
+    It handles registration and execution of user defined commands,
     as well as providing a wrapper around :obj:`slackclient.SlackClient`
     to make sending messages to Slack simpler.
     """
@@ -43,12 +45,18 @@ class Phial:
         "maxThreads": 4,
     }
 
-    def __init__(self, token: str, config: Dict = default_config) -> None:
-        self.slack_client = SlackClient(token)
-        self.commands: List[Command] = []
-        self.config: Dict = dict(self.default_config)
+    def __init__(
+        self, app_token: str, bot_token: str, config: dict = default_config
+    ) -> None:
+        self.config = dict(self.default_config)
         self.config.update(config)
-        self.middleware_functions: List[Callable[[Message], Optional[Message]]] = []
+        self.slack_client = SocketModeClient(
+            app_token=app_token,
+            web_client=WebClient(token=bot_token),
+            auto_reconnect_enabled=cast(bool, self.config["autoReconnect"]),
+        )
+        self.commands: list[Command] = []
+        self.middleware_functions: list[Callable[[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
         self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
         self.logger = logging.getLogger(__name__)
@@ -401,11 +409,11 @@ class Phial:
 
         :param message: The message to be sent to Slack
         """
-        api_method = "chat.postEphemeral" if message.ephemeral else "chat.postMessage"
 
-        if message.original_ts:
-            self.slack_client.api_call(
-                api_method,
+        if message.ephemeral:
+            if message.user is None:
+                raise ValueError("User not provided for ephemeral message")
+            self.slack_client.web_client.chat_postEphemeral(
                 channel=message.channel,
                 text=message.text,
                 thread_ts=message.original_ts,
@@ -414,12 +422,11 @@ class Phial:
                 as_user=True,
             )
         else:
-            self.slack_client.api_call(
-                api_method,
+            self.slack_client.web_client.chat_postMessage(
                 channel=message.channel,
                 text=message.text,
+                thread_ts=message.original_ts,
                 attachments=json.dumps(message.attachments),
-                user=message.user,
                 as_user=True,
             )
 
@@ -430,12 +437,14 @@ class Phial:
         :param response: Response containing the reaction to be
                          sent to Slack
         """
-        self.slack_client.api_call(
-            "reactions.add",
+        if response.original_ts is None or response.reaction is None:
+            raise ValueError(
+                "Original timestamp and reaction must be provided for reaction"
+            )
+        self.slack_client.web_client.reactions_add(
             channel=response.channel,
             timestamp=response.original_ts,
             name=response.reaction,
-            as_user=True,
         )
 
     def upload_attachment(self, attachment: Attachment) -> None:
@@ -444,11 +453,11 @@ class Phial:
 
         :param attachment: The attachment to be uploaded to Slack
         """
-        self.slack_client.api_call(
-            "files.upload",
+        self.slack_client.web_client.files_upload_v2(
             channels=attachment.channel,
             filename=attachment.filename,
-            file=attachment.content,
+            file=attachment.content,  # type: ignore
+            title=attachment.filename,
         )
 
     def _register_standard_commands(self) -> None:
@@ -491,15 +500,28 @@ class Phial:
         if isinstance(response, Attachment):
             self.upload_attachment(response)
 
-    def _handle_message(self, message: Optional[Message]) -> None:
-        if not message:
+    def _handle_message(self, client: SocketModeClient, req: SocketModeRequest) -> None:
+        try:
+            self._handle_message_internal(client, req)
+        except Exception as e:
+            self.logger.error(e)
+
+    def _handle_message_internal(
+        self, client: SocketModeClient, req: SocketModeRequest
+    ) -> None:
+        # Acknowledge the request so it is not resent
+        ack_response = SocketModeResponse(envelope_id=req.envelope_id)
+        client.send_socket_mode_response(ack_response)
+
+        if req.type != "events_api":
             return
+        message = parse_slack_event(req.payload)
 
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
                 self.logger.debug(
-                    "Ran middleware: {0} on" " {1}".format(func.__name__, message)
+                    "Ran middleware: {0} on {1}".format(func.__name__, message)
                 )
                 message = func(message)
 
@@ -511,6 +533,8 @@ class Phial:
         if (
             "prefix" in self.config
             and self.config["prefix"] is not None
+            and self.config["prefix"] != ""
+            and isinstance(self.config["prefix"], str)
             and not message.text.startswith(self.config["prefix"])
         ):
             return
@@ -532,7 +556,7 @@ class Phial:
                     return
                 finally:
                     self.logger.debug(
-                        "Ran command: {0} on" " {1}".format(command_name, message)
+                        "Ran command: {0} on {1}".format(command_name, message)
                     )
                     _command_ctx_stack.pop()
 
@@ -552,31 +576,27 @@ class Phial:
 
         When called will start the bot listening to messages from Slack
         """
-        auto_reconnect = self.config["autoReconnect"]
-        if not self.slack_client.rtm_connect(
-            auto_reconnect=auto_reconnect, with_team_state=False
-        ):
-            raise ValueError("Connection failed. Invalid Token or bot ID")
+        self.slack_client.socket_mode_request_listeners.append(self._handle_message)  # type: ignore
+        self.slack_client.connect()
 
         self.logger.info("Phial connected and running!")
 
-        thread_pool_size = self.config["maxThreads"]
+        thread_pool_size = int(cast(str, self.config["maxThreads"]))
         thread_pool = ThreadPoolExecutor(thread_pool_size)
         run_pending_tasks: Optional[Future] = None
 
         while True:
             try:
-                message = parse_slack_output(self.slack_client.rtm_read())
-                thread_pool.submit(self._handle_message, message)
                 if run_pending_tasks is None or run_pending_tasks.done():
                     run_pending_tasks = thread_pool.submit(self.scheduler.run_pending)
             except Exception as e:
                 self.logger.error(e)
-            sleep(self.config["loopDelay"])  # Help prevent high CPU usage.
+            sleep(cast(float, self.config["loopDelay"]))  # Help prevent high CPU usage.
 
     def run(self) -> None:  # pragma: no cover
         """Run the bot."""
         if self.config["hotReload"]:
-            run_with_reloader(self._start)
+            # TODO: Implement hot reload
+            self._start()
         else:
             self._start()

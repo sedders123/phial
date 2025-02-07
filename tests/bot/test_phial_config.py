@@ -1,17 +1,19 @@
 """Test phial config."""
+
 from phial import Phial
 
 
 def test_uses_default_config_when_not_specified() -> None:
     """Test phial using default config."""
-    bot = Phial("test-token")
+    bot = Phial("app-token", "bot-token")
     assert bot.config == Phial.default_config
 
 
 def test_config_override() -> None:
     """Test config can be overriden."""
     bot = Phial(
-        "test-token",
+        "app-token",
+        "bot-token",
         config={
             "prefix": "/",
             "registerHelpCommand": False,
@@ -36,7 +38,7 @@ def test_config_override() -> None:
 
 def test_partial_config_override() -> None:
     """Test config can be partially oerriden."""
-    bot = Phial("test-token", config={"prefix": "/"})
+    bot = Phial("app-token", "bot-token", config={"prefix": "/"})
 
     assert bot.config["prefix"] == "/"
     assert bot.config["baseHelpText"] == "All available commands:"

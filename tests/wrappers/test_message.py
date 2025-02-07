@@ -1,4 +1,5 @@
 """Test Message class."""
+
 from phial import Message
 
 

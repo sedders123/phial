@@ -1,5 +1,7 @@
 """Helpers for unit tests."""
+
 from typing import Any
+
 import pytest  # noqa
 
 
@@ -12,7 +14,7 @@ def wildpatch(target: Any, name: str, value: Any = None, raising: bool = True) -
             raise TypeError(
                 "use setattr(target, name, value) or "
                 "setattr(target, value) with target being a dotted"
-                " import string"
+                " import string",
             )
         value = name
         name, target = derive_importpath(target, raising)  # type: ignore # noqa

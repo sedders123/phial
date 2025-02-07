@@ -1,4 +1,5 @@
 """Advanced examples."""
+
 import logging
 import os
 from multiprocessing import Process
@@ -6,7 +7,9 @@ from time import sleep
 
 from phial import Message, Phial, Response, Schedule, command
 
-slackbot = Phial(os.getenv("SLACK_API_TOKEN", "NONE"))
+slackbot = Phial(
+    os.getenv("SLACK_APP_TOKEN", "NONE"), os.getenv("SLACK_BOT_TOKEN", "NONE")
+)
 SCHEDULED_CHANNEL = "channel-id"
 
 
@@ -18,14 +21,13 @@ def regex_in_command() -> Response:
         base_command = base_command[1:]
     if base_command == "center":
         return Response(text="Yeehaw! You're a Yank", channel=command.channel)
-    elif base_command == "centre":
+    if base_command == "centre":
         return Response(text="I say! You appear to be a Brit", channel=command.channel)
-    else:
-        return Response(
-            text="Well this is awkward... this isn't meant to \
-                        happen",
-            channel=command.channel,
-        )
+    return Response(
+        text="Well this is awkward... this isn't meant to \
+                    happen",
+        channel=command.channel,
+    )
 
 
 @slackbot.command("colo[u]?r <arg>")
@@ -33,7 +35,7 @@ def regex_in_command_with_arg(arg: str) -> Response:
     """Command that uses regex to define structure with an arg."""
     base_command = command.text.split(" ")[0]
     return Response(
-        text="My favourite {0} is {1}".format(base_command, arg),
+        text=f"My favourite {base_command} is {arg}",
         channel=command.channel,
     )
 
@@ -91,7 +93,7 @@ def get_message_with_attachment() -> Response:
                         "short": True,
                     },
                 ],
-            }
+            },
         ],
     )
 

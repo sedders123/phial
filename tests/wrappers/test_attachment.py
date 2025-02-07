@@ -1,4 +1,5 @@
 """Test Attachment class."""
+
 import io
 
 from phial import Attachment

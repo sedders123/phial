@@ -1,4 +1,5 @@
 """Test Schedule class."""
+
 from datetime import datetime, timedelta
 
 import pytest
@@ -96,7 +97,7 @@ def test_at_after_time() -> None:
     now = datetime.now()
     next_run = schedule.get_next_run_time(now)
     expected_datetime = (now + timedelta(days=1)).replace(
-        hour=12, minute=0, second=0, microsecond=0
+        hour=12, minute=0, second=0, microsecond=0,
     )
     assert next_run == expected_datetime
 

@@ -1,4 +1,5 @@
 """Test Command class."""
+
 from phial.wrappers import Command, Message
 
 

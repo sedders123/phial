@@ -136,3 +136,4 @@ pip-selfcheck.json
 .noseids
 .pytest_cache/
 _build/
+.ruff_cache/
