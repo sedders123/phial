@@ -19,9 +19,9 @@ jobs:
           python -m pip install uv
           uv sync
           pip install -e .
-      - name: Lint with flake8
+      - name: Lint with ruff
         run: |
-          flake8 phial/ tests/ examples/
+          ruff check phial/ tests/ examples/
       - name: Lint with mypy
         run: |
           mypy phial tests stubs examples
