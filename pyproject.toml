@@ -1,0 +1,67 @@
+[project]
+name = "phial"
+dynamic = ["version"]
+authors = [{ name = "James Seden Smith", email = "sedders123@gmail.com" }]
+maintainers = [{ name = "James Seden Smith", email = "sedders123@gmail.com" }]
+description = "A Slack bot framework"
+readme = "README.rst"
+requires-python = ">=3.11"
+dependencies = ["slack-sdk>=3.34.0", "werkzeug>=3.1.3"]
+keywords = ["slack", "bot", "framework", "phial", "slackbot"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/sedders123/phial/"
+Documentation = "https://phial.dev/"
+Source = "https://github.com/sedders123/phial/"
+Issues = "https://github.com/sedders123/phial/issues"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["phial"]
+package-data = { "phial" = ["py.typed"] }
+
+[tool.setuptools.dynamic]
+version = { attr = "phial.__version__" }
+
+[dependency-groups]
+dev = [
+    "freezegun>=1.5.1",
+    "mypy>=1.15.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.5",
+    "sphinx>=8.1.3",
+    "sphinx-autodoc-typehints>=3.0.1",
+]
+
+[tool.mypy]
+mypy_path = "stubs"
+warn_unused_ignores = true
+warn_return_any = true
+
+strict_optional = true
+no_implicit_optional = true
+
+disallow_any_unimported = true
+disallow_subclassing_any = true
+
+disallow_untyped_calls = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+disallow_untyped_decorators = true
+
+check_untyped_defs = true
+ignore_missing_imports = false
