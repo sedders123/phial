@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 #
 # phial documentation build configuration file, created by
 # sphinx-quickstart on Sat Jul  1 21:23:47 2017.
@@ -55,7 +54,7 @@ master_doc = "index"
 
 # General information about the project.
 project = "phial"
-copyright = "2017-2019, James Seden Smith"
+copyright = "2017 James Seden Smith"
 author = "James Seden Smith"
 
 # The version info for the project you're documenting, acts as replacement for
@@ -132,7 +131,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, "phial.tex", "phial Documentation", "James Seden Smith", "manual")
+    (master_doc, "phial.tex", "phial Documentation", "James Seden Smith", "manual"),
 ]
 
 
@@ -157,8 +156,8 @@ texinfo_documents = [
         "phial",
         "One line description of project.",
         "Miscellaneous",
-    )
+    ),
 ]
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {"https://docs.python.org/": None}
+intersphinx_mapping = {"python": ("https://docs.python.org/3", None)}
