@@ -1,8 +1,9 @@
 """The classes related to scheduling of regular jobs in phial."""
+
 import logging
 from collections import namedtuple
 from datetime import datetime, timedelta
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
 LOGGER = logging.getLogger("phial.bot.scheduler")
 
@@ -242,7 +243,7 @@ class Scheduler:
     """A store for Scheduled Jobs."""
 
     def __init__(self) -> None:
-        self.jobs: List[ScheduledJob] = []
+        self.jobs: list[ScheduledJob] = []
 
     def add_job(self, job: ScheduledJob) -> None:
         """
@@ -259,6 +260,6 @@ class Scheduler:
         Runs any ScheduledJobs in the store, where :code:`job.should_run()`
         returns true
         """
-        jobs_to_run: List[ScheduledJob] = [job for job in self.jobs if job.should_run()]
+        jobs_to_run = [job for job in self.jobs if job.should_run()]
         for job in jobs_to_run:
             job.run()

@@ -1,7 +1,5 @@
 """Test parse_slack_output."""
 
-from typing import Dict, List
-
 from phial.utils import parse_slack_event
 
 
@@ -52,6 +50,6 @@ def test_parse_slack_event_bot() -> None:
 
 def test_parse_slack_output_returns_none_on_empty_input() -> None:
     """Check returns None when no messages passed in."""
-    sample_input = {}
+    sample_input: dict = {}
     output = parse_slack_event(sample_input)
     assert output is None

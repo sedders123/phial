@@ -4,7 +4,7 @@ import json
 import logging
 from concurrent.futures import Future, ThreadPoolExecutor
 from time import sleep
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Optional, cast
 
 from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
@@ -46,19 +46,17 @@ class Phial:
     }
 
     def __init__(
-        self, app_token: str, bot_token: str, config: Dict = default_config
+        self, app_token: str, bot_token: str, config: dict = default_config
     ) -> None:
-        self.config: Dict = dict(self.default_config)
+        self.config = dict(self.default_config)
         self.config.update(config)
         self.slack_client = SocketModeClient(
             app_token=app_token,
             web_client=WebClient(token=bot_token),
-            auto_reconnect_enabled=self.config["autoReconnect"],
+            auto_reconnect_enabled=cast(bool, self.config["autoReconnect"]),
         )
-        self.commands: List[Command] = []
-        self.config: Dict = dict(self.default_config)
-        self.config.update(config)
-        self.middleware_functions: List[Callable[[Message], Optional[Message]]] = []
+        self.commands: list[Command] = []
+        self.middleware_functions: list[Callable[[Message], Optional[Message]]] = []
         self.scheduler = Scheduler()
         self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
         self.logger = logging.getLogger(__name__)
@@ -413,6 +411,8 @@ class Phial:
         """
 
         if message.ephemeral:
+            if message.user is None:
+                raise ValueError("User not provided for ephemeral message")
             self.slack_client.web_client.chat_postEphemeral(
                 channel=message.channel,
                 text=message.text,
@@ -437,6 +437,10 @@ class Phial:
         :param response: Response containing the reaction to be
                          sent to Slack
         """
+        if response.original_ts is None or response.reaction is None:
+            raise ValueError(
+                "Original timestamp and reaction must be provided for reaction"
+            )
         self.slack_client.web_client.reactions_add(
             channel=response.channel,
             timestamp=response.original_ts,
@@ -452,7 +456,7 @@ class Phial:
         self.slack_client.web_client.files_upload_v2(
             channels=attachment.channel,
             filename=attachment.filename,
-            file=attachment.content,
+            file=attachment.content,  # type: ignore
             title=attachment.filename,
         )
 
@@ -506,8 +510,8 @@ class Phial:
         self, client: SocketModeClient, req: SocketModeRequest
     ) -> None:
         # Acknowledge the request so it is not resent
-        response = SocketModeResponse(envelope_id=req.envelope_id)
-        client.send_socket_mode_response(response)
+        ack_response = SocketModeResponse(envelope_id=req.envelope_id)
+        client.send_socket_mode_response(ack_response)
 
         if req.type != "events_api":
             return
@@ -529,6 +533,8 @@ class Phial:
         if (
             "prefix" in self.config
             and self.config["prefix"] is not None
+            and self.config["prefix"] != ""
+            and isinstance(self.config["prefix"], str)
             and not message.text.startswith(self.config["prefix"])
         ):
             return
@@ -570,12 +576,12 @@ class Phial:
 
         When called will start the bot listening to messages from Slack
         """
-        self.slack_client.socket_mode_request_listeners.append(self._handle_message)
+        self.slack_client.socket_mode_request_listeners.append(self._handle_message)  # type: ignore
         self.slack_client.connect()
 
         self.logger.info("Phial connected and running!")
 
-        thread_pool_size = self.config["maxThreads"]
+        thread_pool_size = int(cast(str, self.config["maxThreads"]))
         thread_pool = ThreadPoolExecutor(thread_pool_size)
         run_pending_tasks: Optional[Future] = None
 
@@ -585,7 +591,7 @@ class Phial:
                     run_pending_tasks = thread_pool.submit(self.scheduler.run_pending)
             except Exception as e:
                 self.logger.error(e)
-            sleep(self.config["loopDelay"])  # Help prevent high CPU usage.
+            sleep(cast(float, self.config["loopDelay"]))  # Help prevent high CPU usage.
 
     def run(self) -> None:  # pragma: no cover
         """Run the bot."""

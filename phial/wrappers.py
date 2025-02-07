@@ -1,10 +1,7 @@
 """Contains models for phial to use."""
 
 import re
-from typing import IO, Callable, Dict, List, Optional, Pattern, Union
-
-#: A union of all response types phial can use
-PhialResponse = Union[None, str, "Response", "Attachment"]
+from typing import IO, Callable, Optional, Pattern
 
 
 class Response:
@@ -59,9 +56,7 @@ class Response:
         reaction: Optional[str] = None,
         ephemeral: bool = False,
         user: Optional[str] = None,
-        attachments: Optional[
-            List[Dict[str, Union[str, int, float, bool, List]]]
-        ] = None,
+        attachments: Optional[list[dict[str, str | int | float | bool | list]]] = None,
     ) -> None:
         self.channel = channel
         self.text = text
@@ -142,6 +137,9 @@ class Message:
         return self.__dict__ == other.__dict__
 
 
+PhialResponse = None | str | Response | Attachment
+
+
 class Command:
     """
     An action executable from Slack.
@@ -177,8 +175,8 @@ class Command:
     def __repr__(self) -> str:
         return "<Command: {0}>".format(self.pattern_string)
 
-    def _get_alias_patterns(self, func: Callable) -> List[Pattern]:
-        patterns: List[Pattern] = []
+    def _get_alias_patterns(self, func: Callable) -> list[Pattern]:
+        patterns: list[Pattern] = []
         if hasattr(func, "alias_patterns"):
             for pattern in func.alias_patterns:
                 patterns.append(self._build_pattern_regex(pattern))
@@ -194,7 +192,7 @@ class Command:
             "^{}$".format(command_regex), 0 if case_sensitive else re.IGNORECASE
         )
 
-    def pattern_matches(self, message: Message) -> Optional[Dict[str, str]]:
+    def pattern_matches(self, message: Message) -> Optional[dict[str, str]]:
         """
         Check if message should invoke the command.
 

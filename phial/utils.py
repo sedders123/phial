@@ -2,16 +2,16 @@
 
 import re
 from inspect import Parameter, Signature, signature
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Optional
 
 from phial.errors import ArgumentTypeValidationError, ArgumentValidationError
 from phial.wrappers import Message
 
 
-def validate_kwargs(func: Callable, kwargs: Dict[str, str]) -> Dict[str, Any]:
+def validate_kwargs(func: Callable, kwargs: dict[str, str]) -> dict[str, Any]:
     """Validate kwargs match a functions signature."""
     func_params = signature(func).parameters
-    validated_kwargs: Dict[str, Any] = {}
+    validated_kwargs: dict[str, Any] = {}
     for key in func_params.values():
         value = None
         if key.default is not Parameter.empty:
@@ -54,7 +54,7 @@ def parse_help_text(help_text: str) -> str:
     return help_text
 
 
-def parse_slack_event(slack_event: Dict) -> Optional["Message"]:
+def parse_slack_event(slack_event: dict) -> Optional["Message"]:
     """Parse Slack output."""
     event = slack_event.get("event", {})
     if "text" in event:
@@ -74,3 +74,4 @@ def parse_slack_event(slack_event: Dict) -> Optional["Message"]:
             bot_id,
         )
         return msg
+    return None
