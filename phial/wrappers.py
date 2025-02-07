@@ -180,7 +180,7 @@ class Command:
     def _get_alias_patterns(self, func: Callable) -> List[Pattern]:
         patterns: List[Pattern] = []
         if hasattr(func, "alias_patterns"):
-            for pattern in func.alias_patterns:  # type: ignore
+            for pattern in func.alias_patterns:
                 patterns.append(self._build_pattern_regex(pattern))
         return patterns
 

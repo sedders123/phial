@@ -1,4 +1,5 @@
 """Provides the globaly scoped parts of phial."""
+
 from typing import cast
 
 from werkzeug.local import LocalProxy, LocalStack

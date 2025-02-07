@@ -1,4 +1,5 @@
 """Helper utilities for phial."""
+
 import re
 from inspect import Parameter, Signature, signature
 from typing import Any, Callable, Dict, List, Optional
@@ -53,25 +54,23 @@ def parse_help_text(help_text: str) -> str:
     return help_text
 
 
-def parse_slack_output(slack_rtm_output: List[Dict]) -> Optional["Message"]:
+def parse_slack_event(slack_event: Dict) -> Optional["Message"]:
     """Parse Slack output."""
-    output_list = slack_rtm_output
-    if output_list and len(output_list) > 0:
-        for output in output_list:
-            if output and "text" in output:
-                bot_id = None
-                team = None
-                if "team" in output:
-                    team = output["team"]
-                if "bot_id" in output:
-                    bot_id = output["bot_id"]
+    event = slack_event.get("event", {})
+    if "text" in event:
+        bot_id = None
+        team = None
+        if "team" in event:
+            team = event["team"]
+        if "bot_id" in event:
+            bot_id = event["bot_id"]
 
-                return Message(
-                    output["text"],
-                    output["channel"],
-                    output["user"],
-                    output["ts"],
-                    team,
-                    bot_id,
-                )
-    return None
+        msg = Message(
+            event["text"],
+            event["channel"],
+            event["user"],
+            event["ts"],
+            team,
+            bot_id,
+        )
+        return msg
