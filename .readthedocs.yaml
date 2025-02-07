@@ -17,4 +17,4 @@ build:
         - uv run sphinx-build -T -b html docs $READTHEDOCS_OUTPUT/html
 
 sphinx:
-  configuration: docs/source/conf.py
+  configuration: docs/conf.py

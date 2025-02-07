@@ -30,4 +30,4 @@ jobs:
           uv run pytest tests -v
       - name: Build docs
         run: |
-          uv run python -msphinx -M html "docs/source" "build/"
+          uv run python -msphinx -M html "docs/" "build/"
