@@ -7,7 +7,8 @@ from phial import Attachment, Phial, Response, command
 from phial.wrappers import Command
 
 slackbot = Phial(
-    os.getenv("SLACK_APP_TOKEN", "NONE"), os.getenv("SLACK_BOT_TOKEN", "NONE")
+    os.getenv("SLACK_APP_TOKEN", "NONE"),
+    os.getenv("SLACK_BOT_TOKEN", "NONE"),
 )
 
 
@@ -116,7 +117,7 @@ def long() -> str:
 @slackbot.command("hidden", hide_from_help_command=True)
 def hidden() -> str:
     """A command that is hidden from the default help command."""
-    return "Suprise"
+    return "Surprise"
 
 
 @slackbot.fallback_command()
