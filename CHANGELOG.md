@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [0.12.1](https://github.com/sedders123/phial/releases/tag/0.12.1) - 2025-02-08
+
+### Fixed
+
+- Fixed config requiring a 'hotReload' key, despite this not currently being a feature
+
 ## [0.12.0](https://github.com/sedders123/phial/releases/tag/0.12.0) - 2025-02-08
 
 ### Changed
