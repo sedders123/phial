@@ -589,8 +589,9 @@ class Phial:
 
     def run(self) -> None:  # pragma: no cover
         """Run the bot."""
-        if self.config["hotReload"]:
-            # TODO: Implement hot reload
-            self._start()
-        else:
-            self._start()
+        self._start()
+        # TODO: Implement hot reload
+        # if self.config["hotReload"]:
+        # self._start()
+        # else:
+        #     self._start()
