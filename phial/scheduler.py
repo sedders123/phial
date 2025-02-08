@@ -205,6 +205,7 @@ class Schedule:
                 minute=self._at.minute,
                 second=self._at.second,
                 microsecond=0,
+                tzinfo=UTC,
             )
             if next_run <= datetime.now(tz=UTC):
                 next_run += timedelta(days=self._days)
