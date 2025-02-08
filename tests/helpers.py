@@ -5,7 +5,13 @@ from typing import Any
 import pytest  # noqa
 
 
-def wildpatch(target: Any, name: str, value: Any = None, raising: bool = True) -> None:
+def wildpatch(
+    target: Any,  # noqa: ANN401
+    name: str,
+    value: Any = None,  # noqa: ANN401
+    *,
+    raising: bool = True,
+) -> None:
     """Monkey patch target."""
     import inspect
 
@@ -21,7 +27,7 @@ def wildpatch(target: Any, name: str, value: Any = None, raising: bool = True) -
 
     oldval = getattr(target, name, None)
     if raising and oldval is None:
-        raise AttributeError("%r has no attribute %r" % (target, name))
+        raise AttributeError(f"{target} has no attribute {name}")
 
     # avoid class descriptors like staticmethod/classmethod
     if inspect.isclass(target):

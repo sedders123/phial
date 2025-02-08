@@ -1,7 +1,9 @@
 """Contains models for phial to use."""
 
 import re
-from typing import IO, Callable, Optional, Pattern
+from collections.abc import Callable
+from re import Pattern
+from typing import IO
 
 
 class Response:
@@ -51,12 +53,13 @@ class Response:
     def __init__(
         self,
         channel: str,
-        text: Optional[str] = None,
-        original_ts: Optional[str] = None,
-        reaction: Optional[str] = None,
+        *,
+        text: str | None = None,
+        original_ts: str | None = None,
+        reaction: str | None = None,
+        user: str | None = None,
+        attachments: list[dict[str, str | int | float | bool | list]] | None = None,
         ephemeral: bool = False,
-        user: Optional[str] = None,
-        attachments: Optional[list[dict[str, str | int | float | bool | list]]] = None,
     ) -> None:
         self.channel = channel
         self.text = text
@@ -67,7 +70,7 @@ class Response:
         self.attachments = attachments
 
     def __repr__(self) -> str:
-        return "<Response: {0}>".format(self.text)
+        return f"<Response: {self.text}>"
 
     def __eq__(self, other: object) -> bool:
         return self.__dict__ == other.__dict__
@@ -95,7 +98,7 @@ class Attachment:
         self.content = content
 
     def __repr__(self) -> str:
-        return "<Attachment {0} in {1}>".format(self.filename, self.channel)
+        return f"<Attachment {self.filename} in {self.channel}>"
 
 
 class Message:
@@ -118,8 +121,9 @@ class Message:
         channel: str,
         user: str,
         timestamp: str,
-        team: Optional[str],
-        bot_id: Optional[str] = None,
+        team: str | None,
+        *,
+        bot_id: str | None = None,
     ) -> None:
         self.text = text
         self.channel = channel
@@ -129,8 +133,8 @@ class Message:
         self.bot_id = bot_id
 
     def __repr__(self) -> str:
-        return "<Message: {0} in {1}:{2} at {3}>".format(
-            self.text, self.channel, self.team, self.timestamp
+        return (
+            f"<Message: {self.text} in {self.channel}:{self.team} at {self.timestamp}>"
         )
 
     def __eq__(self, other: object) -> bool:
@@ -160,12 +164,13 @@ class Command:
         self,
         pattern: str,
         func: Callable[..., PhialResponse],
+        *,
+        help_text_override: str | None = None,
         case_sensitive: bool = False,
-        help_text_override: Optional[str] = None,
-        hide_from_help_command: Optional[bool] = False,
+        hide_from_help_command: bool | None = False,
     ):
         self.pattern_string = pattern
-        self.pattern = self._build_pattern_regex(pattern, case_sensitive)
+        self.pattern = self._build_pattern_regex(pattern, case_sensitive=case_sensitive)
         self.alias_patterns = self._get_alias_patterns(func)
         self.func = func
         self.case_sensitive = case_sensitive
@@ -173,26 +178,27 @@ class Command:
         self.hide_from_help_command = hide_from_help_command
 
     def __repr__(self) -> str:
-        return "<Command: {0}>".format(self.pattern_string)
+        return f"<Command: {self.pattern_string}>"
 
     def _get_alias_patterns(self, func: Callable) -> list[Pattern]:
         patterns: list[Pattern] = []
         if hasattr(func, "alias_patterns"):
-            for pattern in func.alias_patterns:
-                patterns.append(self._build_pattern_regex(pattern))
+            patterns.extend(
+                self._build_pattern_regex(pattern) for pattern in func.alias_patterns
+            )
         return patterns
 
     @staticmethod
     def _build_pattern_regex(
-        pattern: str, case_sensitive: bool = False
+        pattern: str,
+        *,
+        case_sensitive: bool = False,
     ) -> Pattern[str]:
         command = re.sub(r"(<\w+>)", r"(\"?\1\"?)", pattern)
         command_regex = re.sub(r"(<\w+>)", r'(?P\1[^"]*)', command)
-        return re.compile(
-            "^{}$".format(command_regex), 0 if case_sensitive else re.IGNORECASE
-        )
+        return re.compile(f"^{command_regex}$", 0 if case_sensitive else re.IGNORECASE)
 
-    def pattern_matches(self, message: Message) -> Optional[dict[str, str]]:
+    def pattern_matches(self, message: Message) -> dict[str, str] | None:
         """
         Check if message should invoke the command.
 
@@ -212,7 +218,7 @@ class Command:
         return None
 
     @property
-    def help_text(self) -> Optional[str]:
+    def help_text(self) -> str | None:
         """A description of the command's function."""
         if self.help_text_override is not None:
             return self.help_text_override

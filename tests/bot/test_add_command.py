@@ -11,7 +11,7 @@ def test_add_command() -> None:
     def test() -> None:
         pass
 
-    bot = Phial("app-token", "bot-token", {"registerHelpCommand": False})
+    bot = Phial("app-token", "bot-token", config={"registerHelpCommand": False})
     bot.add_command("test", test)
 
     assert len(bot.commands) == 1
@@ -24,7 +24,7 @@ def test_add_same_command_throws() -> None:
     def test() -> None:
         pass
 
-    bot = Phial("app-token", "bot-token", {"registerHelpCommand": False})
+    bot = Phial("app-token", "bot-token", config={"registerHelpCommand": False})
     bot.add_command("test", test)
 
     with pytest.raises(ValueError):
@@ -33,7 +33,7 @@ def test_add_same_command_throws() -> None:
 
 def test_add_command_decorator() -> None:
     """Test add_command decorator works correctly."""
-    bot = Phial("app-token", "bot-token", {"registerHelpCommand": False})
+    bot = Phial("app-token", "bot-token", config={"registerHelpCommand": False})
 
     @bot.command("test")
     def test() -> None:
@@ -45,7 +45,7 @@ def test_add_command_decorator() -> None:
 
 def test_alias_decorator() -> None:
     """Test alias decorator works correctly."""
-    bot = Phial("app-token", "bot-token", {"registerHelpCommand": False})
+    bot = Phial("app-token", "bot-token", config={"registerHelpCommand": False})
 
     @bot.command("test")
     @bot.alias("test2")

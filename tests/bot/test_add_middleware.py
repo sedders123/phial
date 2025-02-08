@@ -9,7 +9,7 @@ def test_add_middleware_command() -> None:
     def test(message: Message) -> None:
         pass
 
-    bot = Phial("app-token", "bot-token", {})
+    bot = Phial("app-token", "bot-token")
     bot.add_middleware(test)
 
     assert len(bot.middleware_functions) == 1
@@ -18,7 +18,7 @@ def test_add_middleware_command() -> None:
 
 def test_add_middleware_decorator() -> None:
     """Test add_middleware decorator works correctly."""
-    bot = Phial("app-token", "bot-token", {})
+    bot = Phial("app-token", "bot-token")
 
     @bot.middleware()
     def test(message: Message) -> None:

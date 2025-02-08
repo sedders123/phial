@@ -1,15 +1,16 @@
 """The classes related to scheduling of regular jobs in phial."""
 
 import logging
-from collections import namedtuple
-from datetime import datetime, timedelta
-from typing import Callable, Optional
+from collections.abc import Callable
+from datetime import UTC, datetime, timedelta
+from typing import NamedTuple
 
 LOGGER = logging.getLogger("phial.bot.scheduler")
 
 
-class _Time(namedtuple("Time", ["hour", "minute", "second"])):
-    """Represents a time of day.
+class _Time(NamedTuple):
+    """
+    Represent a time of day.
 
     .. py:attribute:: hour
 
@@ -25,6 +26,10 @@ class _Time(namedtuple("Time", ["hour", "minute", "second"])):
 
     """
 
+    hour: int
+    minute: int
+    second: int
+
 
 class Schedule:
     """
@@ -36,7 +41,7 @@ class Schedule:
 
     def __init__(self) -> None:
         self._days = 0
-        self._at: Optional[_Time] = None
+        self._at: _Time | None = None
         self._hours = 0
         self._minutes = 0
         self._seconds = 0
@@ -56,7 +61,7 @@ class Schedule:
 
     def day(self) -> "Schedule":
         """
-        Adds a day to the relative time till the next event.
+        Add a day to the relative time till the next event.
 
         ::
 
@@ -81,7 +86,7 @@ class Schedule:
 
     def at(self, hour: int, minute: int, second: int = 0) -> "Schedule":
         """
-        Specifies the time of day the next occurrence will happen.
+        Specify the time of day the next occurrence will happen.
 
         NOTE: 'at' can only be used with :meth:`day`.
         ::
@@ -98,17 +103,17 @@ class Schedule:
                        Defaults to 0
         """
         if self._hours or self._minutes:
-            raise Exception("'at' can only be used on day(s)")
+            raise ValueError("'at' can only be used on day(s)")
         if not self._days:
-            raise Exception("'at' can only be used on day(s)")
+            raise ValueError("'at' can only be used on day(s)")
         if self._at:
-            raise Exception("'at' can only be set once")
+            raise ValueError("'at' can only be set once")
         self._at = _Time(hour, minute, second)
         return self
 
     def hour(self) -> "Schedule":
         """
-        Adds an hour to the relative time till the next event.
+        Add an hour to the relative time till the next event.
 
         ::
 
@@ -118,7 +123,7 @@ class Schedule:
 
     def hours(self, value: int) -> "Schedule":
         """
-        Sets the hours till the next instance of the event.
+        Set the hours till the next instance of the event.
 
         Adds the specified number of hours to the relative time till the next
         event.
@@ -134,7 +139,7 @@ class Schedule:
 
     def minute(self) -> "Schedule":
         """
-        Adds a minute to the relative time till the next event.
+        Add a minute to the relative time till the next event.
 
         ::
 
@@ -144,7 +149,7 @@ class Schedule:
 
     def minutes(self, value: int) -> "Schedule":
         """
-        Sets the minutes till the next instance of the event.
+        Set the minutes till the next instance of the event.
 
         Adds the specified number of minutes to the relative time till the next
         event.
@@ -160,7 +165,7 @@ class Schedule:
 
     def second(self) -> "Schedule":
         """
-        Adds a second to the relative time till the next event.
+        Add a second to the relative time till the next event.
 
         ::
 
@@ -170,7 +175,7 @@ class Schedule:
 
     def seconds(self, value: int) -> "Schedule":
         """
-        Sets the seconds till the next instance of the event.
+        Set the seconds till the next instance of the event.
 
         Adds the specified number of seconds to the relative time till the next
         event.
@@ -201,7 +206,7 @@ class Schedule:
                 second=self._at.second,
                 microsecond=0,
             )
-            if next_run <= datetime.now():
+            if next_run <= datetime.now(tz=UTC):
                 next_run += timedelta(days=self._days)
             return next_run
 
@@ -220,23 +225,23 @@ class ScheduledJob:
         self.func = func
         self.schedule = schedule
         self.func = func
-        self.next_run = self.schedule.get_next_run_time(datetime.now())
+        self.next_run = self.schedule.get_next_run_time(datetime.now(tz=UTC))
 
     def should_run(self) -> bool:
         """
-        Checks whether the function needs to be run based on the schedule.
+        Check whether the function needs to be run based on the schedule.
 
         :returns: A :obj:`bool` of whether or not to run
         """
-        return self.next_run <= datetime.now()
+        return self.next_run <= datetime.now(tz=UTC)
 
     def run(self) -> None:
-        """Runs the function and calculates + stores the next run time."""
+        """Run the function and calculates + stores the next run time."""
         try:
             self.func()
         except Exception as e:
             LOGGER.error(e)
-        self.next_run = self.schedule.get_next_run_time(datetime.now())
+        self.next_run = self.schedule.get_next_run_time(datetime.now(tz=UTC))
 
 
 class Scheduler:
@@ -247,7 +252,7 @@ class Scheduler:
 
     def add_job(self, job: ScheduledJob) -> None:
         """
-        Adds a scheduled job to the scheduler.
+        Add a scheduled job to the scheduler.
 
         :param job: The job to be added to the scheduler
         """
@@ -255,7 +260,7 @@ class Scheduler:
 
     def run_pending(self) -> None:
         """
-        Runs any pending scheduled jobs.
+        Run any pending scheduled jobs.
 
         Runs any ScheduledJobs in the store, where :code:`job.should_run()`
         returns true

@@ -31,10 +31,10 @@ def validate_kwargs(func: Callable, kwargs: dict[str, str]) -> dict[str, Any]:
         if key.annotation is not Signature.empty and value:
             try:
                 value = key.annotation(value)
-            except ValueError:
+            except ValueError as e:
                 raise ArgumentTypeValidationError(
                     f"{value} could not be converted to {key.annotation.__name__}",
-                )
+                ) from e
         if value:
             validated_kwargs[key.name] = value
     return validated_kwargs
@@ -42,20 +42,20 @@ def validate_kwargs(func: Callable, kwargs: dict[str, str]) -> dict[str, Any]:
 
 def parse_help_text(help_text: str) -> str:
     """Parse help text."""
-    NEW_LINE_SEPERATOR = "<__NEW_LINE_SEPERATOR__>"
+    new_line_separator = "<__NEW_LINE_SEPARATOR__>"
 
     # Strip excess whitespace
     help_text = help_text.strip()
 
     # Remove single new lines
-    help_text = help_text.replace("\n", NEW_LINE_SEPERATOR)
-    help_text = help_text.replace(NEW_LINE_SEPERATOR * 2, "\n")
-    help_text = help_text.replace(NEW_LINE_SEPERATOR, "")
+    help_text = help_text.replace("\n", new_line_separator)
+    help_text = help_text.replace(new_line_separator * 2, "\n")
+    help_text = help_text.replace(new_line_separator, "")
 
     # Remove extra spaces
     help_text = re.sub(r"(^[ \t]+|[ \t]+)", " ", help_text, flags=re.MULTILINE)
 
-    return help_text
+    return help_text  # noqa: RET504
 
 
 def parse_slack_event(slack_event: dict) -> Optional["Message"]:
@@ -69,13 +69,12 @@ def parse_slack_event(slack_event: dict) -> Optional["Message"]:
         if "bot_id" in event:
             bot_id = event["bot_id"]
 
-        msg = Message(
+        return Message(
             event["text"],
             event["channel"],
             event["user"],
             event["ts"],
             team,
-            bot_id,
+            bot_id=bot_id,
         )
-        return msg
     return None

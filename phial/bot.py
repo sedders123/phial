@@ -2,9 +2,10 @@
 
 import json
 import logging
+from collections.abc import Callable
 from concurrent.futures import Future, ThreadPoolExecutor
 from time import sleep
-from typing import Callable, Optional, cast
+from typing import cast
 
 from slack_sdk.socket_mode import SocketModeClient
 from slack_sdk.socket_mode.request import SocketModeRequest
@@ -45,7 +46,11 @@ class Phial:
     }
 
     def __init__(
-        self, app_token: str, bot_token: str, config: dict = default_config
+        self,
+        app_token: str,
+        bot_token: str,
+        *,
+        config: dict = default_config,
     ) -> None:
         self.config = dict(self.default_config)
         self.config.update(config)
@@ -55,9 +60,9 @@ class Phial:
             auto_reconnect_enabled=cast(bool, self.config["autoReconnect"]),
         )
         self.commands: list[Command] = []
-        self.middleware_functions: list[Callable[[Message], Optional[Message]]] = []
+        self.middleware_functions: list[Callable[[Message], Message | None]] = []
         self.scheduler = Scheduler()
-        self.fallback_func: Optional[Callable[[Message], PhialResponse]] = None
+        self.fallback_func: Callable[[Message], PhialResponse] | None = None
         self.logger = logging.getLogger(__name__)
         if not self.logger.hasHandlers():  # pragma: nocover
             handler = logging.StreamHandler()
@@ -72,12 +77,13 @@ class Phial:
         self,
         pattern: str,
         func: Callable[..., PhialResponse],
+        *,
+        help_text_override: str | None = None,
         case_sensitive: bool = False,
-        help_text_override: Optional[str] = None,
-        hide_from_help_command: Optional[bool] = False,
+        hide_from_help_command: bool | None = False,
     ) -> None:
         """
-        Registers a command with the bot.
+        Register a command with the bot.
 
         This method can be used as a decorator via :meth:`command`
 
@@ -125,36 +131,33 @@ class Phial:
                 return "world"
 
         """
-        pattern = "{0}{1}".format(
-            self.config["prefix"] if "prefix" in self.config else "", pattern
-        )
+        pattern = f"{self.config.get('prefix', '')}{pattern}"
         # Validate command does not already exist
         for existing_command in self.commands:
             if pattern == existing_command.pattern_string:
-                raise ValueError(
-                    "Command {0} already exists".format(pattern.split("<")[0])
-                )
+                raise ValueError(f"Command {pattern.split('<')[0]} already exists")
 
         # Create and add command
         command = Command(
             pattern,
             func,
-            case_sensitive,
             help_text_override=help_text_override,
+            case_sensitive=case_sensitive,
             hide_from_help_command=hide_from_help_command,
         )
         self.commands.append(command)
-        self.logger.debug("Command {0} added".format(pattern))
+        self.logger.debug(f"Command {pattern} added")
 
     def command(
         self,
         pattern: str,
+        *,
+        help_text_override: str | None = None,
         case_sensitive: bool = False,
-        help_text_override: Optional[str] = None,
-        hide_from_help_command: Optional[bool] = False,
+        hide_from_help_command: bool | None = False,
     ) -> Callable:
         """
-        Registers a command with the bot.
+        Register a command with the bot.
 
         This command is a decorator version of :meth:`add_command`
 
@@ -198,7 +201,7 @@ class Phial:
             self.add_command(
                 pattern,
                 f,
-                case_sensitive,
+                case_sensitive=case_sensitive,
                 help_text_override=help_text_override,
                 hide_from_help_command=hide_from_help_command,
             )
@@ -208,7 +211,7 @@ class Phial:
 
     def alias(self, pattern: str) -> Callable:
         """
-        A decorator that is used to register an alias for a command.
+        Register an alias for a command.
 
         :param pattern: The pattern that a :obj:`Message`'s text must
                         match for the command to be invoked.
@@ -222,9 +225,7 @@ class Phial:
             def hello():
                 return "world"
         """
-        pattern = "{0}{1}".format(
-            self.config["prefix"] if "prefix" in self.config else "", pattern
-        )
+        pattern = f"{self.config.get('prefix', '')}{pattern}"
 
         def decorator(f: Callable) -> Callable:
             if not hasattr(f, "alias_patterns"):
@@ -267,7 +268,7 @@ class Phial:
 
     def fallback_command(self) -> Callable:
         """
-        A decorator to add a fallback command.
+        Add a fallback command.
 
         See :meth:`add_fallback_command` for more information on
         fallback commands
@@ -287,9 +288,9 @@ class Phial:
 
         return decorator
 
-    def add_middleware(self, func: Callable[[Message], Optional[Message]]) -> None:
+    def add_middleware(self, func: Callable[[Message], Message | None]) -> None:
         """
-        Adds a middleware function to the bot.
+        Add a middleware function to the bot.
 
         Middleware functions get passed every message the bot receives from
         slack before the bot process the message itself. Returning :obj:`None`
@@ -317,13 +318,11 @@ class Phial:
 
         """
         self.middleware_functions.append(func)
-        self.logger.debug(
-            "Middleware {0} added".format(getattr(func, "__name__", repr(func)))
-        )
+        self.logger.debug(f"Middleware {getattr(func, '__name__', repr(func))} added")
 
     def middleware(self) -> Callable:
         """
-        A decorator to add a middleware function to the bot.
+        Add a middleware function to the bot.
 
         See :meth:`add_middleware` for more information about middleware
 
@@ -344,7 +343,7 @@ class Phial:
 
     def add_scheduled(self, schedule: Schedule, func: Callable) -> None:
         """
-        Adds a scheduled function to the bot.
+        Add a scheduled function to the bot.
 
         This method can be used as a decorator via :meth:`scheduled`.
 
@@ -372,13 +371,11 @@ class Phial:
         """
         job = ScheduledJob(schedule, func)
         self.scheduler.add_job(job)
-        self.logger.debug(
-            "Schedule {0} added".format(getattr(func, "__name__", repr(func)))
-        )
+        self.logger.debug(f"Schedule {getattr(func, '__name__', repr(func))} added")
 
     def scheduled(self, schedule: Schedule) -> Callable:
         """
-        A decorator that is used to register a scheduled function.
+        Register a scheduled function.
 
         See :meth:`add_scheduled` for more information on scheduled
         jobs.
@@ -404,11 +401,10 @@ class Phial:
 
     def send_message(self, message: Response) -> None:
         """
-        Sends a message to Slack.
+        Send a message to Slack.
 
         :param message: The message to be sent to Slack
         """
-
         if message.ephemeral:
             if message.user is None:
                 raise ValueError("User not provided for ephemeral message")
@@ -431,14 +427,14 @@ class Phial:
 
     def send_reaction(self, response: Response) -> None:
         """
-        Sends a reaction to a Slack Message.
+        Send a reaction to a Slack Message.
 
         :param response: Response containing the reaction to be
                          sent to Slack
         """
         if response.original_ts is None or response.reaction is None:
             raise ValueError(
-                "Original timestamp and reaction must be provided for reaction"
+                "Original timestamp and reaction must be provided for reaction",
             )
         self.slack_client.web_client.reactions_add(
             channel=response.channel,
@@ -477,11 +473,12 @@ class Phial:
             self.send_message(Response(text=response, channel=original_channel))
 
         elif not isinstance(response, Response) and not isinstance(
-            response, Attachment
+            response,
+            Attachment,
         ):
             raise ValueError(
                 "Only Response or Attachment objects can be "
-                "returned from command functions"
+                "returned from command functions",
             )
 
         if isinstance(response, Response):
@@ -489,7 +486,7 @@ class Phial:
                 raise ValueError(
                     "Response objects with an original timestamp "
                     "can only have one of the attributes: "
-                    "Reaction, Text"
+                    "Reaction, Text",
                 )
             if response.original_ts and response.reaction:
                 self.send_reaction(response)
@@ -506,7 +503,9 @@ class Phial:
             self.logger.error(e)
 
     def _handle_message_internal(
-        self, client: SocketModeClient, req: SocketModeRequest
+        self,
+        client: SocketModeClient,
+        req: SocketModeRequest,
     ) -> None:
         # Acknowledge the request so it is not resent
         ack_response = SocketModeResponse(envelope_id=req.envelope_id)
@@ -519,9 +518,7 @@ class Phial:
         # Run middleware functions
         for func in self.middleware_functions:
             if message:
-                self.logger.debug(
-                    "Ran middleware: {0} on {1}".format(func.__name__, message)
-                )
+                self.logger.debug(f"Ran middleware: {func.__name__} on {message}")
                 message = func(message)
 
         # If message has been intercepted or is a bot message return early
@@ -554,13 +551,11 @@ class Phial:
                     self._send_response(str(e), message.channel)
                     return
                 finally:
-                    self.logger.debug(
-                        "Ran command: {0} on {1}".format(command_name, message)
-                    )
+                    self.logger.debug(f"Ran command: {command_name} on {message}")
                     _command_ctx_stack.pop()
 
         # If we are here then no commands have matched
-        self.logger.warning("Command {0} not found".format(message.text))
+        self.logger.warning(f"Command {message.text} not found")
         if self.fallback_func is not None:
             try:
                 _command_ctx_stack.push(message)
@@ -571,7 +566,7 @@ class Phial:
 
     def _start(self) -> None:  # pragma: no cover
         """
-        Starts the bot.
+        Start the bot.
 
         When called will start the bot listening to messages from Slack
         """
@@ -582,7 +577,7 @@ class Phial:
 
         thread_pool_size = int(cast(str, self.config["maxThreads"]))
         thread_pool = ThreadPoolExecutor(thread_pool_size)
-        run_pending_tasks: Optional[Future] = None
+        run_pending_tasks: Future | None = None
 
         while True:
             try:

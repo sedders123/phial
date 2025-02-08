@@ -2,15 +2,17 @@
 
 import logging
 import os
+from collections.abc import Callable
+from functools import wraps
 from multiprocessing import Process
 from time import sleep
-from functools import wraps
-from typing import Any, Callable
+from typing import Any
 
 from phial import Message, Phial, Response, Schedule, command
 
 slackbot = Phial(
-    os.getenv("SLACK_APP_TOKEN", "NONE"), os.getenv("SLACK_BOT_TOKEN", "NONE")
+    os.getenv("SLACK_APP_TOKEN", "NONE"),
+    os.getenv("SLACK_BOT_TOKEN", "NONE"),
 )
 SCHEDULED_CHANNEL = "channel-id"
 

@@ -9,7 +9,7 @@ def test_add_scheduled_command() -> None:
     def test(message: Message) -> None:
         pass
 
-    bot = Phial("app-token", "bot-token", {})
+    bot = Phial("app-token", "bot-token")
     bot.add_scheduled(Schedule().seconds(30), test)
 
     assert len(bot.scheduler.jobs) == 1
@@ -18,7 +18,7 @@ def test_add_scheduled_command() -> None:
 
 def test_add_scheduled_decorator() -> None:
     """Test scheduled decorator works correctly."""
-    bot = Phial("app-token", "bot-token", {})
+    bot = Phial("app-token", "bot-token")
 
     @bot.scheduled(Schedule().seconds(30))
     def test(message: Message) -> None:

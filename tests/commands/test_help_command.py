@@ -10,12 +10,12 @@ def test_returns_help_string_correctly() -> None:
 
     @bot.command("test")
     def test() -> None:
-        """help."""
+        """Help."""
 
     help_text = help_command(bot)
     expected_help_text = (
         "All available commands:\n*!help* - List all"
-        " available commmands\n*!test* - help.\n"
+        " available commands\n*!test* - Help.\n"
     )
 
     assert help_text == expected_help_text
@@ -31,7 +31,7 @@ def test_returns_help_string_correctly_when_no_help_text() -> None:
 
     help_text = help_command(bot)
     expected_help_text = (
-        "All available commands:\n*!help* - List all available commmands\n*!test* - \n"
+        "All available commands:\n*!help* - List all available commands\n*!test* - \n"
     )
 
     assert help_text == expected_help_text
@@ -47,7 +47,7 @@ def test_hide_from_help_command_hides_correctly() -> None:
 
     help_text = help_command(bot)
     expected_help_text = (
-        "All available commands:\n*!help* - List all available commmands\n"
+        "All available commands:\n*!help* - List all available commands\n"
     )
 
     assert help_text == expected_help_text
@@ -60,12 +60,11 @@ def test_help_text_override_overrides_correctly() -> None:
     @bot.command("test", help_text_override="Override")
     def test() -> None:
         """Not this."""
-        pass
 
     help_text = help_command(bot)
     expected_help_text = (
         "All available commands:\n*!help* - List all"
-        " available commmands\n*!test* - Override\n"
+        " available commands\n*!test* - Override\n"
     )
 
     assert help_text == expected_help_text
@@ -76,13 +75,13 @@ def test_returns_help_string_correctly_when_no_base() -> None:
     bot = Phial(
         "app-token",
         "bot-token",
-        {"registerHelpCommand": False, "baseHelpText": "", "prefix": ""},
+        config={"registerHelpCommand": False, "baseHelpText": "", "prefix": ""},
     )
 
     @bot.command("test")
     def test() -> None:
-        """help."""
+        """Help."""
 
     help_text = help_command(bot)
-    expected_help_text = "*test* - help.\n"
+    expected_help_text = "*test* - Help.\n"
     assert help_text == expected_help_text

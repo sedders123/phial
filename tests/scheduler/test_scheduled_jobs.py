@@ -1,6 +1,6 @@
 """Test ScheduledJob class."""
 
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
 
 from freezegun import freeze_time
@@ -18,8 +18,11 @@ def test_job_create_correctly() -> None:
 
     job = ScheduledJob(schedule, job_func)
 
-    expected_time = (datetime.now() + timedelta(days=1)).replace(
-        hour=12, minute=0, second=0, microsecond=0,
+    expected_time = (datetime.now(tz=UTC) + timedelta(days=1)).replace(
+        hour=12,
+        minute=0,
+        second=0,
+        microsecond=0,
     )
 
     assert job.func == job_func
