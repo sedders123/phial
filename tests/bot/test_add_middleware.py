@@ -4,7 +4,7 @@ from phial import Message, Phial
 
 
 def test_add_middleware_command() -> None:
-    """Test add_middleware commmand works correctly."""
+    """Test add_middleware command works correctly."""
 
     def test(message: Message) -> None:
         pass

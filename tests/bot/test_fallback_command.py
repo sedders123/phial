@@ -17,7 +17,7 @@ def test_add_fallback_command() -> None:
 
 
 def test_add_fallback_decorator() -> None:
-    """Tetst fallback_command decorator works."""
+    """Test fallback_command decorator works."""
     bot = Phial("app-token", "bot-token")
 
     @bot.fallback_command()
