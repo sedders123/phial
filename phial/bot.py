@@ -13,7 +13,7 @@ from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.web import WebClient
 
 from phial.commands import help_command
-from phial.errors import ArgumentTypeValidationError
+from phial.errors import ArgumentTypeValidationError, ArgumentValidationError
 from phial.globals import _command_ctx_stack
 from phial.scheduler import Schedule, ScheduledJob, Scheduler
 from phial.utils import parse_slack_event, validate_kwargs
@@ -496,13 +496,13 @@ class Phial:
         if isinstance(response, Attachment):
             self.upload_attachment(response)
 
-    def _handle_message(self, client: SocketModeClient, req: SocketModeRequest) -> None:
+    def _handle_request(self, client: SocketModeClient, req: SocketModeRequest) -> None:
         try:
-            self._handle_message_internal(client, req)
+            self._handle_request_internal(client, req)
         except Exception as e:
             self.logger.error(e)
 
-    def _handle_message_internal(
+    def _handle_request_internal(
         self,
         client: SocketModeClient,
         req: SocketModeRequest,
@@ -547,7 +547,7 @@ class Phial:
                     response = command.func(**kwargs)
                     self._send_response(response, message.channel)
                     return
-                except ArgumentTypeValidationError as e:
+                except (ArgumentValidationError, ArgumentTypeValidationError) as e:
                     self._send_response(str(e), message.channel)
                     return
                 finally:
@@ -570,7 +570,7 @@ class Phial:
 
         When called will start the bot listening to messages from Slack
         """
-        self.slack_client.socket_mode_request_listeners.append(self._handle_message)  # type: ignore
+        self.slack_client.socket_mode_request_listeners.append(self._handle_request)  # type: ignore
         self.slack_client.connect()
 
         self.logger.info("Phial connected and running!")

@@ -110,5 +110,5 @@ mypy-init-return = true
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["E402"]
-"**/{tests,docs}/*" = ["D104", "S101"]
+"**/{tests,docs}/*" = ["D104", "S101", "ANN401", "ANN002", "ANN003", "ARG001", "SLF001"]
 "examples/*" = ["ANN401", "ARG001", "D103", "D401", "INP001"]

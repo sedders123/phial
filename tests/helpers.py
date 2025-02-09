@@ -2,8 +2,6 @@
 
 from typing import Any
 
-import pytest  # noqa
-
 
 def wildpatch(
     target: Any,  # noqa: ANN401
