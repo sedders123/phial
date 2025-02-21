@@ -2,7 +2,8 @@ name: Upload Code Coverage
 
 on: [push]
 
-permissions: {}
+permissions:
+  contents: read
 
 jobs:
   build:
