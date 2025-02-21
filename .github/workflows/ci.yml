@@ -2,6 +2,8 @@ name: CI
 
 on: [push]
 
+permissions: {}
+
 jobs:
   build:
     runs-on: ${{ matrix.os }}
@@ -11,6 +13,8 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
