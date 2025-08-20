@@ -50,6 +50,7 @@ class Phial:
         app_token: str,
         bot_token: str,
         *,
+        app_id: str | None = None,
         config: dict = default_config,
     ) -> None:
         self.config = dict(self.default_config)
@@ -59,7 +60,9 @@ class Phial:
             web_client=WebClient(token=bot_token),
             auto_reconnect_enabled=cast(bool, self.config["autoReconnect"]),
         )
+        self.app_id = app_id
         self.commands: list[Command] = []
+        self.slash_commands: list[Command] = []
         self.middleware_functions: list[Callable[[Message], Message | None]] = []
         self.scheduler = Scheduler()
         self.fallback_func: Callable[[Message], PhialResponse] | None = None
@@ -204,6 +207,48 @@ class Phial:
                 case_sensitive=case_sensitive,
                 help_text_override=help_text_override,
                 hide_from_help_command=hide_from_help_command,
+            )
+            return f
+
+        return decorator
+
+    def add_slash_command(
+        self,
+        pattern: str,
+        func: Callable[..., PhialResponse],
+        *,
+        help_text_override: str | None = None,
+    ) -> None:
+        """Temp."""
+        # Validate command does not already exist
+        for existing_command in self.slash_commands:
+            if pattern == existing_command.pattern_string:
+                raise ValueError(f"Command {pattern.split('<')[0]} already exists")
+
+        # Create and add command
+        command = Command(
+            pattern,
+            func,
+            help_text_override=help_text_override,
+            case_sensitive=False,
+            hide_from_help_command=False,
+        )
+        self.commands.append(command)
+        self.logger.debug(f"Slash Command {pattern} added")
+
+    def slash_command(
+        self,
+        pattern: str,
+        *,
+        help_text_override: str | None = None,
+    ) -> Callable:
+        """Temp."""
+
+        def decorator(f: Callable) -> Callable:
+            self.add_slash_command(
+                pattern,
+                f,
+                help_text_override=help_text_override,
             )
             return f
 
@@ -564,6 +609,14 @@ class Phial:
             finally:
                 _command_ctx_stack.pop()
 
+    def _register_slash_commands(self) -> None:
+        if len(self.slash_commands) == 0:
+            return
+        if self.app_id is None:
+            raise ValueError("App ID must be provided to register slash commands")
+        manifest = self.slack_client.web_client.apps_manifest_export(app_id=self.app_id)
+        print(manifest)
+
     def _start(self) -> None:  # pragma: no cover
         """
         Start the bot.
@@ -574,6 +627,8 @@ class Phial:
         self.slack_client.connect()
 
         self.logger.info("Phial connected and running!")
+
+        self._register_slash_commands()
 
         thread_pool_size = int(cast(str, self.config["maxThreads"]))
         thread_pool = ThreadPoolExecutor(thread_pool_size)
