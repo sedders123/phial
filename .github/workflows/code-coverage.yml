@@ -25,6 +25,6 @@ jobs:
         run: |
           uv run pytest tests -v --cov=phial --cov-report xml
       - name: Upload coverage to CodeCov
-        uses: codecov/codecov-action@fdcc8476540edceab3de004e990f80d881c6cc00
+        uses: codecov/codecov-action@5a1091511ad55cbe89839c7260b706298ca349f7
         with:
           token: ${{secrets.CODECOV_TOKEN}}
