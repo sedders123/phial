@@ -6,7 +6,11 @@ maintainers = [{ name = "James Seden Smith", email = "sedders123@gmail.com" }]
 description = "A Slack bot framework"
 readme = "README.rst"
 requires-python = ">=3.11"
-dependencies = ["slack-sdk>=3.34.0", "werkzeug>=3.1.3"]
+dependencies = [
+    "slack-sdk>=3.34.0",
+    "werkzeug>=3.1.3",
+    "tzdata",
+]
 keywords = ["slack", "bot", "framework", "phial", "slackbot"]
 classifiers = [
     "Development Status :: 3 - Alpha",

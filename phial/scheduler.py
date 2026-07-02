@@ -2,8 +2,9 @@
 
 import logging
 from collections.abc import Callable
-from datetime import UTC, datetime, timedelta
+from datetime import UTC, datetime, timedelta, tzinfo
 from typing import NamedTuple
+from zoneinfo import ZoneInfo
 
 LOGGER = logging.getLogger("phial.bot.scheduler")
 
@@ -24,11 +25,17 @@ class _Time(NamedTuple):
 
         The second of the minute.
 
+    .. py:attribute:: tz
+
+        The timezone the time of day is expressed in. When ``None`` the
+        time is interpreted as UTC.
+
     """
 
     hour: int
     minute: int
     second: int
+    tz: tzinfo | None = None
 
 
 class Schedule:
@@ -84,7 +91,13 @@ class Schedule:
         self._days = value
         return self
 
-    def at(self, hour: int, minute: int, second: int = 0) -> "Schedule":
+    def at(
+        self,
+        hour: int,
+        minute: int,
+        second: int = 0,
+        tz: str | tzinfo | None = None,
+    ) -> "Schedule":
         """
         Specify the time of day the next occurrence will happen.
 
@@ -92,6 +105,21 @@ class Schedule:
         ::
 
             schedule = Schedule().every().day().at(12,00)
+
+        A timezone can be supplied to interpret the time of day in that
+        zone rather than UTC. It may be either an IANA timezone name or a
+        :obj:`~datetime.tzinfo` object.
+        ::
+
+            from zoneinfo import ZoneInfo
+
+            schedule = Schedule().every().day().at(9, 00, tz="Europe/London")
+            schedule = Schedule().every().day().at(
+                9, 00, tz=ZoneInfo("Europe/London")
+            )
+
+        NOTE: When the clocks go back and the time of day occurs twice, the
+        event runs at the first occurrence, once per day.
 
         :param hour: The hour of day the next event should happen,
                      when combined with the minute
@@ -101,6 +129,9 @@ class Schedule:
                        happen, when combined with the hour and
                        minute.
                        Defaults to 0
+        :param tz: The timezone to interpret the time of day in, either an
+                   IANA timezone name (e.g. ``"Europe/London"``) or a
+                   :obj:`~datetime.tzinfo`. Defaults to UTC
         """
         if self._hours or self._minutes:
             raise ValueError("'at' can only be used on day(s)")
@@ -108,7 +139,8 @@ class Schedule:
             raise ValueError("'at' can only be used on day(s)")
         if self._at:
             raise ValueError("'at' can only be set once")
-        self._at = _Time(hour, minute, second)
+        resolved_tz = ZoneInfo(tz) if isinstance(tz, str) else tz
+        self._at = _Time(hour, minute, second, resolved_tz)
         return self
 
     def hour(self) -> "Schedule":
@@ -200,7 +232,8 @@ class Schedule:
         :returns: A :obj:`datetime` of when the event should next happen
         """
         if self._at:
-            next_run = last_run.replace(
+            tz = self._at.tz or UTC
+            next_run = last_run.astimezone(tz).replace(
                 hour=self._at.hour,
                 minute=self._at.minute,
                 second=self._at.second,

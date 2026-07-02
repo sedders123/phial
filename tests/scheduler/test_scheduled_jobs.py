@@ -2,6 +2,7 @@
 
 from datetime import UTC, datetime, timedelta
 from unittest.mock import MagicMock
+from zoneinfo import ZoneInfo
 
 from freezegun import freeze_time
 
@@ -51,3 +52,25 @@ def test_job_reschedules_after_failure() -> None:
 
     job.run()
     assert job.next_run is not None
+
+
+def test_job_runs_once_on_dst_fall_back_day() -> None:
+    """Test a daily zoned job runs once when the local time occurs twice."""
+    test_func = MagicMock()
+    tz = ZoneInfo("Europe/London")
+    schedule = Schedule().every().day().at(1, 00, tz=tz)
+    # Clocks go back on 2018-10-28, so 01:00 London happens twice:
+    # 01:00 BST (00:00 UTC) and 01:00 GMT (01:00 UTC).
+    with freeze_time("2018-10-27 20:00:00") as frozen:
+        job = ScheduledJob(schedule, test_func)
+        for instant in [
+            "2018-10-28 00:00:00",  # first 01:00 BST
+            "2018-10-28 00:30:00",
+            "2018-10-28 01:00:00",  # second 01:00 GMT
+            "2018-10-28 01:30:00",
+        ]:
+            frozen.move_to(instant)
+            if job.should_run():
+                job.run()
+
+    test_func.assert_called_once()
