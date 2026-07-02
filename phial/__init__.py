@@ -5,7 +5,7 @@ from phial.globals import command
 from phial.scheduler import Schedule
 from phial.wrappers import Attachment, Message, PhialResponse, Response
 
-__version__ = "0.12.2"
+__version__ = "0.13.0"
 __all__ = [
     "Attachment",
     "Message",
